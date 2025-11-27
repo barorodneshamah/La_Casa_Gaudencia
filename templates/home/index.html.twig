@@ -1,0 +1,636 @@
+{% block title %}La Casa Gaudencia{% endblock %}
+
+{% block body %}
+
+<style>
+/* --- Sign In Button --- */
+.navbar ul li .signin-btn {
+    background: #c24a16;
+    color: #fff !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.navbar ul li .signin-btn:hover {
+    background: #a93e10;
+    transform: scale(1.05);
+}
+
+/* --- Global Brand Styles --- */
+body { 
+    margin: 0; 
+    font-family: 'Lato', sans-serif; 
+    background-color: #fcfbf7;
+    background-image: radial-gradient(#e0d8cf 1px, transparent 1px); 
+}
+h2, h3 { 
+    font-family: 'Playfair Display', serif; 
+    color: #c24a16; 
+}
+p, li, input, button, textarea { 
+    font-family: 'Roboto', sans-serif; 
+}
+section { 
+    padding: 80px 20px; 
+}
+
+/* NAVBAR */
+.navbar { 
+    position: fixed; 
+    top: 0; 
+    width: 100%; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background-color: #fcfbf7; 
+    padding: 15px 50px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    z-index: 1000; 
+}
+.navbar::before { 
+    content: ""; 
+    position: absolute; 
+    inset: 0;
+    background: url('{{ asset("Images/B1.png") }}') repeat-x;
+    background-size: 160px auto; 
+    opacity: 0.90; 
+    z-index: 0; 
+}
+.navbar .logo, .navbar ul { 
+    position: relative; 
+    z-index: 1; 
+}
+.navbar .logo { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+    font-family: 'Playfair Display', serif; 
+    font-size: 22px; 
+    font-weight: bold; 
+    color: #c24a16; 
+}
+.navbar .logo img { 
+    height: 50px; 
+    width: auto; 
+}
+.navbar ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+.navbar ul li {
+    display: flex;
+    align-items: center;
+}
+.navbar ul li a {
+    display: inline-block;
+    text-decoration: none;
+    color: #c24a16ff; 
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s ease;
+}
+.navbar ul li a:hover {
+    color: #000;
+}
+/* Underline effect */
+.navbar ul li a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background-color: #c24a16; 
+    transition: width 0.3s ease;
+}
+.navbar ul li a:hover::after {
+    width: 100%;
+}
+
+/* HERO */
+.hero { 
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.45)),
+                url('{{ asset("Images/ground.jpeg") }}') center/cover no-repeat;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center; 
+    text-align: center; 
+    color: #fff; 
+    padding: 0 20px;
+}
+.hero h1 { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 52px; 
+    margin-bottom: 20px; 
+}
+.hero p.insight { 
+    font-size: 20px; 
+    max-width: 800px; 
+    margin: 0 auto 25px; 
+    line-height: 1.6; 
+}
+.hero .btn { 
+    margin-top: 10px; 
+    background: #c24a16; 
+    color: #fff; 
+    padding: 14px 30px;
+    border-radius: 10px; 
+    text-decoration: none; 
+    font-size: 18px; 
+    font-weight: 600;
+    transition: all 0.3s ease-in-out; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+}
+.hero .btn:hover { 
+    background: #a93e10; 
+    transform: scale(1.07);
+}
+
+/* ABOUT */
+.about { 
+    background: #fff8f5; 
+    text-align: center; 
+}
+.about h2 { 
+    font-size: 36px; 
+    margin-bottom: 40px; 
+}
+.about-cards { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 30px; 
+    text-align: center;
+}
+.about-card { 
+    flex: 1 1 280px; 
+    max-width: 320px; 
+    background: #fff; 
+    padding: 25px;
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+.about-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+}
+.about-card h3 { 
+    margin-bottom: 10px; 
+    font-size: 20px; 
+}
+
+/* EXPERIENCES */
+.experiences { 
+    background: #fcfbf7; 
+    text-align: center; 
+}
+.experiences h2 { 
+    font-size: 34px; 
+    margin-bottom: 40px; 
+}
+.review-feed { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 25px; 
+}
+.review-card { 
+    background: #fff; 
+    border-radius: 14px; 
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    text-align: left; 
+    transition: 0.3s; 
+}
+.review-card:hover { 
+    transform: translateY(-5px); 
+}
+.review-image { 
+    width: 100%; 
+    height: 200px; 
+    object-fit: cover; 
+}
+.review-content { 
+    padding: 20px; 
+    flex-grow: 1; 
+}
+.review-text { 
+    font-size: 16px; 
+    color: #444; 
+    margin-bottom: 12px; 
+    line-height: 1.6; 
+    font-style: italic; 
+}
+.review-author { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-top: auto; 
+}
+.review-author img { 
+    width: 42px; 
+    height: 42px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid #c24a16; 
+}
+.review-author span { 
+    font-weight: 600; 
+    font-size: 15px; 
+    color: #333; 
+}
+
+/* SERVICES */
+.services { 
+    background: #fff; 
+    text-align: center; 
+}
+.services h2 { 
+    font-size: 34px; 
+    margin-bottom: 40px; 
+}
+.service-list { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 25px; 
+    text-align: center; 
+}
+.service-item { 
+    flex: 1 1 260px; 
+    max-width: 300px; 
+    background: #fcfbf7; 
+    padding: 25px; 
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+    transition: 0.3s; 
+}
+.service-item:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12); 
+}
+.service-item h3 { 
+    margin-bottom: 8px; 
+    font-size: 20px; 
+    color: #333; 
+}
+
+/* CTA */
+.cta { 
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.55)),
+                url('{{ asset("Images/ground.jpeg") }}') center/cover no-repeat;
+    padding: 100px 20px; 
+    text-align: center; 
+    color: #fff; 
+}
+.cta h2 { 
+    font-size: 38px; 
+    margin-bottom: 20px; 
+    color: #fff; 
+}
+.cta a { 
+    background: #c24a16; 
+    padding: 16px 32px; 
+    color: #fff;
+    border-radius: 10px; 
+    text-decoration: none; 
+    font-size: 18px; 
+    font-weight: 600;
+    transition: all 0.3s ease; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+}
+.cta a:hover { 
+    background: #a93e10; 
+    transform: scale(1.07); 
+}
+
+/* FOOTER */
+footer { 
+    position: relative; 
+    background: #c24a16; 
+    color: #fff; 
+    padding: 50px 20px; 
+    text-align: center; 
+}
+footer::before { 
+    content: ""; 
+    position: absolute; 
+    inset: 0;
+    background: url('{{ asset("Images/B1.png") }}') repeat;
+    background-size: 100px auto; 
+    opacity: 0.25; 
+    z-index: 0; 
+}
+footer p, footer .social-icons { 
+    position: relative; 
+    z-index: 1; 
+    margin: 8px 0; 
+}
+footer .social-icons a { 
+    margin: 0 10px; 
+    color: #fff; 
+    font-size: 22px; 
+    transition: color 0.3s, transform 0.3s; 
+}
+footer .social-icons a:hover { 
+    color: #ffd9c7; 
+    transform: scale(1.2); 
+}
+
+/* MODALS */
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 2000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0,0,0,0.6); 
+    justify-content: center; 
+    align-items: center; 
+    opacity: 0;
+    transition: opacity 0.3s ease; 
+}
+.modal.show { 
+    display: flex; 
+    opacity: 1; 
+}
+.modal-content { 
+    background: #fff; 
+    padding: 40px; 
+    border-radius: 16px;
+    width: 90%; 
+    max-width: 420px; 
+    text-align: center; 
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25); 
+    animation: slideDown 0.35s ease; 
+}
+@keyframes slideDown { 
+    from { 
+        transform: translateY(-20px); 
+        opacity: 0; 
+    } 
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    } 
+}
+.modal-content h2 { 
+    margin-bottom: 25px; 
+    font-family: 'Playfair Display', serif; 
+    color: #c24a16; 
+    font-size: 26px; 
+}
+.modal-content input { 
+    width: 100%; 
+    margin-bottom: 18px; 
+    padding: 14px; 
+    border-radius: 10px;
+    border: 1px solid #ddd; 
+    font-size: 15px; 
+    transition: all 0.2s ease; 
+}
+.modal-content input:focus { 
+    border-color: #c24a16; 
+    box-shadow: 0 0 6px rgba(194,74,22,0.2); 
+    outline: none; 
+}
+.modal-content button { 
+    width: 100%; 
+    padding: 14px; 
+    background: #c24a16; 
+    color: #fff; 
+    border: none;
+    border-radius: 10px; 
+    font-size: 16px; 
+    font-weight: 600; 
+    transition: all 0.3s; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+}
+.modal-content button:hover { 
+    background: #a93e10; 
+    transform: scale(1.03); 
+}
+.modal-close { 
+    position: absolute; 
+    top: 12px; 
+    right: 18px; 
+    font-size: 22px; 
+    cursor: pointer; 
+    color: #666; 
+    transition: color 0.3s; 
+}
+.modal-close:hover { 
+    color: #000; 
+}
+.modal-content .switch { 
+    margin-top: 15px; 
+    font-size: 14px; 
+}
+.modal-content .switch a { 
+    color: #c24a16; 
+    font-weight: 600; 
+    cursor: pointer; 
+}
+</style>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="logo">
+    <img src="{{ asset('Images/WEB.png') }}" alt="Logo"> 
+    La Casa Gaudencia
+  </div>
+  <ul>
+    <li><a href="#Home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#experiences">Experiences</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#" class="signin-btn open-signin">Sign-in</a></li>
+  </ul>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="Home">
+  <h1>“A House of Joy, Warmth, and Memories”</h1>
+  <p class="insight">A world where every journey feels like home, where travelers not only discover places but also collect unforgettable moments of comfort, connection, and culture.</p>
+  <a href="#" class="btn open-signin">Start Your Experience</a>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <h2>About Us</h2>
+  <div class="about-cards">
+    <div class="about-card">
+      <h3>Mission</h3>
+      <p>To provide travelers with boutique hospitality, personalized travel planning, and cultural experiences—creating joy, warmth, and lasting memories.</p>
+    </div>
+    <div class="about-card">
+      <h3>Vision</h3>
+      <p>A world where every journey feels like home, with unforgettable moments of comfort, connection, and culture.</p>
+    </div>
+    <div class="about-card">
+      <h3>Core Values</h3>
+      <p>Warmth & Hospitality<br>Authentic Cultural Experiences<br>Comfort & Elegance<br>Personalized Journeys<br>Lasting Memories</p>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCES -->
+<section class="experiences" id="experiences">
+  <h2>Guest Reviews</h2>
+  <div class="review-feed">
+    <div class="review-card">
+      <img src="{{ asset('Images/review1.jpg') }}" class="review-image">
+      <div class="review-content">
+        <p class="review-text">“Staying here felt like being welcomed into a family.”</p>
+        <div class="review-author">
+          <img src="{{ asset('Images/user1.jpg') }}">
+          <span>Maria, Spain</span>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <img src="{{ asset('Images/review2.jpg') }}" class="review-image">
+      <div class="review-content">
+        <p class="review-text">“The cultural tour was incredible! Dumaguete’s heritage felt so alive.”</p>
+        <div class="review-author">
+          <img src="{{ asset('Images/user2.jpg') }}">
+          <span>Kenji, Japan</span>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <img src="{{ asset('Images/review3.jpg') }}" class="review-image">
+      <div class="review-content">
+        <p class="review-text">“I chose Relaxation and everything—from meals to activities—was perfectly tailored.”</p>
+        <div class="review-author">
+          <img src="{{ asset('Images/user3.jpg') }}">
+          <span>Aiden, Canada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <h2>Our Services</h2>
+  <div class="service-list">
+    <div class="service-item">
+      <h3>Boutique Hotel & Hostel</h3>
+      <p>Stylish, comfortable rooms for every traveler.</p>
+    </div>
+    <div class="service-item">
+      <h3>Cultural & Adventure Tours</h3>
+      <p>Heritage walks, eat cultural food, and outdoor thrills.</p>
+    </div>
+    <div class="service-item">
+      <h3>Personalized Travel Planning</h3>
+      <p>Customized itineraries for a seamless experience.</p>
+    </div>
+    <div class="service-item">
+      <h3>Share Wall</h3>
+      <p>Digital memory journal where guests share their travel photo and experiences.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Ready for Your Next Journey?</h2>
+  <a href="#" class="open-signin">Book Now</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><i class="fas fa-map-marker-alt"></i>📍 Main Office: Here and There Building, Dumaguete City, Philippines</p>
+  <p><i class="fas fa-envelope"></i>✉️ lacasagaudencia@gmail.com | <i class="fas fa-phone"></i>📞 +63 912 578 6789</p>
+  <p><i class="fas fa-globe"></i>🌐 www.lacasagaudencia.ph</p>
+  <div class="social-icons">
+    <a href="#"><i class="fab fa-facebook"></i></a>
+    <a href="#"><i class="fab fa-instagram"></i></a>
+    <a href="#"><i class="fab fa-tiktok"></i></a>
+  </div>
+  <p>© 2025 La Casa Gaudencia - All rights reserved</p>
+</footer>
+
+<!-- MODALS -->
+<div id="signinModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h2>Sign In</h2>
+    <form>
+      <input type="text" placeholder="Username or Email" required>
+      <input type="password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+    </form>
+    <p class="switch">Don’t have an account? <a class="open-signup">Sign up</a></p>
+  </div>
+</div>
+
+<div id="signupModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h2>Sign Up</h2>
+    <form>
+      <input type="text" placeholder="Full Name" required>
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
+      <button type="submit">Sign Up</button>
+    </form>
+    <p class="switch">Already have an account? <a class="open-signin">Sign in</a></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const signinModal = document.getElementById("signinModal");
+  const signupModal = document.getElementById("signupModal");
+  const openSignin = document.querySelectorAll(".open-signin");
+  const openSignup = document.querySelectorAll(".open-signup");
+  const closeButtons = document.querySelectorAll(".modal-close");
+
+  // Open Sign In
+  openSignin.forEach(btn => btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    signupModal.classList.remove("show");
+    signinModal.classList.add("show");
+  }));
+
+  // Open Sign Up
+  openSignup.forEach(btn => btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    signinModal.classList.remove("show");
+    signupModal.classList.add("show");
+  }));
+
+  // Close Modals
+  closeButtons.forEach(btn => btn.addEventListener("click", () => {
+    signinModal.classList.remove("show");
+    signupModal.classList.remove("show");
+  }));
+
+  // Close on outside click
+  window.addEventListener("click", (e) => {
+    if (e.target === signinModal || e.target === signupModal) {
+      signinModal.classList.remove("show");
+      signupModal.classList.remove("show");
+    }
+  });
+});
+</script>
+
+{% endblock %}
