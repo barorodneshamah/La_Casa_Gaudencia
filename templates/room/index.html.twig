@@ -1,0 +1,1135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Room Management{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="/datatables/datatables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-cream: #fcfbf7;
+    --brand-black: #000000;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== GLOBAL ===== */
+body {
+    margin: 0;
+    background-color: #f7f5edff;
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+}
+
+/* ===== ACCENT BAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    z-index: 30;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+    transition: all .3s ease;
+}
+
+/* ===== BRAND ===== */
+.brand {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.brand img {
+    width: 75px;
+    height: 75px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+}
+
+.brand h1 {
+    font-family: 'Playfair Display', serif;
+    color: #c24a16;
+    font-size: 22px;
+    letter-spacing: .5px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.brand small {
+    color: #777;
+    font-size: 12px;
+    letter-spacing: .75px;
+    font-weight: 500;
+}
+
+/* ===== SEPARATOR ===== */
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 20px 0 25px 0;
+}
+
+/* ===== MENU ===== */
+.sidebar ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+.sidebar ul li svg {
+    width: 20px;
+    height: 20px;
+    fill: #888;
+    transition: .25s;
+}
+
+/* ===== Hover & Active Menu ===== */
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+}
+
+.sidebar ul li a:hover svg,
+.sidebar ul li.active a svg {
+    fill: white !important;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 268px;
+    background: #c24a16;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.topbar-left {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: .7px;
+}
+
+.datetime-display {
+    text-align: right;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+}
+
+.datetime-display .time {
+    font-size: 17px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.datetime-display .date {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 2px;
+}
+
+/* ===== MENU ===== */
+.sidebar ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+.sidebar ul li svg {
+    width: 20px;
+    height: 20px;
+    fill: #888;
+    transition: .25s;
+}
+
+/* ===== Hover & Active Menu ===== */
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+}
+
+.sidebar ul li a:hover svg,
+.sidebar ul li.active a svg {
+    fill: white !important;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 268px;
+    background: #c24a16;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.topbar-left {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: .7px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 268px;
+    padding: 25px 35px;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+
+.page-header .section-title {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #c24a16;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header .section-title i {
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+/* ===== HEADER BUTTONS ===== */
+.header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-back {
+    padding: 10px 20px;
+    border: 2px solid #c24a16;
+    color: #c24a16;
+    background: white;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-back:hover {
+    background: #c24a16;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+.btn-add {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+}
+
+.btn-add:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+    color: white;
+}
+
+/* ===== TABLE CARD CONTAINER ===== */
+.table-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ===== TABLE HEADER INFO ===== */
+.table-header-info {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    padding: 20px 25px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-header-info .info-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.table-header-info .info-icon {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+.table-header-info .info-text h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.table-header-info .info-text p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #888;
+}
+
+.table-header-info .info-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stat-item .stat-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: #c24a16;
+}
+
+.stat-item .stat-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== DATATABLE WRAPPER ===== */
+.datatable-wrapper {
+    padding: 20px 25px;
+}
+
+/* ===== DATATABLE CUSTOM STYLES ===== */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 20px;
+}
+
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    width: 220px;
+    padding-left: 15px;
+}
+
+.dataTables_wrapper .dataTables_length select:focus,
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #c24a16;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(194, 74, 22, 0.1);
+}
+
+/* ===== TABLE STYLES ===== */
+table.dataTable {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+table.dataTable thead th {
+    background: linear-gradient(135deg, #2f2f2f 0%, #444 100%);
+    color: white;
+    padding: 16px 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    border: none;
+    position: relative;
+}
+
+table.dataTable thead th:first-child {
+    border-radius: 10px 0 0 0;
+}
+
+table.dataTable thead th:last-child {
+    border-radius: 0 10px 0 0;
+}
+
+table.dataTable thead th:after,
+table.dataTable thead th:before {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+table.dataTable tbody tr {
+    transition: all 0.3s ease;
+}
+
+table.dataTable tbody tr:hover {
+    background: linear-gradient(135deg, #fff5f0 0%, #fff8f5 100%) !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.1);
+}
+
+table.dataTable tbody td {
+    padding: 16px 18px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+    color: #444;
+}
+
+table.dataTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== ROOM NUMBER COLUMN ===== */
+.room-number {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.room-number .room-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 3px 10px rgba(194, 74, 22, 0.3);
+}
+
+.room-number .room-info .room-num {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+}
+
+.room-number .room-info .room-floor {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* ===== ROOM TYPE BADGE ===== */
+.room-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.room-type.standard {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.room-type.deluxe {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.room-type.suite {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.room-type.presidential {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+    color: #5d4e00;
+}
+
+/* ===== PRICE COLUMN ===== */
+.price-cell {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2e7d32;
+}
+
+.price-cell .per-night {
+    font-size: 11px;
+    color: #888;
+    font-weight: 400;
+    display: block;
+}
+
+/* ===== CAPACITY COLUMN ===== */
+.capacity-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.capacity-cell i {
+    color: #c24a16;
+    font-size: 16px;
+}
+
+.capacity-cell span {
+    font-weight: 500;
+    color: #555;
+}
+
+/* ===== FEATURES COLUMN ===== */
+.features-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: 200px;
+}
+
+.feature-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #f5f5f5;
+    border-radius: 15px;
+    font-size: 11px;
+    color: #666;
+    border: 1px solid #e8e8e8;
+    transition: all 0.2s ease;
+}
+
+.feature-tag:hover {
+    background: #c24a16;
+    color: white;
+    border-color: #c24a16;
+}
+
+.feature-tag i {
+    font-size: 10px;
+}
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.available {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.status-badge.occupied {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.status-badge.maintenance {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+    border: 1px solid #ffcc80;
+}
+
+.status-badge.reserved {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+    border: 1px solid #90caf9;
+}
+
+.status-badge i {
+    font-size: 10px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-action.btn-view {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+}
+
+.btn-action.btn-view:hover {
+    background: #1565c0;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4);
+}
+
+.btn-action.btn-edit {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+}
+
+.btn-action.btn-edit:hover {
+    background: #ef6c00;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(239, 108, 0, 0.4);
+}
+
+.btn-action.btn-delete {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+}
+
+.btn-action.btn-delete:hover {
+    background: #c62828;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.4);
+}
+
+/* ===== PAGINATION STYLES ===== */
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 8px 14px;
+    margin: 0 3px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0 !important;
+    background: white !important;
+    color: #555 !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #c24a16 !important;
+    color: white !important;
+    border-color: #c24a16 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%) !important;
+    color: white !important;
+    border-color: #c24a16 !important;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.4);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== INFO TEXT ===== */
+.dataTables_wrapper .dataTables_info {
+    color: #888;
+    font-size: 13px;
+    padding-top: 15px;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state i {
+    font-size: 60px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    color: #888;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* ===== TOOLTIP ===== */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+    margin-bottom: 8px;
+}
+
+[data-tooltip]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #333;
+    z-index: 100;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>Admin Panel</small>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <ul>
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                User Management
+            </a>
+        </li>
+
+        <li class="active">
+            <a href="{{ path('app_admin_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">Admin Services</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2 class="section-title">
+            <i class="fas fa-door-open"></i>
+            Room Management
+        </h2>
+
+        <div class="header-buttons">
+            <a href="{{ path('app_admin_services') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back to Services
+            </a>
+            <a href="{{ path('app_room_new') }}" class="btn-add">
+                <i class="fas fa-plus"></i>
+                Add New Room
+            </a>
+        </div>
+    </div>
+
+    <!-- TABLE CONTAINER -->
+    <div class="table-container">
+        
+        <!-- TABLE HEADER INFO -->
+        <div class="table-header-info">
+            <div class="info-left">
+                <div class="info-icon">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div class="info-text">
+                    <h3>All Rooms</h3>
+                    <p>Manage and organize your property rooms</p>
+                </div>
+            </div>
+            <div class="info-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ rooms|length }}</div>
+                    <div class="stat-label">Total Rooms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ rooms|filter(r => r.status == 'Available')|length }}</div>
+                    <div class="stat-label">Available</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ rooms|filter(r => r.status == 'Occupied')|length }}</div>
+                    <div class="stat-label">Occupied</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATATABLE WRAPPER -->
+        <div class="datatable-wrapper">
+            {% if rooms|length > 0 %}
+            <table id="roomTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Capacity</th>
+                        <th>Features</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for room in rooms %}
+                    <tr>
+                        <!-- ROOM NUMBER -->
+                        <td>
+                            <div class="room-number">
+                                <div class="room-icon">
+                                    {{ room.roomNumber }}
+                                </div>
+                                <div class="room-info">
+                                    <div class="room-num">Room {{ room.roomNumber }}</div>
+                                    <div class="room-floor">Floor {{ (room.roomNumber / 100)|round(0, 'floor') }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- ROOM TYPE -->
+                        <td>
+                            {% set typeClass = 'standard' %}
+                            {% if room.type|lower == 'deluxe' %}
+                                {% set typeClass = 'deluxe' %}
+                            {% elseif room.type|lower == 'suite' %}
+                                {% set typeClass = 'suite' %}
+                            {% elseif room.type|lower == 'presidential' %}
+                                {% set typeClass = 'presidential' %}
+                            {% endif %}
+                            <span class="room-type {{ typeClass }}">
+                                <i class="fas fa-star"></i>
+                                {{ room.type }}
+                            </span>
+                        </td>
+
+                        <!-- PRICE -->
+                        <td>
+                            <div class="price-cell">
+                                ₱{{ room.pricePerNight|number_format(2) }}
+                                <span class="per-night">per night</span>
+                            </div>
+                        </td>
+
+                        <!-- CAPACITY -->
+                        <td>
+                            <div class="capacity-cell">
+                                <i class="fas fa-user-friends"></i>
+                                <span>{{ room.capacity }} Guest{{ room.capacity > 1 ? 's' : '' }}</span>
+                            </div>
+                        </td>
+
+                        <!-- FEATURES -->
+                        <td>
+                            <div class="features-cell">
+                                {% set features = room.features|split(',') %}
+                                {% for feature in features|slice(0, 3) %}
+                                    <span class="feature-tag">
+                                        <i class="fas fa-check"></i>
+                                        {{ feature|trim }}
+                                    </span>
+                                {% endfor %}
+                                {% if features|length > 3 %}
+                                    <span class="feature-tag" data-tooltip="{{ features|slice(3)|join(', ') }}">
+                                        +{{ features|length - 3 }} more
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            {% set statusClass = 'available' %}
+                            {% set statusIcon = 'check-circle' %}
+                            {% if room.status|lower == 'occupied' %}
+                                {% set statusClass = 'occupied' %}
+                                {% set statusIcon = 'times-circle' %}
+                            {% elseif room.status|lower == 'maintenance' %}
+                                {% set statusClass = 'maintenance' %}
+                                {% set statusIcon = 'tools' %}
+                            {% elseif room.status|lower == 'reserved' %}
+                                {% set statusClass = 'reserved' %}
+                                {% set statusIcon = 'clock' %}
+                            {% endif %}
+                            <span class="status-badge {{ statusClass }}">
+                                <i class="fas fa-{{ statusIcon }}"></i>
+                                {{ room.status }}
+                            </span>
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ path('app_room_show', {'id': room.id}) }}" 
+                                   class="btn-action btn-view" 
+                                   data-tooltip="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <a href="{{ path('app_room_edit', {'id': room.id}) }}" 
+                                   class="btn-action btn-edit"
+                                   data-tooltip="Edit Room">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form method="post" 
+                                      action="{{ path('app_room_delete', {'id': room.id}) }}" 
+                                      style="display:inline;" 
+                                      onsubmit="return confirm('Are you sure you want to delete Room {{ room.roomNumber }}?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ room.id) }}">
+                                    <button type="submit" 
+                                            class="btn-action btn-delete"
+                                            data-tooltip="Delete Room">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- EMPTY STATE -->
+            <div class="empty-state">
+                <i class="fas fa-bed"></i>
+                <h4>No Rooms Found</h4>
+                <p>Start by adding your first room to the system.</p>
+                <a href="{{ path('app_room_new') }}" class="btn-add" style="margin-top: 20px;">
+                    <i class="fas fa-plus"></i>
+                    Add First Room
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/jquery/jquery-3.7.1.min.js"></script>
+<script src="/datatables/datatables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#roomTable').DataTable({
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all"
+        },
+        {
+            "orderable": false,
+            "targets": [6] // Disable sorting on Actions column
+        }],
+        order: [[0, 'asc']], // Sort by room number by default
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        language: {
+            search: "<i class='fas fa-search'></i>",
+            searchPlaceholder: "Search rooms...",
+            lengthMenu: "Show _MENU_ rooms",
+            info: "Showing _START_ to _END_ of _TOTAL_ rooms",
+            infoEmpty: "No rooms available",
+            infoFiltered: "(filtered from _MAX_ total rooms)",
+            paginate: {
+                first: '<i class="fas fa-angle-double-left"></i>',
+                last: '<i class="fas fa-angle-double-right"></i>',
+                next: '<i class="fas fa-angle-right"></i>',
+                previous: '<i class="fas fa-angle-left"></i>'
+            }
+        },
+        dom: '<"top"lf>rt<"bottom"ip><"clear">',
+        drawCallback: function() {
+            // Add animation to rows
+            $(this.api().table().body()).find('tr').each(function(index) {
+                $(this).css({
+                    'opacity': '0',
+                    'transform': 'translateY(20px)'
+                }).delay(50 * index).animate({
+                    'opacity': '1'
+                }, 300).css('transform', 'translateY(0)');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

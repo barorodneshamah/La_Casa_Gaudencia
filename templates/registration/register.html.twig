@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+	<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--color-background);">
+		<div style="background-color: white; padding: 3rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 500px; width: 100%;">
+			<h1 style="color: var(--color-primary); font-family: var(--font-family-display); font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2rem;">Create Account</h1>
+
+			{% if form_errors(registrationForm) %}
+				<div style="background-color: #fee; border: 1px solid #fcc; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #c33;">
+					{{ form_errors(registrationForm) }}
+				</div>
+			{% endif %}
+
+			{{ form_start(registrationForm, {'attr': {'class': 'fs-form', 'style': 'width: 100%; padding: 0;'}}) }}
+
+			<div class="fs-field">
+				{{ form_label(registrationForm.username, 'Username', {'label_attr': {'class': 'fs-label'}}) }}
+				{{ form_widget(registrationForm.username, {'attr': {'class': 'fs-input', 'placeholder': 'Enter your username'}}) }}
+				{{ form_errors(registrationForm.username) }}
+			</div>
+
+			<div class="fs-field">
+				{{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'fs-label'}}) }}
+				{{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'fs-input', 'placeholder': 'Enter your password'}}) }}
+				{{ form_errors(registrationForm.plainPassword) }}
+			</div>
+
+			<div class="fs-checkbox-field" style="margin-top: 1rem;">
+				<div class="fs-checkbox-wrapper">
+					{{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'fs-checkbox'}}) }}
+				</div>
+				<div style="flex: 1;">
+					{{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'fs-label'}}) }}
+					{{ form_errors(registrationForm.agreeTerms) }}
+				</div>
+			</div>
+
+			<div class="fs-button-group" style="margin-top: 2rem;">
+				<button type="submit" class="fs-button" style="width: 100%;">Register</button>
+			</div>
+
+			{{ form_end(registrationForm) }}
+
+			<p style="text-align: center; margin-top: 1.5rem; color: var(--color-text-muted);">
+				Already have an account?
+				<a href="/login" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">Sign in</a>
+			</p>
+		</div>
+	</div>
+{% endblock %}

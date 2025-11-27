@@ -1,0 +1,288 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Services{% endblock %}
+
+{% block body %}
+<style>
+   /* ===== GLOBAL ===== */
+body {
+    margin: 0;
+    background-color: #f7f5edff;
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+}
+
+/* ===== ACCENT BAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    z-index: 30;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+    transition: all .3s ease;
+}
+
+/* ===== BRAND ===== */
+.brand {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.brand img {
+    width: 75px;
+    height: 75px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+}
+
+.brand h1 {
+    font-family: 'Playfair Display', serif;
+    color: #c24a16;
+    font-size: 22px;
+    letter-spacing: .5px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.brand small {
+    color: #777;
+    font-size: 12px;
+    letter-spacing: .75px;
+    font-weight: 500;
+}
+
+/* ===== SEPARATOR ===== */
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 20px 0 25px 0;
+}
+
+/* ===== MENU ===== */
+.sidebar ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+.sidebar ul li svg {
+    width: 20px;
+    height: 20px;
+    fill: #888;
+    transition: .25s;
+}
+
+/* ===== Hover & Active Menu ===== */
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+}
+
+.sidebar ul li a:hover svg,
+.sidebar ul li.active a svg {
+    fill: white !important;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 260px;
+    background: #c24a16;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.topbar-left {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: .7px;
+} 
+   
+    /* MAIN CONTENT */
+     .main-content {
+    margin-left:290px;  
+    padding:10px 15px;
+}
+
+    .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 25px;
+    color: #c24a16;
+    margin-bottom: 18px;
+    font-weight: 400; 
+    letter-spacing: 0.5px;
+}
+
+    /* Single Card Grid */
+    .service-card-grid {
+        display:grid; grid-template-columns:repeat(3, 1fr);
+        gap:30px; margin-top:20px;
+    }
+
+    .service-card {
+        background:white; padding:30px; border-radius:14px;
+        box-shadow:0 8px 22px rgba(0,0,0,0.08);
+        border-left:6px solid #c24a16;
+        transition:.3s ease;
+    }
+
+    .service-card:hover {
+        transform:translateY(-5px);
+        box-shadow:0 12px 26px rgba(0,0,0,0.12);
+    }
+
+    .service-title {
+        font-size:20px; font-weight:700; color:#333;
+        margin-bottom:10px;
+    }
+
+    .service-btn {
+        margin-top:12px; display:inline-block; background:#c24a16;
+        color:white; padding:8px 18px; border-radius:8px;
+        text-decoration:none; font-size:14px;
+        transition:.25s;
+    }
+
+    .service-btn:hover { background:#9e3b12; }
+</style>
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>Admin Panel</small>
+    </div>
+
+    <!-- NEW BAR LINE HERE -->
+    <div class="sidebar-separator"></div>
+
+<ul>
+
+    <!-- DASHBOARD -->
+    <li>
+        <a href="{{ path('app_admin_dashboard') }}"
+           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+            Dashboard
+        </a>
+    </li>
+
+    <!-- USER MANAGEMENT -->
+    <li>
+        <a href="#"
+           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
+            <svg viewBox="0 0 24 24">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 
+                1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 
+                2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 
+                2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 
+                0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3
+                c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            User Management
+        </a>
+    </li>
+
+    <!-- SERVICES -->
+    <li class="active">
+        <a href="{{ path('app_admin_services') }}"
+           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 
+                4h10v2H4v-2z"/>
+            </svg>
+            Services
+        </a>
+    </li>
+
+    <!-- RESERVATIONS -->
+    <li>
+        <a href="#"
+           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 
+                2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 
+                2 0 00-2-2zm0 14H4V10h16v10z"/>
+            </svg>
+            Reservations
+        </a>
+    </li>
+
+</ul>
+
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">Admin Services</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <h2 class="section-title">Available Services</h2>
+
+    <div class="service-card-grid">
+        <!-- ROOM SERVICE CARD -->
+        <div class="service-card">
+            <div class="service-title">Room Services</div>
+            <p>Manage hotel rooms, pricing, availability, features and more.</p>
+            <a href="{{ path('app_room_index') }}" class="service-btn">Manage Rooms</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
