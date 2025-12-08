@@ -32,14 +32,14 @@ class UserFixtures extends Fixture
         $staff->setPassword($hashedPassword);
         $manager->persist($staff);
         
-
-        $user = new User();
-        $user->setUsername('babor');
-        $user->setRoles(['ROLE_USER']);
-        $hashedPassword = $this->passwordHasher->hashPassword($user, 'user123');
-        $user->setPassword($hashedPassword);
-        $manager->persist($user);
         $manager->flush();
+      //  $user = new User();
+       // $user->setUsername('user');
+        //$user->setRoles(['ROLE_USER']);
+       // $hashedPassword = $this->passwordHasher->hashPassword($user, 'user123');
+       // $user->setPassword($hashedPassword);
+      //  $manager->persist($user);
+       // $manager->flush();
     }
 
 }
