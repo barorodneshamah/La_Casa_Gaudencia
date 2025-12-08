@@ -11,11 +11,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
-use Symfony\Component\Validator\Constraints\Range;
 
 class RoomType extends AbstractType
 {
@@ -52,12 +51,9 @@ class RoomType extends AbstractType
                 'scale' => 2,
                 'html5' => true,
                 'attr' => [
-                    'placeholder' => '0.00',
-                    'min' => 0,
                     'step' => '0.01',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Please enter a price']),
                     new Positive(['message' => 'Price must be a positive number']),
                 ],
             ])
@@ -84,7 +80,6 @@ class RoomType extends AbstractType
                 'label' => 'Room Features',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'WiFi, Air Conditioning, Mini Bar, Ocean View...',
                     'rows' => 3,
                 ],
             ])
@@ -92,7 +87,6 @@ class RoomType extends AbstractType
                 'label' => 'Room Description',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Describe the room...',
                     'rows' => 4,
                 ],
             ])
@@ -100,9 +94,8 @@ class RoomType extends AbstractType
                 'label' => 'Status',
                 'choices' => [
                     'Available' => 'Available',
-                    'Occupied' => 'Occupied',
-                    'Maintenance' => 'Maintenance',
                     'Reserved' => 'Reserved',
+                    'Occupied' => 'Occupied',
                 ],
                 'placeholder' => 'Select status',
                 'constraints' => [
@@ -110,19 +103,15 @@ class RoomType extends AbstractType
                 ],
             ])
             ->add('mainImageFile', FileType::class, [
-                'label' => 'Main Room Image',
+                'label' => 'Main Image',
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '5M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/webp',
-                        ],
-                        'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG, or WebP)',
-                    ])
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
+                        'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG or WebP)',
+                    ]),
                 ],
             ])
             ->add('galleryImageFiles', FileType::class, [
@@ -132,16 +121,14 @@ class RoomType extends AbstractType
                 'multiple' => true,
                 'constraints' => [
                     new All([
-                        new File([
-                            'maxSize' => '5M',
-                            'mimeTypes' => [
-                                'image/jpeg',
-                                'image/png',
-                                'image/webp',
-                            ],
-                            'mimeTypesMessage' => 'Please upload valid images (JPEG, PNG, or WebP)',
-                        ])
-                    ])
+                        'constraints' => [
+                            new File([
+                                'maxSize' => '5M',
+                                'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
+                                'mimeTypesMessage' => 'Each file must be a valid image (JPEG, PNG or WebP)',
+                            ]),
+                        ],
+                    ]),
                 ],
             ])
         ;

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Add New Room | La Casa Gaudencia{% endblock %}
+{% block title %}Edit Tour | La Casa Gaudencia{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -198,6 +198,7 @@ body {
     align-items: center;
     margin-bottom: 28px;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .page-header .section-title {
@@ -206,6 +207,20 @@ body {
     font-size: 26px;
     color: var(--brand-primary);
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header .section-title i {
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .btn-back {
@@ -226,6 +241,102 @@ body {
 .btn-back:hover {
     background: var(--brand-primary);
     color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+/* ===== TOUR INFO CARD ===== */
+.tour-info-card {
+    background: linear-gradient(135deg, #fff5f0 0%, #fff8f5 100%);
+    border: 2px solid rgba(194, 74, 22, 0.15);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.tour-info-card .tour-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+.tour-info-card .tour-details {
+    flex: 1;
+}
+
+.tour-info-card .tour-details h3 {
+    margin: 0 0 6px 0;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--brand-text);
+}
+
+.tour-info-card .tour-details .tour-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.tour-info-card .tour-details .tour-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--brand-text-muted);
+}
+
+.tour-info-card .tour-details .tour-meta span i {
+    color: var(--brand-primary);
+}
+
+.tour-info-card .status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tour-info-card .status-badge.available {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.tour-info-card .status-badge.booked {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+    border: 1px solid #90caf9;
+}
+
+.tour-info-card .status-badge.cancelled {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.tour-info-card .status-badge.pending {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+    border: 1px solid #ffcc80;
+}
+
+.tour-info-card .status-badge.completed {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    color: #7b1fa2;
+    border: 1px solid #ce93d8;
 }
 
 /* ===== FORM ===== */
@@ -315,9 +426,17 @@ body {
     grid-template-columns: 1fr;
 }
 
+.form-grid.triple {
+    grid-template-columns: repeat(3, 1fr);
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
 }
 
 .form-group label {
@@ -385,35 +504,6 @@ body {
 
 .help-text i {
     color: var(--brand-primary);
-}
-
-/* ===== FEATURE TAGS ===== */
-.feature-tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-.feature-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
-    background: rgba(194, 74, 22, 0.06);
-    border: 1px solid rgba(194, 74, 22, 0.2);
-    border-radius: 18px;
-    font-size: 12px;
-    color: var(--brand-primary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.feature-tag:hover,
-.feature-tag.selected {
-    background: var(--brand-primary);
-    color: white;
-    border-color: var(--brand-primary);
 }
 
 /* ===== IMAGE UPLOAD ===== */
@@ -507,32 +597,28 @@ body {
     object-fit: cover;
 }
 
-.image-preview-item .remove-btn {
+/* ===== BADGES & LABELS ===== */
+.image-badge {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 26px;
-    height: 26px;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    border-radius: 8px;
     font-size: 11px;
-    transition: all 0.2s ease;
-    opacity: 0;
+    font-weight: 700;
+    color: white;
+    background: rgba(0,0,0,0.6);
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: .6px;
 }
 
-.image-preview-item:hover .remove-btn {
-    opacity: 1;
+.image-badge.current-badge {
+    background: var(--brand-primary);
 }
 
-.image-preview-item .remove-btn:hover {
-    background: #c82333;
-    transform: scale(1.1);
+.image-badge.new-badge {
+    background: rgba(0,0,0,0.6);
 }
 
 .main-image-badge {
@@ -564,14 +650,67 @@ body {
     font-weight: 600;
 }
 
+.gallery-number {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ===== DELETE IMAGE BUTTON ===== */
+.btn-delete-image {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(220, 53, 69, 0.9);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.btn-delete-image:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
 /* ===== FORM ACTIONS ===== */
 .form-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 14px;
     margin-top: 36px;
     padding-top: 24px;
     border-top: 2px solid rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
+}
+
+.form-actions-left {
+    display: flex;
+    gap: 12px;
+}
+
+.form-actions-right {
+    display: flex;
+    gap: 12px;
 }
 
 .btn-cancel {
@@ -595,6 +734,28 @@ body {
     color: var(--brand-primary);
 }
 
+.btn-delete {
+    padding: 13px 26px;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
 .btn-submit {
     padding: 13px 32px;
     background: var(--brand-primary);
@@ -614,6 +775,7 @@ body {
 .btn-submit:hover {
     background: #a33d12;
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(194, 74, 22, 0.35);
 }
 
 /* ===== FLASH MESSAGES ===== */
@@ -639,13 +801,152 @@ body {
     color: #c62828;
 }
 
+/* ===== DELETE MODAL ===== */
+.delete-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-modal-overlay.show {
+    display: flex;
+}
+
+.delete-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.delete-modal .modal-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #c62828;
+    font-size: 32px;
+}
+
+.delete-modal h3 {
+    margin: 0 0 12px;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--brand-text);
+}
+
+.delete-modal p {
+    margin: 0 0 24px;
+    color: var(--brand-text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.delete-modal .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.delete-modal .btn-modal-cancel {
+    padding: 12px 24px;
+    border: 2px solid #ddd;
+    color: #666;
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.delete-modal .btn-modal-cancel:hover {
+    border-color: #999;
+    color: #333;
+}
+
+.delete-modal .btn-modal-delete {
+    padding: 12px 24px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.delete-modal .btn-modal-delete:hover {
+    background: #c82333;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 992px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
+    .form-grid.triple {
+        grid-template-columns: 1fr;
+    }
     .datetime-display {
         display: none;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .form-actions-left,
+    .form-actions-right {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+    
+    .sidebar,
+    .sidebar-accent {
+        display: none;
+    }
+    
+    .topbar {
+        margin-left: 0;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .tour-info-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .tour-info-card .tour-details .tour-meta {
+        justify-content: center;
+    }
+    
+    .image-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     }
 }
 </style>
@@ -700,12 +1001,12 @@ body {
             </a>
         </li>
         <li>
-             <a href="#">
-                 <svg viewBox="0 0 24 24">
-                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
-                 </svg>
-                 Payments
-             </a>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
         </li>
         <li>
             <a href="#">
@@ -720,7 +1021,7 @@ body {
 
 <!-- TOPBAR -->
 <div class="topbar">
-    <div class="topbar-left">Room Management</div>
+    <div class="topbar-left">Tour Management</div>
     <div class="topbar-right">
         <div class="datetime-display">
             <div class="time" id="currentTime">00:00 AM</div>
@@ -742,29 +1043,63 @@ body {
         {% endfor %}
     {% endfor %}
 
-    <!-- PAGE HEADER (ICON REMOVED) -->
+    <!-- PAGE HEADER -->
     <div class="page-header">
-        <h2 class="section-title">Add New Room</h2>
-        <a href="{{ path('app_room_index') }}" class="btn-back">
-            <i class="fas fa-arrow-left"></i>
-            Back to Rooms
-        </a>
+        <h2 class="section-title">
+            <i class="fas fa-compass"></i>
+            Edit Tour
+        </h2>
+        <div class="header-buttons">
+            <a href="{{ path('app_tour_index') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back to Tours
+            </a>
+        </div>
+    </div>
+
+    <!-- TOUR INFO CARD -->
+    <div class="tour-info-card">
+        <div class="tour-icon">
+            <i class="fas fa-mountain-sun"></i>
+        </div>
+        <div class="tour-details">
+            <h3>{{ tour.name }}</h3>
+            <div class="tour-meta">
+                <span><i class="fas fa-map-marker-alt"></i> {{ tour.location }}</span>
+                <span><i class="fas fa-clock"></i> {{ tour.duration }}</span>
+                <span><i class="fas fa-peso-sign"></i> ₱{{ tour.price|number_format(2) }}/person</span>
+                <span><i class="fas fa-users"></i> {{ tour.availableSlots }} Slot{{ tour.availableSlots > 1 ? 's' : '' }}</span>
+            </div>
+        </div>
+        {% set statusClass = 'available' %}
+        {% if tour.status|lower == 'booked' %}
+            {% set statusClass = 'booked' %}
+        {% elseif tour.status|lower == 'cancelled' %}
+            {% set statusClass = 'cancelled' %}
+        {% elseif tour.status|lower == 'pending' %}
+            {% set statusClass = 'pending' %}
+        {% elseif tour.status|lower == 'completed' %}
+            {% set statusClass = 'completed' %}
+        {% endif %}
+        <span class="status-badge {{ statusClass }}">
+            {{ tour.status }}
+        </span>
     </div>
 
     <!-- FORM -->
     <div class="form-container">
         <div class="form-header">
             <div class="header-icon">
-                <i class="fas fa-bed"></i>
+                <i class="fas fa-compass"></i>
             </div>
             <div class="header-text">
-                <h3>Room Information</h3>
-                <p>Fill in the details below to add a new room</p>
+                <h3>Update Tour Information</h3>
+                <p>Modify the tour details below</p>
             </div>
         </div>
 
         <div class="form-body">
-            {{ form_start(form, {'attr': {'class': 'room-form', 'enctype': 'multipart/form-data', 'id': 'roomForm'}}) }}
+            {{ form_start(form, {'attr': {'class': 'tour-form', 'enctype': 'multipart/form-data', 'id': 'tourForm'}}) }}
 
             <!-- BASIC INFO -->
             <div class="form-section">
@@ -774,123 +1109,99 @@ body {
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label><i class="fas fa-door-open"></i> Room Number <span class="required">*</span></label>
-                        {{ form_widget(form.roomNumber, {'attr': {'placeholder': 'e.g., 101, 202'}}) }}
-                        {{ form_errors(form.roomNumber) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter a unique room identifier</span>
+                        <label>
+                            <i class="fas fa-tag"></i>
+                            Tour Name <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Island Hopping Adventure'}}) }}
+                        {{ form_errors(form.name) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter a catchy tour name</span>
                     </div>
-
                     <div class="form-group">
-                        <label><i class="fas fa-star"></i> Room Type <span class="required">*</span></label>
-                        {{ form_widget(form.roomType) }}
-                        {{ form_errors(form.roomType) }}
+                        <label>
+                            <i class="fas fa-map-marker-alt"></i>
+                            Location <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.location, {'attr': {'placeholder': 'e.g., Boracay Island, Philippines'}}) }}
+                        {{ form_errors(form.location) }}
                     </div>
-
                     <div class="form-group">
-                        <label><i class="fas fa-peso-sign"></i> Price Per Night <span class="required">*</span></label>
-                        {{ form_widget(form.pricePerNight, {'attr': {'placeholder': '0.00'}}) }}
-                        {{ form_errors(form.pricePerNight) }}
+                        <label>
+                            <i class="fas fa-peso-sign"></i>
+                            Price Per Person <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.price, {'attr': {'placeholder': '0.00'}}) }}
+                        {{ form_errors(form.price) }}
                     </div>
-
                     <div class="form-group">
-                        <label><i class="fas fa-users"></i> Guest Capacity <span class="required">*</span></label>
-                        {{ form_widget(form.capacity) }}
-                        {{ form_errors(form.capacity) }}
+                        <label>
+                            <i class="fas fa-clock"></i>
+                            Duration <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.duration) }}
+                        {{ form_errors(form.duration) }}
                     </div>
-
                     <div class="form-group">
-                        <label><i class="fas fa-toggle-on"></i> Status <span class="required">*</span></label>
+                        <label>
+                            <i class="fas fa-users"></i>
+                            Available Slots <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.availableSlots, {'attr': {'placeholder': 'Number of slots', 'min': 0}}) }}
+                        {{ form_errors(form.availableSlots) }}
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-toggle-on"></i>
+                            Status <span class="required">*</span>
+                        </label>
                         {{ form_widget(form.status) }}
                         {{ form_errors(form.status) }}
                     </div>
                 </div>
             </div>
 
-            <!-- DESCRIPTION & FEATURES -->
+            <!-- SCHEDULE -->
             <div class="form-section">
                 <div class="section-header">
-                    <i class="fas fa-align-left"></i>
-                    <h4>Description & Features</h4>
+                    <i class="fas fa-calendar-alt"></i>
+                    <h4>Schedule</h4>
                 </div>
                 <div class="form-grid single">
                     <div class="form-group">
-                        <label><i class="fas fa-file-alt"></i> Room Description</label>
-                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe the room...', 'rows': 4}}) }}
-                        {{ form_errors(form.description) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Short description for guests</span>
+                        <label><i class="fas fa-calendar-check"></i> Schedule Date & Time</label>
+                        {{ form_widget(form.scheduleDate) }}
+                        {{ form_errors(form.scheduleDate) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> When will this tour take place?</span>
                     </div>
+                </div>
+            </div>
 
+            <!-- DESCRIPTION -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-align-left"></i>
+                    <h4>Description</h4>
+                </div>
+                <div class="form-grid single">
                     <div class="form-group">
-                        <label><i class="fas fa-list-check"></i> Room Features</label>
-                        {{ form_widget(form.features, {'attr': {'placeholder': 'WiFi, AC, Mini Bar, TV...', 'rows': 3, 'id': 'featuresInput'}}) }}
-                        {{ form_errors(form.features) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Click a tag below to add it</span>
-
-                        <div class="feature-tags-container">
-                            <div class="feature-tag" data-value="WiFi">WiFi</div>
-                            <div class="feature-tag" data-value="Air Conditioning">Air Conditioning</div>
-                            <div class="feature-tag" data-value="Mini Bar">Mini Bar</div>
-                            <div class="feature-tag" data-value="Television">Television</div>
-                            <div class="feature-tag" data-value="Hot Shower">Hot Shower</div>
-                            <div class="feature-tag" data-value="Complimentary Breakfast">Complimentary Breakfast</div>
-                            <div class="feature-tag" data-value="Room Service">Room Service</div>
-                            <div class="feature-tag" data-value="Balcony">Balcony</div>
-                            <div class="feature-tag" data-value="Sea View">Sea View</div>
-                            <div class="feature-tag" data-value="Soundproof">Soundproof</div>
-                            <div class="feature-tag" data-value="Laundry Service">Laundry Service</div>
-                            <div class="feature-tag" data-value="Gym Access">Gym Access</div>
-                            <div class="feature-tag" data-value="Swimming Pool Access">Swimming Pool Access</div>
-                            <div class="feature-tag" data-value="Pet Friendly">Pet Friendly</div>
-                            <div class="feature-tag" data-value="Kitchenette">Kitchenette</div>
-                            <div class="feature-tag" data-value="Parking">Parking</div>
-                            <div class="feature-tag" data-value="Wheelchair Accessible">Wheelchair Accessible</div>
-                            <div class="feature-tag" data-value="Daily Housekeeping">Daily Housekeeping</div>
-                            <div class="feature-tag" data-value="Coffee Maker">Coffee Maker</div>
-                            <div class="feature-tag" data-value="Hair Dryer">Hair Dryer</div>
-                            <div class="feature-tag" data-value="Iron and Ironing Board">Iron and Ironing Board</div>
-                            <div class="feature-tag" data-value="Blackout Curtains">Blackout Curtains</div>
-                            <div class="feature-tag" data-value="Telephone">Telephone</div>
-                            <div class="feature-tag" data-value="Desk/Work Area">Desk/Work Area</div>
-                            <div class="feature-tag" data-value="Extra Bedding">Extra Bedding</div>
-                            <div class="feature-tag" data-value="Refrigerator">Refrigerator</div>
-                            <div class="feature-tag" data-value="Microwave">Microwave</div>
-                            <div class="feature-tag" data-value="Toaster">Toaster</div>
-                            <div class="feature-tag" data-value="Gas Stove">Gas Stove</div>
-                            <div class="feature-tag" data-value="Dishwasher">Dishwasher</div>
-                            <div class="feature-tag" data-value="Dining Area">Dining Area</div>
-                            <div class="feature-tag" data-value="Living Area">Living Area</div>
-                            <div class="feature-tag" data-value="Fireplace">Fireplace</div>
-                            <div class="feature-tag" data-value="Jacuzzi">Jacuzzi</div>
-                            <div class="feature-tag" data-value="Terrace">Terrace</div>
-                            <div class="feature-tag" data-value="Garden View">Garden View</div>
-                            <div class="feature-tag" data-value="City View">City View</div>
-                            <div class="feature-tag" data-value="Mountain View">Mountain View</div>
-                            <div class="feature-tag" data-value="Beach Access">Beach Access</div>
-                            <div class="feature-tag" data-value="Spa Access">Spa Access</div>
-                            <div class="feature-tag" data-value="Sauna">Sauna</div>
-                            <div class="feature-tag" data-value="Steam Room">Steam Room</div>
-                            <div class="feature-tag" data-value="Sofa Bed">Sofa Bed</div>
-                            <div class="feature-tag" data-value="Crib Available">Crib Available</div>
-                            <div class="feature-tag" data-value="Slippers">Slippers</div>
-                            <div class="feature-tag" data-value="Bathrobe">Bathrobe</div>
-                            <div class="feature-tag" data-value="Toiletries">Toiletries</div>
-                            <div class="feature-tag" data-value="Towels">Towels</div>
-                            <div class="feature-tag" data-value="Minibar">Minibar</div> 
-                        </div>
-                    </div>  
+                        <label><i class="fas fa-file-alt"></i> Tour Description</label>
+                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe the tour experience, highlights, and what guests can expect...', 'rows': 5}}) }}
+                        {{ form_errors(form.description) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Provide a detailed description to attract guests</span>
+                    </div>
                 </div>
             </div>
 
             <!-- IMAGES -->
             <div class="form-section">
-                 <div class="section-header">
-                     <i class="fas fa-images"></i>
-                     <h4>Room Images</h4>
-                 </div>
+                <div class="section-header">
+                    <i class="fas fa-images"></i>
+                    <h4>Tour Images</h4>
+                </div>
                 <div class="form-grid">
                     <!-- Main Image -->
                     <div class="form-group">
-                        <label><i class="fas fa-image"></i> Main Room Image</label>
+                        <label><i class="fas fa-image"></i> Main Tour Image</label>
                         <div class="image-upload-area" id="mainUploadArea">
                             {{ form_widget(form.mainImageFile, {'attr': {'class': 'file-input', 'id': 'mainImageInput', 'accept': 'image/*'}}) }}
                             <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
@@ -901,6 +1212,21 @@ body {
                             </div>
                         </div>
                         <div class="image-preview-container">
+                            <div class="image-preview-grid">
+                                {% if tour.mainImage %}
+                                    <div class="image-preview-item">
+                                        <img src="{{ asset('uploads/tours/' ~ tour.mainImage) }}" alt="Current main image">
+                                        <span class="image-badge current-badge">Current</span>
+                                        <button type="button"
+                                                class="btn-delete-image"
+                                                title="Delete main image"
+                                                data-action="{{ path('app_tour_delete_image', {'id': tour.id, 'type': 'main', 'index': 0}) }}"
+                                                data-token="{{ csrf_token('delete-image' ~ tour.id) }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
                             <div class="image-preview-grid" id="mainImagePreview"></div>
                         </div>
                     </div>
@@ -918,6 +1244,24 @@ body {
                             </div>
                         </div>
                         <div class="image-preview-container">
+                            <div class="image-preview-grid">
+                                {% if tour.galleryImages is defined and tour.galleryImages %}
+                                    {% for image in tour.galleryImages %}
+                                        <div class="image-preview-item">
+                                            <img src="{{ asset('uploads/tours/' ~ image) }}" alt="Gallery image {{ loop.index }}">
+                                            <span class="gallery-number">{{ loop.index }}</span>
+                                            <span class="image-badge current-badge">Current</span>
+                                            <button type="button"
+                                                    class="btn-delete-image"
+                                                    title="Delete gallery image"
+                                                    data-action="{{ path('app_tour_delete_image', {'id': tour.id, 'type': 'gallery', 'index': loop.index0}) }}"
+                                                    data-token="{{ csrf_token('delete-image' ~ tour.id) }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
                             <div class="image-preview-grid" id="galleryImagesPreview"></div>
                         </div>
                     </div>
@@ -926,17 +1270,45 @@ body {
 
             <!-- FORM ACTIONS -->
             <div class="form-actions">
-                <a href="{{ path('app_room_index') }}" class="btn-cancel">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-check"></i> Create Room
-                </button>
+                <div class="form-actions-left">
+                    <button type="button" class="btn-delete" id="deleteTourBtn">
+                        <i class="fas fa-trash-alt"></i> Delete Tour
+                    </button>
+                </div>
+                <div class="form-actions-right">
+                    <a href="{{ path('app_tour_index') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Update Tour
+                    </button>
+                </div>
             </div>
-          {{ form_end(form) }}
-         </div>
-     </div>
- </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="modal-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>Delete "{{ tour.name }}"?</h3>
+        <p>Are you sure you want to delete this tour? This action cannot be undone and all associated data will be permanently removed.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" id="cancelDeleteBtn">Cancel</button>
+            <form method="post" action="{{ path('app_tour_delete', {'id': tour.id}) }}" style="display: inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tour.id) }}">
+                <button type="submit" class="btn-modal-delete">
+                    <i class="fas fa-trash-alt"></i> Yes, Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
@@ -953,36 +1325,53 @@ document.addEventListener('DOMContentLoaded', function() {
             el = uploadArea.querySelector('input[type="file"]');
             if (el) return el;
         }
-        // last resort: any file input on page
         el = document.querySelector('input[type="file"]');
         return el;
     }
-
-    // ===== DATE TIME (unchanged) =====
+    
+    // ===== DATE TIME =====
     function updateDateTime() {
         const now = new Date();
         const timeEl = document.getElementById('currentTime');
         const dateEl = document.getElementById('currentDate');
-
+        
         if (timeEl && dateEl) {
-            timeEl.textContent = now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
+            timeEl.textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
             });
-            dateEl.textContent = now.toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
+            dateEl.textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
             });
         }
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
-    // ===== FEATURE TAGS (unchanged) =====
-    (function(){ const featureTags = document.querySelectorAll('.feature-tag'); if (!featureTags.length) return; const featuresEl = document.getElementById('featuresInput') || document.querySelector('[name$="[features]"]') || document.querySelector('[name*="features"]'); if (!featuresEl) { console.warn('Feature tags: target input not found'); return; } const tagType = featuresEl.tagName.toLowerCase(); const getValues = () => { if (tagType === 'select') { return Array.from(featuresEl.options).filter(o => o.selected).map(o => o.value).filter(Boolean); } return (featuresEl.value || '').split(',').map(s => s.trim()).filter(Boolean); }; const setValues = (arr) => { if (tagType === 'select') { arr.forEach(v=>{ if (!Array.from(featuresEl.options).some(o=>o.value===v)){ const opt = document.createElement('option'); opt.value = v; opt.text = v; featuresEl.appendChild(opt); } }); Array.from(featuresEl.options).forEach(o => o.selected = arr.includes(o.value)); } else { featuresEl.value = arr.join(','); } featuresEl.dispatchEvent(new Event('input', {bubbles:true})); featuresEl.dispatchEvent(new Event('change', {bubbles:true})); }; const initial = getValues(); featureTags.forEach(tag => { if (initial.includes(tag.dataset.value)) tag.classList.add('selected'); }); featureTags.forEach(tag => { tag.addEventListener('click', () => { const value = String(tag.dataset.value || '').trim(); if (!value) return; let current = getValues(); if (!current.includes(value)) { current.push(value); tag.classList.add('selected'); } else { current = current.filter(v => v !== value); tag.classList.remove('selected'); } setValues(current); }); }); })();
+    // ===== DELETE MODAL =====
+    const deleteBtn = document.getElementById('deleteTourBtn');
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+    if (deleteBtn && deleteModal) {
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('show');
+        });
+
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('show');
+        });
+
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('show');
+            }
+        });
+    }
 
     // ===== IMAGE UPLOAD HANDLER =====
     class ImageUploader {
@@ -1003,11 +1392,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             if (!this.input) {
-                console.warn('File input not found for id:', inputId, ' — looking inside upload area.');
+                console.warn('File input not found for id:', inputId);
             } else {
-                // If the input was not inside the upload area, move it there so styling/overlay match
                 if (!this.uploadArea.contains(this.input)) {
-                    // make input visually invisible but inside uploadArea
                     this.input.style.position = 'absolute';
                     this.input.style.top = '0';
                     this.input.style.left = '0';
@@ -1023,7 +1410,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         init() {
-            // Try to re-find input in case it's rendered later by Symfony JS
             this.input = findFileInput(this.inputId, this.uploadArea);
             if (!this.input) {
                 console.error('No file input available for uploader', this.inputId);
@@ -1031,7 +1417,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             this.input.addEventListener('change', (e) => {
-                console.debug('File input change event for', this.inputId, e.target.files);
                 this.handleFiles(e.target.files);
             });
 
@@ -1085,7 +1470,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     item.innerHTML = `
                         <img src="${e.target.result}" alt="${file.name}">
                         ${!this.isMultiple ? '<span class="main-image-badge">Main</span>' : `<span class="gallery-badge">${index + 1}</span>`}
-                        <button type="button" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
+                        <span class="image-badge new-badge">New</span>
+                        <button type="button" class="btn-delete-image remove-btn" title="Remove"><i class="fas fa-times"></i></button>
                     `;
 
                     item.querySelector('.remove-btn').addEventListener('click', () => {
@@ -1105,17 +1491,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dt = new DataTransfer();
                 this.files.forEach(file => dt.items.add(file));
                 this.input.files = dt.files;
-                console.debug('Updated input.files for', this.inputId, this.input.files);
             } catch (err) {
                 console.error('Could not set input.files programmatically:', err);
             }
         }
     }
 
-    // Initialize uploaders with improved lookup
+    // Initialize uploaders
     new ImageUploader('mainImageInput', 'mainImagePreview', 'mainUploadArea', false);
     new ImageUploader('galleryImagesInput', 'galleryImagesPreview', 'galleryUploadArea', true);
 
+    // ===== DELETE IMAGE BUTTONS =====
+    document.querySelectorAll('.btn-delete-image:not(.remove-btn)').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            if (!confirm('Delete this image?')) return;
+            const action = btn.dataset.action;
+            const token = btn.dataset.token;
+            if (!action) return;
+            try {
+                const res = await fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({ _token: token })
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const text = await res.text();
+                    console.error('Delete failed', res.status, text);
+                    alert('Failed to delete image.');
+                }
+            } catch (err) {
+                console.error('Delete error', err);
+                alert('Failed to delete image.');
+            }
+        });
+    });
 });
 </script>
 {% endblock %}

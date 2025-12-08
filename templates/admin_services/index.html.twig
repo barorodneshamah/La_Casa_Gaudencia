@@ -2,287 +2,898 @@
 
 {% block title %}Admin Services{% endblock %}
 
-{% block body %}
+{% block stylesheets %}
+{{ parent() }}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-   /* ===== GLOBAL ===== */
-body {
-    margin: 0;
-    background-color: #f7f5edff;
-    font-family: 'Roboto', sans-serif;
-    color: #2f2f2f;
-}
-
-/* ===== ACCENT BAR ===== */
-.sidebar-accent {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 8px;
-    height: 100vh;
-    background-color: #c24a16;
-    border-radius: 0 6px 6px 0;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-    z-index: 30;
-}
-
-/* ===== SIDEBAR ===== */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 8px;
-    width: 260px;
-    height: 100vh;
-    background: white;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 28px;
-    border-radius: 0 12px 12px 0;
-    z-index: 20;
-    transition: all .3s ease;
-}
-
-/* ===== BRAND ===== */
-.brand {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.brand img {
-    width: 75px;
-    height: 75px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
-}
-
-.brand h1 {
-    font-family: 'Playfair Display', serif;
-    color: #c24a16;
-    font-size: 22px;
-    letter-spacing: .5px;
-    margin: 0;
-    font-weight: 600;
-}
-
-.brand small {
-    color: #777;
-    font-size: 12px;
-    letter-spacing: .75px;
-    font-weight: 500;
-}
-
-/* ===== SEPARATOR ===== */
-.sidebar-separator {
-    width: 75%;
-    height: 1.5px;
-    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
-    margin: 20px 0 25px 0;
-}
-
-/* ===== MENU ===== */
-.sidebar ul {
-    list-style: none;
-    width: 100%;
-    padding: 0;
-}
-
-.sidebar ul li a {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    padding: 14px 35px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #2f2f2f;
-    text-decoration: none;
-    transition: all .25s ease;
-}
-
-.sidebar ul li svg {
-    width: 20px;
-    height: 20px;
-    fill: #888;
-    transition: .25s;
-}
-
-/* ===== Hover & Active Menu ===== */
-.sidebar ul li a:hover,
-.sidebar ul li.active a {
-    background-color: #c24a16;
-    color: white;
-    margin-left: -12px;
-    border-radius: 0 30px 30px 0;
-    padding-left: 48px;
-    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
-}
-
-.sidebar ul li a:hover svg,
-.sidebar ul li.active a svg {
-    fill: white !important;
-}
-
-/* ===== TOPBAR ===== */
-.topbar {
-    margin-left: 260px;
-    background: #c24a16;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 35px;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-}
-
-.topbar-left {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: .7px;
-} 
-   
-    /* MAIN CONTENT */
-     .main-content {
-    margin-left:290px;  
-    padding:10px 15px;
-}
-
-    .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 25px;
-    color: #c24a16;
-    margin-bottom: 18px;
-    font-weight: 400; 
-    letter-spacing: 0.5px;
-}
-
-    /* Single Card Grid */
-    .service-card-grid {
-        display:grid; grid-template-columns:repeat(3, 1fr);
-        gap:30px; margin-top:20px;
+    :root {
+        --brand-primary: #c24a16;
+        --brand-primary-dark: #a53f13;
+        --brand-primary-light: #e85d04;
+        --brand-cream: #fcfbf7;
+        --brand-black: #000000;
+        --brand-text: #2f2f2f;
+        --brand-text-muted: #888888;
+        --font-heading: 'Playfair Display', serif;
+        --font-body: 'Roboto', sans-serif;
     }
 
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #f7f5edff;
+        font-family: 'Roboto', sans-serif;
+        color: #2f2f2f;
+    }
+
+    /* ===== ACCENT BAR ===== */
+    .sidebar-accent {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 8px;
+        height: 100vh;
+        background-color: #c24a16;
+        border-radius: 0 6px 6px 0;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+        z-index: 30;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 8px;
+        width: 260px;
+        height: 100vh;
+        background: white;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 28px;
+        border-radius: 0 12px 12px 0;
+        z-index: 20;
+    }
+
+    /* ===== BRAND ===== */
+    .brand {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .brand img {
+        width: 75px;
+        height: 75px;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+    }
+
+    .brand h1 {
+        font-family: 'Playfair Display', serif;
+        color: #c24a16;
+        font-size: 22px;
+        letter-spacing: .5px;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .brand small {
+        color: #777;
+        font-size: 12px;
+        letter-spacing: .75px;
+        font-weight: 500;
+    }
+
+    /* ===== SEPARATOR ===== */
+    .sidebar-separator {
+        width: 75%;
+        height: 1.5px;
+        background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+        margin: 10px 0 15px 0;
+    }
+
+    /* ===== MENU ===== */
+    .sidebar ul {
+        list-style: none;
+        width: 100%;
+        padding: 0;
+        flex: 1;
+    }
+
+    .sidebar ul li a {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 14px 35px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #2f2f2f;
+        text-decoration: none;
+        transition: all .25s ease;
+    }
+
+    .sidebar ul li svg {
+        width: 20px;
+        height: 20px;
+        fill: #888;
+        transition: .25s;
+    }
+
+    /* HOVER & ACTIVE STATES */
+    .sidebar ul li a:hover,
+    .sidebar ul li.active a {
+        background-color: #c24a16;
+        color: white;
+        margin-left: -12px;
+        border-radius: 0 30px 30px 0;
+        padding-left: 48px;
+        box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+    }
+
+    .sidebar ul li a:hover svg,
+    .sidebar ul li.active a svg {
+        fill: white !important;
+    }
+
+    /* ===== LOGOUT SECTION ===== */
+    .sidebar-logout {
+        width: 100%;
+        padding: 20px 30px;
+        margin-top: auto;
+        display: flex;
+        justify-content: center;
+        border-top: 1px solid #eee;
+    }
+
+    .logout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 80%;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+        border: none;
+        cursor: pointer;
+    }
+
+    .logout-btn:hover {
+        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+    }
+
+    .logout-btn i {
+        font-size: 16px;
+    }
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+        margin-left: 268px;
+        background: #c24a16;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 35px;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    .topbar-left {
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: .7px;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .datetime-display {
+        text-align: right;
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+    }
+
+    .datetime-display .time {
+        font-size: 14px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .datetime-display .date {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 1px;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+        margin-left: 268px;
+        padding: 32px;
+        min-height: calc(100vh - 70px);
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .section-title {
+        margin: 0;
+        font-family: var(--font-heading);
+        font-size: 28px;
+        color: var(--brand-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title i {
+        font-size: 24px;
+        opacity: 0.85;
+    }
+
+    /* ===== SERVICE CARDS GRID ===== */
+    .service-card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-top: 10px;
+    }
+
+    /* ===== ENHANCED SERVICE CARD ===== */
     .service-card {
-        background:white; padding:30px; border-radius:14px;
-        box-shadow:0 8px 22px rgba(0,0,0,0.08);
-        border-left:6px solid #c24a16;
-        transition:.3s ease;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(0,0,0,0.04);
+        position: relative;
     }
 
     .service-card:hover {
-        transform:translateY(-5px);
-        box-shadow:0 12px 26px rgba(0,0,0,0.12);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(194, 74, 22, 0.15);
+    }
+
+    /* ===== CARD IMAGE SECTION ===== */
+    .card-image {
+        width: 45%;
+        min-height: 280px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .service-card:hover .card-image img {
+        transform: scale(1.08);
+    }
+
+    /* Image Overlay */
+    .card-image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(194, 74, 22, 0.1) 0%, rgba(0,0,0,0.2) 100%);
+        transition: all 0.3s ease;
+    }
+
+    .service-card:hover .card-image-overlay {
+        background: linear-gradient(135deg, rgba(194, 74, 22, 0.2) 0%, rgba(0,0,0,0.3) 100%);
+    }
+
+    /* Category Badge on Image */
+    .card-category-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        z-index: 2;
+    }
+
+    .card-category-badge i {
+        font-size: 11px;
+    }
+
+    /* ===== CARD CONTENT SECTION ===== */
+    .card-content {
+        width: 55%;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Card Header */
+    .card-header {
+        margin-bottom: 15px;
+    }
+
+    .card-icon-title {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #fff5f0 0%, #ffe8de 100%);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c24a16;
+        font-size: 22px;
+        box-shadow: 0 4px 12px rgba(194, 74, 22, 0.15);
     }
 
     .service-title {
-        font-size:20px; font-weight:700; color:#333;
-        margin-bottom:10px;
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #2f2f2f;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .service-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    /* ===== CARD STATS ===== */
+    .card-stats {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 25px;
+        padding: 18px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
+        border-radius: 14px;
+        border: 1px solid #eee;
+    }
+
+    .stat-item {
+        text-align: center;
+        flex: 1;
+        position: relative;
+    }
+
+    .stat-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 35px;
+        background: linear-gradient(to bottom, transparent, #ddd, transparent);
+    }
+
+    .stat-number {
+        font-size: 26px;
+        font-weight: 700;
+        color: #c24a16;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    /* ===== CARD FEATURES ===== */
+    .card-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .feature-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: #f8f8f8;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        font-size: 12px;
+        color: #555;
+        transition: all 0.25s ease;
+    }
+
+    .feature-tag i {
+        color: #c24a16;
+        font-size: 10px;
+    }
+
+    .feature-tag:hover {
+        background: #c24a16;
+        color: white;
+        border-color: #c24a16;
+    }
+
+    .feature-tag:hover i {
+        color: white;
+    }
+
+    /* ===== CARD ACTIONS ===== */
+    .card-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: auto;
     }
 
     .service-btn {
-        margin-top:12px; display:inline-block; background:#c24a16;
-        color:white; padding:8px 18px; border-radius:8px;
-        text-decoration:none; font-size:14px;
-        transition:.25s;
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
     }
 
-    .service-btn:hover { background:#9e3b12; }
-</style>
+    .service-btn.btn-primary {
+        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.35);
+    }
 
+    .service-btn.btn-primary:hover {
+        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(194, 74, 22, 0.45);
+    }
+
+    .service-btn.btn-secondary {
+        background: white;
+        color: #c24a16;
+        border: 2px solid #c24a16;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .service-btn.btn-secondary:hover {
+        background: #fff5f0;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(194, 74, 22, 0.15);
+    }
+
+    .service-btn i {
+        font-size: 14px;
+        transition: transform 0.3s ease;
+    }
+
+    .service-btn:hover i {
+        transform: translateX(4px);
+    }
+
+    /* ===== CARD RIBBON (Optional) ===== */
+    .card-ribbon {
+        position: absolute;
+        top: 20px;
+        right: -35px;
+        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+        color: white;
+        padding: 8px 40px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transform: rotate(45deg);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    /* ===== SINGLE COLUMN CARD (Full Width) ===== */
+    .service-card.full-width {
+        grid-column: span 2;
+    }
+
+    .service-card.full-width .card-image {
+        width: 40%;
+    }
+
+    .service-card.full-width .card-content {
+        width: 60%;
+    }
+
+    /* ===== VERTICAL CARD VARIANT ===== */
+    .service-card.vertical {
+        flex-direction: column;
+    }
+
+    .service-card.vertical .card-image {
+        width: 100%;
+        min-height: 200px;
+    }
+
+    .service-card.vertical .card-content {
+        width: 100%;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1400px) {
+        .service-card-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .service-card.full-width {
+            grid-column: span 1;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .service-card {
+            flex-direction: column;
+        }
+
+        .service-card .card-image,
+        .service-card.full-width .card-image {
+            width: 100%;
+            min-height: 220px;
+        }
+
+        .service-card .card-content,
+        .service-card.full-width .card-content {
+            width: 100%;
+        }
+
+        .card-stats {
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            min-width: 80px;
+        }
+
+        .stat-item:not(:last-child)::after {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            display: none;
+        }
+
+        .sidebar-accent {
+            display: none;
+        }
+
+        .main-content,
+        .topbar {
+            margin-left: 0;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .card-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
 <!-- ACCENT BAR -->
 <div class="sidebar-accent"></div>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-
     <div class="brand">
         <img src="/Images/WEB.png" alt="Logo">
         <h1>La Casa Gaudencia</h1>
         <small>Admin Panel</small>
     </div>
 
-    <!-- NEW BAR LINE HERE -->
+    <!-- BAR LINE -->
     <div class="sidebar-separator"></div>
 
-<ul>
+    <ul>
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                User Management
+            </a>
+        </li>
+        <li class="active">
+            <a href="{{ path('app_admin_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/>
+                </svg>
+                Activity Logs
+            </a>
+        </li>
+    </ul>
 
-    <!-- DASHBOARD -->
-    <li>
-        <a href="{{ path('app_admin_dashboard') }}"
-           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
-            <svg viewBox="0 0 24 24">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
-            </svg>
-            Dashboard
+    <!-- LOGOUT SECTION -->
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">
+            Log Out
         </a>
-    </li>
-
-    <!-- USER MANAGEMENT -->
-    <li>
-        <a href="#"
-           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
-            <svg viewBox="0 0 24 24">
-                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 
-                1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 
-                2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 
-                2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 
-                0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3
-                c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            User Management
-        </a>
-    </li>
-
-    <!-- SERVICES -->
-    <li class="active">
-        <a href="{{ path('app_admin_services') }}"
-           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
-            <svg viewBox="0 0 24 24">
-                <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 
-                4h10v2H4v-2z"/>
-            </svg>
-            Services
-        </a>
-    </li>
-
-    <!-- RESERVATIONS -->
-    <li>
-        <a href="#"
-           style="text-decoration:none; display:flex; align-items:center; gap:12px;">
-            <svg viewBox="0 0 24 24">
-                <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 
-                2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 
-                2 0 00-2-2zm0 14H4V10h16v10z"/>
-            </svg>
-            Reservations
-        </a>
-    </li>
-
-</ul>
-
+    </div>
 </div>
 
 <!-- TOPBAR -->
 <div class="topbar">
-    <div class="topbar-left">Admin Services</div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="main-content">
-    <h2 class="section-title">Available Services</h2>
-
-    <div class="service-card-grid">
-        <!-- ROOM SERVICE CARD -->
-        <div class="service-card">
-            <div class="service-title">Room Services</div>
-            <p>Manage hotel rooms, pricing, availability, features and more.</p>
-            <a href="{{ path('app_room_index') }}" class="service-btn">Manage Rooms</a>
+    <div class="topbar-left">Admin Service Management</div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
         </div>
     </div>
 </div>
 
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <h2 class="section-title">
+                Available Services
+            </h2>
+        </div>
+    </div>
+
+    {# Rooms Data #}
+    {% set roomsList = rooms|default([]) %}
+    {% set totalRooms = roomsList|length %}
+    {% set availableRooms = roomsList|filter(r => r.status|lower == 'available')|length %}
+    {% set occupiedRooms = roomsList|filter(r => r.status|lower == 'occupied')|length %}
+
+    {# Tours Data #}
+    {% set toursList = tours|default([]) %}
+    {% set totalTours = toursList|length %}
+    {% set availableTours = toursList|filter(t => t.status|lower == 'available')|length %}
+    {% set bookedTours = toursList|filter(t => t.status|lower == 'booked')|length %}
+
+    <!-- SERVICE CARDS GRID -->
+    <div class="service-card-grid">
+        <!-- ROOM SERVICE CARD -->
+        <div class="service-card">
+            <div class="card-image">
+                <img src="/Images/room-service.jpg" alt="Room Services">
+                <div class="card-image-overlay"></div>
+                <span class="card-category-badge">
+                    <i class="fas fa-star"></i>
+                    Hotel Rooms
+                </span>
+            </div>
+
+            <div class="card-content">
+                <div class="card-header">
+                    <div class="card-icon-title">
+                        <div class="card-icon"><i class="fas fa-bed"></i></div>
+                        <h3 class="service-title">Room Services</h3>
+                    </div>
+                    <p class="service-description">
+                        Manage hotel rooms, pricing, availability, features and amenities.
+                        Keep track of room status and ensure optimal guest experiences.
+                    </p>
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ totalRooms }}</div>
+                        <div class="stat-label">Total Rooms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ availableRooms }}</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ occupiedRooms }}</div>
+                        <div class="stat-label">Occupied</div>
+                    </div>
+                </div>
+
+                <div class="card-features">
+                    <span class="feature-tag"><i class="fas fa-check"></i> Pricing</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Availability</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Amenities</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Status</span>
+                </div>
+
+                <div class="card-actions">
+                    <a href="{{ path('app_room_index') }}" class="service-btn btn-primary">
+                        <i class="fas fa-cog"></i>
+                        Manage Rooms
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOUR SERVICE CARD -->
+        <div class="service-card">
+            <div class="card-image">
+                <img src="/Images/tour-service.jpg" alt="Tour Services">
+                <div class="card-image-overlay"></div>
+                <span class="card-category-badge">
+                    <i class="fas fa-star"></i>
+                    Tours & Activities
+                </span>
+            </div>
+
+            <div class="card-content">
+                <div class="card-header">
+                    <div class="card-icon-title">
+                        <div class="card-icon"><i class="fas fa-map-marked-alt"></i></div>
+                        <h3 class="service-title">Tour Services</h3>
+                    </div>
+                    <p class="service-description">
+                        Manage tour, schedules, pricing, and availability.
+                        Organize exciting experiences and adventures for your guests.
+                    </p>
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ totalTours }}</div>
+                        <div class="stat-label">Total Tours</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ availableTours }}</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ bookedTours }}</div>
+                        <div class="stat-label">Booked</div>
+                    </div>
+                </div>
+
+                <div class="card-features">
+                    <span class="feature-tag"><i class="fas fa-check"></i> Schedules</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Locations</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Slots</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Duration</span>
+                </div>
+
+                <div class="card-actions">
+                    <a href="{{ path('app_tour_index') }}" class="service-btn btn-primary">
+                        <i class="fas fa-cog"></i>
+                        Manage Tours
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if totalRooms == 0 and totalTours == 0 %}
+        <div style="margin-top: 24px; padding: 20px; background: #fff3e0; border-left: 4px solid #c24a16; border-radius: 8px; color:#666; font-size: 14px;">
+            <strong>Getting Started:</strong> No services found yet. Start by adding rooms or tours to begin managing your property.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ===== LIVE DATE TIME FUNCTION =====
+        function updateDateTime() {
+            const now = new Date();
+            const timeEl = document.getElementById('currentTime');
+            const dateEl = document.getElementById('currentDate');
+            if (timeEl && dateEl) {
+                timeEl.textContent = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                dateEl.textContent = now.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+            }
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    });
+</script>
 {% endblock %}

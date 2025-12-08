@@ -33,7 +33,6 @@ final class RoomController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             
-            // Handle main image upload
             $mainImageFile = $form->get('mainImageFile')->getData();
             if ($mainImageFile) {
                 $newFilename = $this->uploadImage($mainImageFile, $slugger, 'room_main');
@@ -42,7 +41,6 @@ final class RoomController extends AbstractController
                 }
             }
 
-            // Handle gallery images upload
             $galleryImageFiles = $form->get('galleryImageFiles')->getData();
             if ($galleryImageFiles) {
                 $galleryImages = [];
@@ -69,26 +67,36 @@ final class RoomController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_room_show', methods: ['GET'])]
-    public function show(Room $room): Response
+    #[Route('/show/{id}', name: 'app_room_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function show(RoomRepository $roomRepository, int $id): Response
     {
+        $room = $roomRepository->find($id);
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found.');
+        }
+
         return $this->render('room/show.html.twig', [
             'room' => $room,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_room_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Room $room, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    #[Route('/{id}/edit', name: 'app_room_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function edit(Request $request, RoomRepository $roomRepository, int $id, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
+        $room = $roomRepository->find($id);
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found.');
+        }
+
         $form = $this->createForm(RoomType::class, $room);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             
-            // Handle main image upload
+
             $mainImageFile = $form->get('mainImageFile')->getData();
             if ($mainImageFile) {
-                // Delete old image if exists
+
                 $this->deleteImage($room->getMainImage());
                 
                 $newFilename = $this->uploadImage($mainImageFile, $slugger, 'room_main');
@@ -97,7 +105,6 @@ final class RoomController extends AbstractController
                 }
             }
 
-            // Handle gallery images upload
             $galleryImageFiles = $form->get('galleryImageFiles')->getData();
             if ($galleryImageFiles) {
                 $galleryImages = $room->getGalleryImages() ?? [];
@@ -123,12 +130,16 @@ final class RoomController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_room_delete', methods: ['POST'])]
-    public function delete(Request $request, Room $room, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_room_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(Request $request, RoomRepository $roomRepository, int $id, EntityManagerInterface $entityManager): Response
     {
+        $room = $roomRepository->find($id);
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$room->getId(), $request->getPayload()->getString('_token'))) {
             
-            // Delete associated images
             $this->deleteImage($room->getMainImage());
             foreach ($room->getGalleryImages() ?? [] as $galleryImage) {
                 $this->deleteImage($galleryImage);
@@ -143,9 +154,14 @@ final class RoomController extends AbstractController
         return $this->redirectToRoute('app_room_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/delete-image/{type}/{index}', name: 'app_room_delete_image', methods: ['POST'])]
-    public function deleteRoomImage(Request $request, Room $room, string $type, int $index, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete-image/{type}/{index}', name: 'app_room_delete_image', methods: ['POST'], requirements: ['id' => '\d+', 'index' => '\d+'])]
+    public function deleteRoomImage(Request $request, RoomRepository $roomRepository, int $id, string $type, int $index, EntityManagerInterface $entityManager): Response
     {
+        $room = $roomRepository->find($id);
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found.');
+        }
+
         if ($this->isCsrfTokenValid('delete-image'.$room->getId(), $request->request->get('_token'))) {
             if ($type === 'main') {
                 $this->deleteImage($room->getMainImage());
