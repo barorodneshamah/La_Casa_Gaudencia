@@ -6,7 +6,7 @@
 parameters:
     room_images_directory: '%kernel.project_dir%/public/uploads/rooms'
     tour_images_directory: '%kernel.project_dir%/public/uploads/tours'
-
+    food_images_directory: '%kernel.project_dir%/public/uploads/foods'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -29,3 +29,4 @@ services:
     App\Controller\TourController:
         arguments:
             $tourImagesDirectory: '%tour_images_directory%'
+            

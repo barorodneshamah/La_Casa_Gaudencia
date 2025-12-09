@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Add New Tour | La Casa Gaudencia{% endblock %}
+{% block title %}Add New Food | La Casa Gaudencia{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -138,43 +138,43 @@ body {
 }
 
 /* ===== LOGOUT SECTION ===== */
-    .sidebar-logout {
-        width: 100%;
-        padding: 20px 30px;
-        margin-top: auto;
-        display: flex;
-        justify-content: center;
-        border-top: 1px solid #eee;
-    }
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
 
-    .logout-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 80%;
-        padding: 14px 24px;
-        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
-        border: none;
-        cursor: pointer;
-    }
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    border: none;
+    cursor: pointer;
+}
 
-    .logout-btn:hover {
-        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
-    }
+.logout-btn:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+}
 
-    .logout-btn i {
-        font-size: 16px;
-    }
+.logout-btn i {
+    font-size: 16px;
+}
 
 /* ===== TOPBAR ===== */
 .topbar {
@@ -245,6 +245,14 @@ body {
     font-size: 26px;
     color: var(--brand-primary);
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header .section-title i {
+    font-size: 24px;
+    opacity: 0.8;
 }
 
 .btn-back {
@@ -354,9 +362,17 @@ body {
     grid-template-columns: 1fr;
 }
 
+.form-grid.triple {
+    grid-template-columns: repeat(3, 1fr);
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
 }
 
 .form-group label {
@@ -424,6 +440,68 @@ body {
 
 .help-text i {
     color: var(--brand-primary);
+}
+
+/* ===== CATEGORY TAGS ===== */
+.category-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.category-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    background: rgba(194, 74, 22, 0.06);
+    border: 1px solid rgba(194, 74, 22, 0.2);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--brand-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-tag:hover,
+.category-tag.selected {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
+}
+
+.category-tag i {
+    font-size: 12px;
+}
+
+/* ===== INGREDIENT TAGS ===== */
+.ingredient-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.ingredient-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: rgba(194, 74, 22, 0.06);
+    border: 1px solid rgba(194, 74, 22, 0.2);
+    border-radius: 18px;
+    font-size: 12px;
+    color: var(--brand-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ingredient-tag:hover,
+.ingredient-tag.selected {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
 }
 
 /* ===== IMAGE UPLOAD ===== */
@@ -545,6 +623,89 @@ body {
     transform: scale(1.1);
 }
 
+.main-image-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    background: var(--brand-primary);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.gallery-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ===== NUTRITION INFO GRID ===== */
+.nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.nutrition-item {
+    background: #faf9f5;
+    border: 2px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.nutrition-item:hover {
+    border-color: var(--brand-primary);
+    background: white;
+}
+
+.nutrition-item .nutrition-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(194, 74, 22, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    color: var(--brand-primary);
+    font-size: 18px;
+}
+
+.nutrition-item label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.nutrition-item input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 /* ===== FORM ACTIONS ===== */
 .form-actions {
     display: flex;
@@ -620,13 +781,74 @@ body {
     color: #c62828;
 }
 
+/* ===== ALLERGEN BADGES ===== */
+.allergen-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.allergen-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fff3e0;
+    border: 1px solid #ffcc80;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #ef6c00;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.allergen-badge:hover,
+.allergen-badge.selected {
+    background: #ef6c00;
+    color: white;
+    border-color: #ef6c00;
+}
+
+.allergen-badge i {
+    font-size: 11px;
+}
+
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .nutrition-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 992px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
+    .form-grid.triple {
+        grid-template-columns: 1fr;
+    }
     .datetime-display {
         display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .sidebar-accent {
+        display: none;
+    }
+    
+    .main-content,
+    .topbar {
+        margin-left: 0;
+    }
+    
+    .nutrition-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 </style>
@@ -681,12 +903,12 @@ body {
             </a>
         </li>
         <li>
-             <a href="#">
-                 <svg viewBox="0 0 24 24">
-                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
-                 </svg>
-                 Payments
-             </a>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
         </li>
         <li>
             <a href="#">
@@ -707,7 +929,7 @@ body {
 
 <!-- TOPBAR -->
 <div class="topbar">
-    <div class="topbar-left">Tour Management</div>
+    <div class="topbar-left">Foods & Beverages Management</div>
     <div class="topbar-right">
         <div class="datetime-display">
             <div class="time" id="currentTime">00:00 AM</div>
@@ -731,10 +953,12 @@ body {
 
     <!-- PAGE HEADER -->
     <div class="page-header">
-        <h2 class="section-title">Add New Tour</h2>
-        <a href="{{ path('app_tour_index') }}" class="btn-back">
+        <h2 class="section-title">
+            Add New Food Item
+        </h2>
+        <a href="{{ path('app_food_index') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i>
-            Back to Tours
+            Back to Food List
         </a>
     </div>
 
@@ -742,16 +966,16 @@ body {
     <div class="form-container">
         <div class="form-header">
             <div class="header-icon">
-                <i class="fas fa-map-marked-alt"></i>
+                <i class="fas fa-hamburger"></i>
             </div>
             <div class="header-text">
-                <h3>Tour Information</h3>
-                <p>Fill in the details below to add a new tour package</p>
+                <h3>Food Information</h3>
+                <p>Fill in the details below to add a new food item to the menu</p>
             </div>
         </div>
 
         <div class="form-body">
-            {{ form_start(form, {'attr': {'class': 'tour-form', 'enctype': 'multipart/form-data', 'id': 'tourForm'}}) }}
+            {{ form_start(form, {'attr': {'class': 'food-form', 'enctype': 'multipart/form-data', 'id': 'foodForm'}}) }}
 
             <!-- BASIC INFO -->
             <div class="form-section">
@@ -761,40 +985,24 @@ body {
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Tour Name <span class="required">*</span></label>
-                        {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Island Hopping Adventure'}}) }}
+                        <label><i class="fas fa-tag"></i> Food Name <span class="required">*</span></label>
+                        {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Grilled Salmon, Caesar Salad'}}) }}
                         {{ form_errors(form.name) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter a descriptive tour name</span>
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter the name of the dish</span>
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-map-marker-alt"></i> Location <span class="required">*</span></label>
-                        {{ form_widget(form.location, {'attr': {'placeholder': 'e.g., Boracay Island, Philippines'}}) }}
-                        {{ form_errors(form.location) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-peso-sign"></i> Price Per Person <span class="required">*</span></label>
-                        {{ form_widget(form.price, {'attr': {'placeholder': '0.00'}}) }}
+                        <label><i class="fas fa-peso-sign"></i> Price <span class="required">*</span></label>
+                        {{ form_widget(form.price, {'attr': {'placeholder': '0.00', 'step': '0.01', 'min': '0'}}) }}
                         {{ form_errors(form.price) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Price per serving</span>
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-clock"></i> Duration <span class="required">*</span></label>
-                        {{ form_widget(form.duration) }}
-                        {{ form_errors(form.duration) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-calendar-alt"></i> Schedule Date & Time</label>
-                        {{ form_widget(form.scheduleDate) }}
-                        {{ form_errors(form.scheduleDate) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-users"></i> Available Slots <span class="required">*</span></label>
-                        {{ form_widget(form.availableSlots, {'attr': {'placeholder': 'Number of slots'}}) }}
-                        {{ form_errors(form.availableSlots) }}
+                        <label><i class="fas fa-boxes-stacked"></i> Available Stock <span class="required">*</span></label>
+                        {{ form_widget(form.availableStock, {'attr': {'placeholder': '0', 'min': '0'}}) }}
+                        {{ form_errors(form.availableStock) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Number of servings available</span>
                     </div>
 
                     <div class="form-group">
@@ -802,6 +1010,85 @@ body {
                         {{ form_widget(form.status) }}
                         {{ form_errors(form.status) }}
                     </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-list"></i> Category <span class="required">*</span></label>
+                        {{ form_widget(form.category, {'attr': {'id': 'categoryInput'}}) }}
+                        {{ form_errors(form.category) }}
+                        
+                        <div class="category-tags-container">
+        <!-- Row 1: Main Categories -->
+        <div class="category-tag" data-value="Appetizer">
+            <i class="fas fa-seedling"></i> Appetizer
+        </div>
+        <div class="category-tag" data-value="Main Course">
+            <i class="fas fa-drumstick-bite"></i> Main Course
+        </div>
+        <div class="category-tag" data-value="Dessert">
+            <i class="fas fa-ice-cream"></i> Dessert
+        </div>
+        <div class="category-tag" data-value="Beverage">
+            <i class="fas fa-glass-martini-alt"></i> Beverage
+        </div>
+        <div class="category-tag" data-value="Snack">
+            <i class="fas fa-cookie"></i> Snack
+        </div>
+        <div class="category-tag" data-value="Breakfast">
+            <i class="fas fa-egg"></i> Breakfast
+        </div>
+        
+        <!-- Row 2: Food Types -->
+        <div class="category-tag" data-value="Soup">
+            <i class="fas fa-mug-hot"></i> Soup
+        </div>
+        <div class="category-tag" data-value="Salad">
+            <i class="fas fa-leaf"></i> Salad
+        </div>
+        <div class="category-tag" data-value="Pasta">
+            <i class="fas fa-utensils"></i> Pasta
+        </div>
+        <div class="category-tag" data-value="Pizza">
+            <i class="fas fa-pizza-slice"></i> Pizza
+        </div>
+        <div class="category-tag" data-value="Seafood">
+            <i class="fas fa-fish"></i> Seafood
+        </div>
+        <div class="category-tag" data-value="Grilled">
+            <i class="fas fa-fire"></i> Grilled
+        </div>
+        
+        <!-- Row 3: More Food Types -->
+        <div class="category-tag" data-value="Sandwich">
+            <i class="fas fa-bread-slice"></i> Sandwich
+        </div>
+        <div class="category-tag" data-value="Rice Meal">
+            <i class="fas fa-bowl-rice"></i> Rice Meal
+        </div>
+        
+        <!-- Row 4: Cuisine Types -->
+        <div class="category-tag" data-value="Filipino">
+            <i class="fas fa-flag"></i> Filipino
+        </div>
+        <div class="category-tag" data-value="Asian">
+            <i class="fas fa-bowl-food"></i> Asian
+        </div>
+        <div class="category-tag" data-value="Western">
+            <i class="fas fa-burger"></i> Western
+        </div>
+        
+        <!-- Row 5: Special Categories -->
+        <div class="category-tag" data-value="Vegetarian">
+            <i class="fas fa-carrot"></i> Vegetarian
+        </div>
+        <div class="category-tag" data-value="Kids Meal">
+            <i class="fas fa-child"></i> Kids Meal
+        </div>
+        <div class="category-tag" data-value="Special">
+            <i class="fas fa-star"></i> Special
+        </div>
+    </div>
+    <span class="help-text"><i class="fas fa-lightbulb"></i> Click to select a category</span>
+</div>
                 </div>
             </div>
 
@@ -809,14 +1096,14 @@ body {
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-align-left"></i>
-                    <h4>Tour Description</h4>
+                    <h4>Description & Details</h4>
                 </div>
                 <div class="form-grid single">
                     <div class="form-group">
-                        <label><i class="fas fa-file-alt"></i> Description</label>
-                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe the tour package, itinerary, inclusions...', 'rows': 5}}) }}
+                        <label><i class="fas fa-file-alt"></i> Food Description</label>
+                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe the dish, its ingredients, and flavor profile...', 'rows': 4}}) }}
                         {{ form_errors(form.description) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Provide detailed information about the tour</span>
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> A detailed description helps guests make informed choices</span>
                     </div>
                 </div>
             </div>
@@ -825,12 +1112,12 @@ body {
             <div class="form-section">
                  <div class="section-header">
                      <i class="fas fa-images"></i>
-                     <h4>Room Images</h4>
+                     <h4>Food Images</h4>
                  </div>
                 <div class="form-grid">
                     <!-- Main Image -->
                     <div class="form-group">
-                        <label><i class="fas fa-image"></i> Main Room Image</label>
+                        <label><i class="fas fa-image"></i> Main Food Image</label>
                         <div class="image-upload-area" id="mainUploadArea">
                             {{ form_widget(form.mainImageFile, {'attr': {'class': 'file-input', 'id': 'mainImageInput', 'accept': 'image/*'}}) }}
                             <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
@@ -866,11 +1153,11 @@ body {
 
             <!-- FORM ACTIONS -->
             <div class="form-actions">
-                <a href="{{ path('app_tour_index') }}" class="btn-cancel">
+                <a href="{{ path('app_food_index') }}" class="btn-cancel">
                     <i class="fas fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="btn-submit">
-                    <i class="fas fa-check"></i> Create Tour
+                    <i class="fas fa-check"></i> Create Food Item
                 </button>
             </div>
 
@@ -885,6 +1172,7 @@ body {
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
     // ===== DEBUG HELPERS =====
     function findFileInput(id, uploadArea) {
         let el = document.getElementById(id);
@@ -893,12 +1181,10 @@ document.addEventListener('DOMContentLoaded', function() {
             el = uploadArea.querySelector('input[type="file"]');
             if (el) return el;
         }
-        // last resort: any file input on page
-        el = document.querySelector('input[type="file"]');
-        return el;
+        return null;
     }
 
-    // ===== DATE TIME (unchanged) =====
+    // ===== DATE TIME =====
     function updateDateTime() {
         const now = new Date();
         const timeEl = document.getElementById('currentTime');
@@ -921,6 +1207,55 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
+    // ===== CATEGORY TAGS =====
+    (function() {
+        const categoryTags = document.querySelectorAll('.category-tag');
+        if (!categoryTags.length) return;
+        
+        const categoryInput = document.getElementById('categoryInput') || 
+                              document.querySelector('[name$="[category]"]') || 
+                              document.querySelector('[name*="category"]');
+        
+        if (!categoryInput) {
+            console.warn('Category input not found');
+            return;
+        }
+
+        // Check if it's a select or input
+        const isSelect = categoryInput.tagName.toLowerCase() === 'select';
+        
+        // Set initial selected state
+        const currentValue = isSelect ? categoryInput.value : categoryInput.value;
+        categoryTags.forEach(tag => {
+            if (tag.dataset.value === currentValue) {
+                tag.classList.add('selected');
+            }
+        });
+
+        categoryTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                const value = tag.dataset.value;
+                
+                // Remove selected from all
+                categoryTags.forEach(t => t.classList.remove('selected'));
+                
+                // Add selected to clicked
+                tag.classList.add('selected');
+                
+                // Update input
+                if (isSelect) {
+                    // Find and select the matching option
+                    Array.from(categoryInput.options).forEach(opt => {
+                        opt.selected = opt.value === value || opt.text === value;
+                    });
+                } else {
+                    categoryInput.value = value;
+                }
+                
+                categoryInput.dispatchEvent(new Event('change', {bubbles: true}));
+            });
+        });
+    })();
 
     // ===== IMAGE UPLOAD HANDLER =====
     class ImageUploader {
@@ -941,35 +1276,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             if (!this.input) {
-                console.warn('File input not found for id:', inputId, ' — looking inside upload area.');
-            } else {
-                // If the input was not inside the upload area, move it there so styling/overlay match
-                if (!this.uploadArea.contains(this.input)) {
-                    // make input visually invisible but inside uploadArea
-                    this.input.style.position = 'absolute';
-                    this.input.style.top = '0';
-                    this.input.style.left = '0';
-                    this.input.style.width = '100%';
-                    this.input.style.height = '100%';
-                    this.input.style.opacity = '0';
-                    this.input.style.cursor = 'pointer';
-                    this.uploadArea.insertBefore(this.input, this.uploadArea.firstChild);
-                }
+                console.warn('File input not found for id:', inputId);
+                return;
             }
 
             this.init();
         }
 
         init() {
-            // Try to re-find input in case it's rendered later by Symfony JS
-            this.input = findFileInput(this.inputId, this.uploadArea);
-            if (!this.input) {
-                console.error('No file input available for uploader', this.inputId);
-                return;
-            }
-
             this.input.addEventListener('change', (e) => {
-                console.debug('File input change event for', this.inputId, e.target.files);
                 this.handleFiles(e.target.files);
             });
 
@@ -1043,14 +1358,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dt = new DataTransfer();
                 this.files.forEach(file => dt.items.add(file));
                 this.input.files = dt.files;
-                console.debug('Updated input.files for', this.inputId, this.input.files);
             } catch (err) {
                 console.error('Could not set input.files programmatically:', err);
             }
         }
     }
 
-    // Initialize uploaders with improved lookup
+    // Initialize uploaders
     new ImageUploader('mainImageInput', 'mainImagePreview', 'mainUploadArea', false);
     new ImageUploader('galleryImagesInput', 'galleryImagesPreview', 'galleryUploadArea', true);
 

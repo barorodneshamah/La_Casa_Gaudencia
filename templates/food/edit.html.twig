@@ -1,0 +1,1699 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Food | La Casa Gaudencia{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --brand-primary: #c24a16;
+        --brand-cream: #fcfbf7;
+        --brand-black: #000000;
+        --brand-text: #2f2f2f;
+        --brand-text-muted: #888888;
+        --font-heading: 'Playfair Display', serif;
+        --font-body: 'Roboto', sans-serif;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #f7f5edff;
+        font-family: 'Roboto', sans-serif;
+        color: #2f2f2f;
+    }
+
+    /* ===== ACCENT BAR ===== */
+    .sidebar-accent {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 8px;
+        height: 100vh;
+        background-color: #c24a16;
+        border-radius: 0 6px 6px 0;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+        z-index: 30;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 8px;
+        width: 260px;
+        height: 100vh;
+        background: white;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 28px;
+        border-radius: 0 12px 12px 0;
+        z-index: 20;
+    }
+
+    /* ===== BRAND ===== */
+    .brand {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .brand img {
+        width: 75px;
+        height: 75px;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+    }
+
+    .brand h1 {
+        font-family: 'Playfair Display', serif;
+        color: #c24a16;
+        font-size: 22px;
+        letter-spacing: .5px;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .brand small {
+        color: #777;
+        font-size: 12px;
+        letter-spacing: .75px;
+        font-weight: 500;
+    }
+
+    /* ===== SEPARATOR ===== */
+    .sidebar-separator {
+        width: 75%;
+        height: 1.5px;
+        background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+        margin: 10px 0 15px 0;
+    }
+
+    /* ===== MENU ===== */
+    .sidebar ul {
+        list-style: none;
+        width: 100%;
+        padding: 0;
+    }
+
+    .sidebar ul li a {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 14px 35px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #2f2f2f;
+        text-decoration: none;
+        transition: all .25s ease;
+    }
+
+    .sidebar ul li svg {
+        width: 20px;
+        height: 20px;
+        fill: #888;
+        transition: .25s;
+    }
+
+    .sidebar ul li a:hover,
+    .sidebar ul li.active a {
+        background-color: #c24a16;
+        color: white;
+        margin-left: -12px;
+        border-radius: 0 30px 30px 0;
+        padding-left: 48px;
+        box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+    }
+
+    .sidebar ul li a:hover svg,
+    .sidebar ul li.active a svg {
+        fill: white !important;
+    }
+
+    /* ===== LOGOUT SECTION ===== */
+    .sidebar-logout {
+        width: 100%;
+        padding: 20px 30px;
+        margin-top: auto;
+        display: flex;
+        justify-content: center;
+        border-top: 1px solid #eee;
+    }
+
+    .logout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 80%;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+        border: none;
+        cursor: pointer;
+    }
+
+    .logout-btn:hover {
+        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+    }
+
+    .logout-btn i {
+        font-size: 16px;
+    }
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+        margin-left: 268px;
+        background: #c24a16;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 35px;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    .topbar-left {
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: .7px;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .datetime-display {
+        text-align: right;
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+    }
+
+    .datetime-display .time {
+        font-size: 14px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .datetime-display .date {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 1px;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+        margin-left: 268px;
+        padding: 32px;
+        min-height: calc(100vh - 70px);
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .page-header .section-title {
+        margin: 0;
+        font-family: var(--font-heading);
+        font-size: 26px;
+        color: var(--brand-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-header .section-title i {
+        font-size: 24px;
+        opacity: 0.8;
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-back {
+        padding: 11px 22px;
+        border: 2px solid var(--brand-primary);
+        color: var(--brand-primary);
+        background: white;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.25s ease;
+    }
+
+    .btn-back:hover {
+        background: var(--brand-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+    }
+
+    /* ===== FOOD INFO CARD ===== */
+    .food-info-card {
+        background: linear-gradient(135deg, #fff5f0 0%, #fff8f5 100%);
+        border: 2px solid rgba(194, 74, 22, 0.15);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .food-info-card .food-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 28px;
+        box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+        overflow: hidden;
+    }
+
+    .food-info-card .food-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .food-info-card .food-details {
+        flex: 1;
+    }
+
+    .food-info-card .food-details h3 {
+        margin: 0 0 6px 0;
+        font-family: var(--font-heading);
+        font-size: 20px;
+        color: var(--brand-text);
+    }
+
+    .food-info-card .food-details .food-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .food-info-card .food-details .food-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--brand-text-muted);
+    }
+
+    .food-info-card .food-details .food-meta span i {
+        color: var(--brand-primary);
+    }
+
+    .food-info-card .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .food-info-card .status-badge.available {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #2e7d32;
+        border: 1px solid #a5d6a7;
+    }
+
+    .food-info-card .status-badge.out-of-stock {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        color: #c62828;
+        border: 1px solid #ef9a9a;
+    }
+
+    .food-info-card .status-badge.limited {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        color: #ef6c00;
+        border: 1px solid #ffcc80;
+    }
+
+    .food-info-card .status-badge.coming-soon {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1565c0;
+        border: 1px solid #90caf9;
+    }
+
+    .food-info-card .status-badge.discontinued {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #7b1fa2;
+        border: 1px solid #ce93d8;
+    }
+
+    .food-info-card .status-badge.seasonal {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #388e3c;
+        border: 1px solid #81c784;
+    }
+
+    /* ===== FORM ===== */
+    .form-container {
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: #faf9f5;
+        padding: 24px 28px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .form-header .header-icon {
+        width: 52px;
+        height: 52px;
+        background: var(--brand-primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+    }
+
+    .form-header .header-text h3 {
+        margin: 0;
+        font-family: var(--font-heading);
+        font-size: 19px;
+        font-weight: 600;
+    }
+
+    .form-header .header-text p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: var(--brand-text-muted);
+    }
+
+    .form-body {
+        padding: 32px;
+    }
+
+    .form-section {
+        margin-bottom: 36px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid rgba(194, 74, 22, 0.1);
+    }
+
+    .section-header i {
+        width: 34px;
+        height: 34px;
+        background: rgba(194, 74, 22, 0.08);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand-primary);
+    }
+
+    .section-header h4 {
+        margin: 0;
+        font-family: var(--font-heading);
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .form-grid.single {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid.three-cols {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--brand-text);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .form-group label .required {
+        color: var(--brand-primary);
+    }
+
+    .form-group label i {
+        color: var(--brand-text-muted);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 13px 16px;
+        border: 2px solid #e5e5e5;
+        border-radius: 8px;
+        font-family: var(--font-body);
+        font-size: 14px;
+        color: var(--brand-text);
+        background: var(--brand-cream);
+        transition: all 0.25s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(194, 74, 22, 0.08);
+    }
+
+    .form-group select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .help-text {
+        font-size: 11px;
+        color: var(--brand-text-muted);
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .help-text i {
+        color: var(--brand-primary);
+    }
+
+    /* ===== DIETARY TAGS ===== */
+    .dietary-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .dietary-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        background: rgba(194, 74, 22, 0.06);
+        border: 1px solid rgba(194, 74, 22, 0.2);
+        border-radius: 18px;
+        font-size: 12px;
+        color: var(--brand-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .dietary-tag:hover,
+    .dietary-tag.selected {
+        background: var(--brand-primary);
+        color: white;
+        border-color: var(--brand-primary);
+    }
+
+    .dietary-tag i {
+        font-size: 11px;
+    }
+
+    /* ===== IMAGE UPLOAD ===== */
+    .image-upload-area {
+        border: 2px dashed #d0d0d0;
+        border-radius: 10px;
+        padding: 28px;
+        text-align: center;
+        background: #faf9f5;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.25s ease;
+    }
+
+    .image-upload-area:hover,
+    .image-upload-area.dragover {
+        border-color: var(--brand-primary);
+        background: rgba(194, 74, 22, 0.03);
+    }
+
+    .image-upload-area .file-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--brand-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+        color: white;
+        font-size: 26px;
+    }
+
+    .upload-text h5 {
+        margin: 0 0 6px;
+        font-family: var(--font-heading);
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .upload-text p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--brand-text-muted);
+    }
+
+    .upload-text span {
+        color: var(--brand-primary);
+        font-weight: 500;
+    }
+
+    .upload-text .file-info {
+        font-size: 10px;
+        margin-top: 8px;
+        color: #aaa;
+    }
+
+    /* ===== IMAGE PREVIEW ===== */
+    .image-preview-container {
+        margin-top: 16px;
+    }
+
+    .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .image-preview-item {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        aspect-ratio: 4/3;
+        background: #f0f0f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .image-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ===== BADGES & LABELS ===== */
+    .image-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+        background: rgba(0,0,0,0.6);
+        z-index: 10;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+    .image-badge.current-badge {
+        background: var(--brand-primary);
+    }
+
+    .image-badge.new-badge {
+        background: rgba(0,0,0,0.6);
+    }
+
+    .main-image-badge {
+        position: absolute;
+        bottom: 6px;
+        left: 6px;
+        background: var(--brand-primary);
+        color: white;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .gallery-badge,
+    .gallery-number {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .btn-delete-image {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 12px;
+    }
+
+    .btn-delete-image:hover {
+        background: #dc3545;
+        transform: scale(1.1);
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 11px;
+    }
+
+    .remove-btn:hover {
+        background: #dc3545;
+        transform: scale(1.1);
+    }
+
+    /* ===== FORM ACTIONS ===== */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        margin-top: 36px;
+        padding-top: 24px;
+        border-top: 2px solid rgba(0, 0, 0, 0.05);
+        flex-wrap: wrap;
+    }
+
+    .form-actions-left {
+        display: flex;
+        gap: 12px;
+    }
+
+    .form-actions-right {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-cancel {
+        padding: 13px 26px;
+        border: 2px solid #ddd;
+        color: #666;
+        background: white;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .btn-cancel:hover {
+        border-color: var(--brand-primary);
+        color: var(--brand-primary);
+    }
+
+    .btn-delete {
+        padding: 13px 26px;
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        background: white;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .btn-delete:hover {
+        background: #dc3545;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-submit {
+        padding: 13px 32px;
+        background: var(--brand-primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(194, 74, 22, 0.25);
+        transition: all 0.25s ease;
+    }
+
+    .btn-submit:hover {
+        background: #a33d12;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(194, 74, 22, 0.35);
+    }
+
+    /* ===== FLASH MESSAGES ===== */
+    .flash-message {
+        padding: 14px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .flash-message.success {
+        background: #e8f5e9;
+        border: 1px solid #a5d6a7;
+        color: #2e7d32;
+    }
+
+    .flash-message.error {
+        background: #ffebee;
+        border: 1px solid #ef9a9a;
+        color: #c62828;
+    }
+
+    /* ===== DELETE MODAL ===== */
+    .delete-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .delete-modal-overlay.show {
+        display: flex;
+    }
+
+    .delete-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 420px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .delete-modal .modal-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #c62828;
+        font-size: 32px;
+    }
+
+    .delete-modal h3 {
+        margin: 0 0 12px;
+        font-family: var(--font-heading);
+        font-size: 22px;
+        color: var(--brand-text);
+    }
+
+    .delete-modal p {
+        margin: 0 0 24px;
+        color: var(--brand-text-muted);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .delete-modal .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .delete-modal .btn-modal-cancel {
+        padding: 12px 24px;
+        border: 2px solid #ddd;
+        color: #666;
+        background: white;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .delete-modal .btn-modal-cancel:hover {
+        border-color: #999;
+        color: #333;
+    }
+
+    .delete-modal .btn-modal-delete {
+        padding: 12px 24px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .delete-modal .btn-modal-delete:hover {
+        background: #c82333;
+    }
+
+    /* ===== QUANTITY INDICATOR ===== */
+    .quantity-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+    .quantity-bar {
+        flex: 1;
+        height: 6px;
+        background: #e0e0e0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .quantity-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .quantity-bar-fill.high {
+        background: linear-gradient(90deg, #4caf50, #66bb6a);
+    }
+
+    .quantity-bar-fill.medium {
+        background: linear-gradient(90deg, #ff9800, #ffb74d);
+    }
+
+    .quantity-bar-fill.low {
+        background: linear-gradient(90deg, #f44336, #ef5350);
+    }
+
+    .quantity-text {
+        font-size: 11px;
+        color: var(--brand-text-muted);
+        min-width: 80px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .form-grid.three-cols {
+            grid-template-columns: 1fr;
+        }
+        .datetime-display {
+            display: none;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+        .form-actions-left,
+        .form-actions-right {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            margin-left: 0;
+            padding: 20px;
+        }
+
+        .sidebar,
+        .sidebar-accent {
+            display: none;
+        }
+
+        .topbar {
+            margin-left: 0;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .food-info-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .food-info-card .food-details .food-meta {
+            justify-content: center;
+        }
+
+        .image-preview-grid {
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        }
+
+        .dietary-tag {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>Admin Panel</small>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <ul>
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_user_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                User Management
+            </a>
+        </li>
+        <li class="active">
+            <a href="{{ path('app_admin_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+        <li>
+             <a href="#">
+                 <svg viewBox="0 0 24 24">
+                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                 </svg>
+                 Payments
+             </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/>
+                </svg>
+                Activity Logs
+            </a>
+        </li>
+    </ul>
+
+    <!-- LOGOUT SECTION -->
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">
+            Log Out
+        </a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">Food Management</div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- FLASH MESSAGES -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-message {{ label }}">
+                <i class="fas fa-{{ label == 'success' ? 'check-circle' : 'exclamation-circle' }}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2 class="section-title">
+            Edit Food Item
+        </h2>
+        <div class="header-buttons">
+            <a href="{{ path('app_food_index') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Back to Menu
+            </a>
+        </div>
+    </div>
+
+    <!-- FOOD INFO CARD -->
+    <div class="food-info-card">
+        <div class="food-icon">
+           <i class="fas fa-utensils"></i>
+        </div>
+
+        <div class="food-details">
+            <h3>{{ food.name }}</h3>
+            <div class="food-meta">
+                <span><i class="fas fa-tag"></i> {{ food.category }}</span>
+                <span><i class="fas fa-peso-sign"></i> ₱{{ food.price|number_format(2) }}</span>
+                <span><i class="fas fa-boxes-stacked"></i> {{ food.availableStock }} in stock</span>
+            </div>
+        </div>
+        {% set statusClass = 'available' %}
+        {% if food.status|lower == 'out of stock' %}
+            {% set statusClass = 'out-of-stock' %}
+        {% elseif food.status|lower == 'limited' %}
+            {% set statusClass = 'limited' %}
+        {% elseif food.status|lower == 'coming soon' %}
+            {% set statusClass = 'coming-soon' %}
+        {% elseif food.status|lower == 'discontinued' %}
+            {% set statusClass = 'discontinued' %}
+        {% elseif food.status|lower == 'seasonal' %}
+            {% set statusClass = 'seasonal' %}
+        {% endif %}
+        <span class="status-badge {{ statusClass }}">
+            {{ food.status }}
+        </span>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-container">
+        <div class="form-header">
+            <div class="header-icon">
+                <i class="fas fa-burger"></i>
+            </div>
+            <div class="header-text">
+                <h3>Update Food Information</h3>
+                <p>Modify the food item details below</p>
+            </div>
+        </div>
+
+        <div class="form-body">
+            {{ form_start(form, {'attr': {'class': 'food-form', 'enctype': 'multipart/form-data', 'id': 'foodForm'}}) }}
+
+            <!-- BASIC INFO -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h4>Basic Information</h4>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-signature"></i>
+                            Food Name <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Grilled Salmon, Caesar Salad'}}) }}
+                        {{ form_errors(form.name) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter the dish name</span>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-folder"></i>
+                            Category <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.category) }}
+                        {{ form_errors(form.category) }}
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-peso-sign"></i>
+                            Price <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.price, {'attr': {'placeholder': '0.00'}}) }}
+                        {{ form_errors(form.price) }}
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-boxes-stacked"></i>
+                            Available Stock <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.availableStock, {'attr': {'placeholder': '0', 'min': 0, 'id': 'quantityInput'}}) }}
+                        {{ form_errors(form.availableStock) }}
+                        <div class="quantity-indicator" id="quantityIndicator">
+                            <div class="quantity-bar">
+                                <div class="quantity-bar-fill high" id="quantityBarFill" style="width: 100%;"></div>
+                            </div>
+                            <span class="quantity-text" id="quantityText">In Stock</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-toggle-on"></i>
+                            Status <span class="required">*</span>
+                        </label>
+                        {{ form_widget(form.status) }}
+                        {{ form_errors(form.status) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-align-left"></i>
+                    <h4>Description</h4>
+                </div>
+                <div class="form-grid single">
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Food Description</label>
+                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe the dish, its ingredients, and flavor profile...', 'rows': 4}}) }}
+                        {{ form_errors(form.description) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Provide a mouth-watering description for guests</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMAGES -->
+<div class="form-section">
+    <div class="section-header">
+        <i class="fas fa-images"></i>
+        <h4>Food Images</h4>
+    </div>
+    <div class="form-grid">
+        <!-- Main Image -->
+        <div class="form-group">
+            <label><i class="fas fa-image"></i> Main Food Image</label>
+            <div class="image-upload-area" id="mainUploadArea">
+                {{ form_widget(form.mainImageFile, {'attr': {'class': 'file-input', 'id': 'mainImageInput', 'accept': 'image/*'}}) }}
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="upload-text">
+                    <h5>Upload Main Image</h5>
+                    <p>Drag & drop or <span>browse</span></p>
+                    <p class="file-info">JPEG, PNG or WebP (Max 5MB)</p>
+                </div>
+            </div>
+            <div class="image-preview-container">
+                <div class="image-preview-grid">
+                    {% if food.mainImage %}
+                        <div class="image-preview-item">
+                            <img src="{{ asset(food.mainImage) }}" alt="Current main image">
+                            <span class="image-badge current-badge">Current</span>
+                            <button type="button"
+                                    class="btn-delete-image"
+                                    title="Delete main image"
+                                    data-action="{{ path('app_food_delete_image', {'id': food.id, 'type': 'main', 'index': 0}) }}"
+                                    data-token="{{ csrf_token('delete-image' ~ food.id) }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="image-preview-grid" id="mainImagePreview"></div>
+            </div>
+        </div>
+
+        <!-- Gallery Images -->
+        <div class="form-group">
+            <label><i class="fas fa-photo-video"></i> Gallery Images</label>
+            <div class="image-upload-area" id="galleryUploadArea">
+                {{ form_widget(form.galleryImageFiles, {'attr': {'class': 'file-input', 'id': 'galleryImagesInput', 'accept': 'image/*', 'multiple': true}}) }}
+                <div class="upload-icon"><i class="fas fa-images"></i></div>
+                <div class="upload-text">
+                    <h5>Upload Gallery Images</h5>
+                    <p>Drag & drop or <span>browse</span></p>
+                    <p class="file-info">Multiple files allowed</p>
+                </div>
+            </div>
+            <div class="image-preview-container">
+                <div class="image-preview-grid">
+                    {% for image in food.galleryImages %}
+                        <div class="image-preview-item">
+                            <img src="{{ asset(image) }}" alt="Gallery image {{ loop.index }}">
+                            <span class="gallery-number">{{ loop.index }}</span>
+                            <span class="image-badge current-badge">Current</span>
+                            <button type="button"
+                                    class="btn-delete-image"
+                                    title="Delete gallery image"
+                                    data-action="{{ path('app_food_delete_image', {'id': food.id, 'type': 'gallery', 'index': loop.index0}) }}"
+                                    data-token="{{ csrf_token('delete-image' ~ food.id) }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="image-preview-grid" id="galleryImagesPreview"></div>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- FORM ACTIONS -->
+            <div class="form-actions">
+                <div class="form-actions-left">
+                    <button type="button" class="btn-delete" id="deleteFoodBtn">
+                        <i class="fas fa-trash-alt"></i> Delete Food
+                    </button>
+                </div>
+                <div class="form-actions-right">
+                    <a href="{{ path('app_food_index') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Update Food
+                    </button>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="modal-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>Delete "{{ food.name }}"?</h3>
+        <p>Are you sure you want to delete this food item? This action cannot be undone and all associated data will be permanently removed.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" id="cancelDeleteBtn">Cancel</button>
+            <form method="post" action="{{ path('app_food_delete', {'id': food.id}) }}" style="display: inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ food.id) }}">
+                <button type="submit" class="btn-modal-delete">
+                    <i class="fas fa-trash-alt"></i> Yes, Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== DEBUG HELPERS =====
+    function findFileInput(id, uploadArea) {
+        let el = document.getElementById(id);
+        if (el && el.tagName && el.tagName.toLowerCase() === 'input' && el.type === 'file') return el;
+        if (uploadArea) {
+            el = uploadArea.querySelector('input[type="file"]');
+            if (el) return el;
+        }
+        el = document.querySelector('input[type="file"]');
+        return el;
+    }
+
+    // ===== DATE TIME =====
+    function updateDateTime() {
+        const now = new Date();
+        const timeEl = document.getElementById('currentTime');
+        const dateEl = document.getElementById('currentDate');
+        if (timeEl && dateEl) {
+            timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // ===== DELETE MODAL =====
+    const deleteBtn = document.getElementById('deleteFoodBtn');
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+    if (deleteBtn && deleteModal) {
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('show');
+        });
+
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('show');
+        });
+
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('show');
+            }
+        });
+    }
+
+    // ===== QUANTITY INDICATOR =====
+    const quantityInput = document.getElementById('quantityInput');
+    const quantityBarFill = document.getElementById('quantityBarFill');
+    const quantityText = document.getElementById('quantityText');
+
+    function updateQuantityIndicator() {
+        if (!quantityInput || !quantityBarFill || !quantityText) return;
+        
+        const value = parseInt(quantityInput.value) || 0;
+        let percentage, colorClass, text;
+
+        if (value >= 50) {
+            percentage = 100;
+            colorClass = 'high';
+            text = 'Well Stocked';
+        } else if (value >= 20) {
+            percentage = 70;
+            colorClass = 'high';
+            text = 'In Stock';
+        } else if (value >= 10) {
+            percentage = 50;
+            colorClass = 'medium';
+            text = 'Running Low';
+        } else if (value > 0) {
+            percentage = 25;
+            colorClass = 'low';
+            text = 'Low Stock';
+        } else {
+            percentage = 5;
+            colorClass = 'low';
+            text = 'Out of Stock';
+        }
+
+        quantityBarFill.style.width = percentage + '%';
+        quantityBarFill.className = 'quantity-bar-fill ' + colorClass;
+        quantityText.textContent = text;
+    }
+
+    if (quantityInput) {
+        quantityInput.addEventListener('input', updateQuantityIndicator);
+        updateQuantityIndicator();
+    }
+
+    // ===== IMAGE UPLOAD HANDLER =====
+    class ImageUploader {
+        constructor(inputId, previewId, uploadAreaId, isMultiple = false) {
+            this.uploadArea = document.getElementById(uploadAreaId);
+            this.preview = document.getElementById(previewId);
+            this.inputId = inputId;
+            this.isMultiple = isMultiple;
+            this.files = [];
+
+            this.input = findFileInput(inputId, this.uploadArea);
+
+            if (!this.uploadArea) {
+                console.warn('Upload area not found:', uploadAreaId);
+                return;
+            }
+
+            if (!this.preview) {
+                console.warn('Preview container not found:', previewId);
+                return;
+            }
+
+            if (!this.input) {
+                console.warn('File input not found for id:', inputId);
+            } else {
+                if (!this.uploadArea.contains(this.input)) {
+                    this.input.style.position = 'absolute';
+                    this.input.style.top = '0';
+                    this.input.style.left = '0';
+                    this.input.style.width = '100%';
+                    this.input.style.height = '100%';
+                    this.input.style.opacity = '0';
+                    this.input.style.cursor = 'pointer';
+                    this.uploadArea.insertBefore(this.input, this.uploadArea.firstChild);
+                }
+            }
+
+            this.init();
+        }
+
+        init() {
+            this.input = findFileInput(this.inputId, this.uploadArea);
+            if (!this.input) {
+                console.error('No file input available for uploader', this.inputId);
+                return;
+            }
+
+            this.input.addEventListener('change', (e) => {
+                console.debug('File input change event for', this.inputId, e.target.files);
+                this.handleFiles(e.target.files);
+            });
+
+            this.uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                this.uploadArea.classList.add('dragover');
+            });
+
+            this.uploadArea.addEventListener('dragleave', () => {
+                this.uploadArea.classList.remove('dragover');
+            });
+
+            this.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+                this.handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        handleFiles(fileList) {
+            const newFiles = Array.from(fileList).filter(file => {
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name} is not an image`);
+                    return false;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name} is too large (max 5MB)`);
+                    return false;
+                }
+                return true;
+            });
+
+            if (this.isMultiple) {
+                this.files = [...this.files, ...newFiles];
+            } else {
+                this.files = newFiles.slice(0, 1);
+            }
+
+            this.renderPreview();
+            this.updateInput();
+        }
+
+        renderPreview() {
+            this.preview.innerHTML = '';
+
+            this.files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const item = document.createElement('div');
+                    item.className = 'image-preview-item';
+                    item.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        ${!this.isMultiple ? '<span class="main-image-badge">Main</span>' : `<span class="gallery-badge">${index + 1}</span>`}
+                        <span class="image-badge new-badge">New</span>
+                        <button type="button" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
+                    `;
+
+                    item.querySelector('.remove-btn').addEventListener('click', () => {
+                        this.files.splice(index, 1);
+                        this.renderPreview();
+                        this.updateInput();
+                    });
+
+                    this.preview.appendChild(item);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        updateInput() {
+            try {
+                const dt = new DataTransfer();
+                this.files.forEach(file => dt.items.add(file));
+                this.input.files = dt.files;
+                console.debug('Updated input.files for', this.inputId, this.input.files);
+            } catch (err) {
+                console.error('Could not set input.files programmatically:', err);
+            }
+        }
+    }
+
+    // Initialize uploaders
+    new ImageUploader('mainImageInput', 'mainImagePreview', 'mainUploadArea', false);
+    new ImageUploader('galleryImagesInput', 'galleryImagesPreview', 'galleryUploadArea', true);
+
+    // ===== DELETE IMAGE BUTTONS =====
+    document.querySelectorAll('.btn-delete-image').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            if (!confirm('Delete this image?')) return;
+
+            const action = btn.dataset.action;
+            const token = btn.dataset.token;
+
+            try {
+                const res = await fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({ _token: token })
+                });
+
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const text = await res.text();
+                    console.error('Delete failed', res.status, text);
+                    alert('Failed to delete image.');
+                }
+            } catch (err) {
+                console.error('Delete error', err);
+                alert('Failed to delete image.');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
