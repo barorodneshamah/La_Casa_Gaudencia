@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tour | La Casa Gaudencia{% endblock %}
+{% block title %}{{ food.name }} - Food{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -138,43 +138,43 @@ body {
 }
 
 /* ===== LOGOUT SECTION ===== */
-    .sidebar-logout {
-        width: 100%;
-        padding: 20px 30px;
-        margin-top: auto;
-        display: flex;
-        justify-content: center;
-        border-top: 1px solid #eee;
-    }
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
 
-    .logout-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 80%;
-        padding: 14px 24px;
-        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
-        border: none;
-        cursor: pointer;
-    }
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    border: none;
+    cursor: pointer;
+}
 
-    .logout-btn:hover {
-        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
-    }
+.logout-btn:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+}
 
-    .logout-btn i {
-        font-size: 16px;
-    }
+.logout-btn i {
+    font-size: 16px;
+}
 
 /* ===== TOPBAR ===== */
 .topbar {
@@ -227,7 +227,7 @@ body {
 .main-content { margin-left: 268px; padding: 32px; min-height: calc(100vh - 70px); }
 
 /* Page header */
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 16px; }
 .page-header .section-title { margin: 0; font-family: var(--font-heading); font-size: 26px; color: var(--brand-primary); font-weight: 600; display: flex; gap: 12px; align-items: center; }
 .section-title i { font-size: 22px; opacity: .9; }
 
@@ -273,61 +273,80 @@ body {
 .header-buttons form button:hover { transform: translateY(-2px); }
 
 /* Card wrapper */
-.tour-card { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08); border: 1px solid rgba(0,0,0,.05); overflow: hidden; }
+.food-card { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08); border: 1px solid rgba(0,0,0,.05); overflow: hidden; }
 
 /* Top summary strip */
-.tour-hero { display: flex; justify-content: space-between; gap: 18px; padding: 20px 22px; background: linear-gradient(135deg, #faf8f4 0%, #fff 100%); border-bottom: 1px solid #eee; flex-wrap: wrap; }
-.tour-id { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px; }
-.tour-icon { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 16px rgba(194,74,22,.3); }
-.tour-meta h3 { margin: 0; font-size: 20px; color: #2f2f2f; font-weight: 800; line-height: 1.3; }
-.tour-location { display: flex; align-items: center; gap: 6px; color: #888; font-size: 13px; margin-top: 4px; }
-.tour-location i { color: #c24a16; }
+.food-hero { display: flex; justify-content: space-between; gap: 18px; padding: 20px 22px; background: linear-gradient(135deg, #faf8f4 0%, #fff 100%); border-bottom: 1px solid #eee; }
+.food-id { display: flex; align-items: center; gap: 14px; }
+.food-icon { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 16px rgba(194,74,22,.3); }
+.food-meta h3 { margin: 0; font-size: 20px; color: #2f2f2f; font-weight: 800; }
 
 /* Badges */
 .badges { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-.duration-badge { background: #e3f2fd; color: #1565c0; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.category-badge { background: #e3f2fd; color: #1565c0; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.category-badge.appetizer { background: #fff3e0; color: #ef6c00; }
+.category-badge.main-course { background: #ffebee; color: #c62828; }
+.category-badge.dessert { background: #fce4ec; color: #c2185b; }
+.category-badge.beverage { background: #e3f2fd; color: #1565c0; }
+.category-badge.snack { background: #f3e5f5; color: #7b1fa2; }
+.category-badge.breakfast { background: #fff8e1; color: #ff8f00; }
+.category-badge.soup { background: #e8f5e9; color: #2e7d32; }
+.category-badge.salad { background: #e8f5e9; color: #388e3c; }
+.category-badge.pasta { background: #fff3e0; color: #e65100; }
+.category-badge.pizza { background: #ffebee; color: #d32f2f; }
+.category-badge.seafood { background: #e0f7fa; color: #00838f; }
+.category-badge.grilled { background: #efebe9; color: #5d4037; }
+.category-badge.sandwich { background: #fff8e1; color: #ffa000; }
+.category-badge.rice-meal { background: #f5f5f5; color: #616161; }
+.category-badge.filipino { background: #ffebee; color: #c62828; }
+.category-badge.asian { background: #fff3e0; color: #e65100; }
+.category-badge.western { background: #e3f2fd; color: #1565c0; }
+.category-badge.vegetarian { background: #e8f5e9; color: #2e7d32; }
+.category-badge.kids-meal { background: #f3e5f5; color: #8e24aa; }
+.category-badge.special { background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%); color: #5d4e00; }
+
 .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; }
 .status-badge.available { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
-.status-badge.booked { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
-.status-badge.cancelled { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
-.status-badge.pending { background: #fff3e0; color: #ef6c00; border-color: #ffcc80; }
-.status-badge.completed { background: #f3e5f5; color: #7b1fa2; border-color: #ce93d8; }
+.status-badge.out-of-stock { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+.status-badge.limited { background: #fff3e0; color: #ef6c00; border-color: #ffcc80; }
+.status-badge.coming-soon { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+.status-badge.discontinued { background: #fafafa; color: #616161; border-color: #e0e0e0; }
+.status-badge.seasonal { background: #f3e5f5; color: #7b1fa2; border-color: #ce93d8; }
 
 /* Quick tiles */
-.tour-quick { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-.quick-tile { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px 14px; min-width: 140px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
-.quick-tile i { color: #c24a16; font-size: 18px; }
+.food-quick { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.quick-tile { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px 14px; min-width: 160px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
+.quick-tile i { color: #c24a16; }
 .quick-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; }
 .quick-value { font-size: 16px; font-weight: 800; color: #2f2f2f; }
 
+/* Stock indicator */
+.stock-indicator { display: flex; align-items: center; gap: 8px; }
+.stock-bar { width: 60px; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+.stock-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.stock-fill.high { background: #4caf50; }
+.stock-fill.medium { background: #ff9800; }
+.stock-fill.low { background: #f44336; }
+
 /* Content body */
-.tour-body { padding: 22px; }
+.food-body { padding: 22px; }
 
 /* GALLERY */
-.tour-gallery { margin-bottom: 22px; }
+.food-gallery { margin-bottom: 22px; }
 .gallery-main { position: relative; height: 380px; border-radius: 16px; overflow: hidden; background: #f3f3f3; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
 .gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; border-radius: 50%; background: #fff; color: #c24a16; box-shadow: 0 6px 16px rgba(0,0,0,.15); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-.gallery-nav:hover { background: #c24a16; color: #fff; }
+.gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; border-radius: 50%; background: #fff; color: #c24a16; box-shadow: 0 6px 16px rgba(0,0,0,.15); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .gallery-nav.prev { left: 12px; }
 .gallery-nav.next { right: 12px; }
 .gallery-thumbs { display: flex; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 6px; }
-.gallery-thumb { width: 80px; height: 58px; border-radius: 10px; overflow: hidden; border: 2px solid transparent; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 0; cursor: pointer; transition: all 0.2s ease; }
+.gallery-thumb { width: 80px; height: 58px; border-radius: 10px; overflow: hidden; border: 2px solid transparent; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 0; cursor: pointer; }
 .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gallery-thumb.active { border-color: #c24a16; box-shadow: 0 4px 12px rgba(194,74,22,.25); }
-
-/* Highlights chips */
-.highlights-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-.highlight-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f7f7f7; border: 1px solid #eee; color: #555; font-size: 12px; border-radius: 18px; transition: .2s ease; }
-.highlight-chip i { color: #c24a16; font-size: 10px; }
-.highlight-chip:hover { background: #c24a16; color: #fff; border-color: #c24a16; }
-.highlight-chip:hover i { color: #fff; }
 
 /* Details grid */
 .details-grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 14px; }
 .detail-item { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
-.detail-label { color: #c24a16; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-.detail-label i { font-size: 14px; }
+.detail-label { color: #c24a16; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; font-weight: 600; }
 .detail-value { color: #2f2f2f; font-weight: 700; }
 
 /* Description Section */
@@ -344,56 +363,6 @@ body {
     font-size: 14px;
     line-height: 1.7;
     margin: 0;
-    white-space: pre-line;
-}
-
-/* Schedule Section */
-.schedule-section {
-    background: linear-gradient(135deg, #fff5f0 0%, #fff8f5 100%);
-    border: 2px solid rgba(194, 74, 22, 0.15);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.schedule-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
-}
-
-.schedule-details {
-    flex: 1;
-}
-
-.schedule-details h4 {
-    margin: 0 0 4px 0;
-    font-family: var(--font-heading);
-    font-size: 16px;
-    color: var(--brand-text);
-}
-
-.schedule-details p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--brand-text-muted);
-}
-
-.schedule-details .schedule-date {
-    font-size: 18px;
-    font-weight: 700;
-    color: #c24a16;
 }
 
 /* No image placeholder */
@@ -408,6 +377,11 @@ body {
     color: #999;
 }
 .no-image-placeholder i { font-size: 48px; margin-bottom: 10px; color: #c24a16; opacity: 0.5; }
+
+@media (max-width: 900px) {
+    .details-grid { grid-template-columns: 1fr; }
+    .food-hero { flex-direction: column; align-items: flex-start; }
+}
 
 /* Timestamps */
 .timestamps {
@@ -429,21 +403,6 @@ body {
 
 .timestamp-item i {
     color: #c24a16;
-}
-
-@media (max-width: 900px) {
-    .details-grid { grid-template-columns: 1fr; }
-    .tour-hero { flex-direction: column; align-items: flex-start; }
-    .tour-quick { width: 100%; }
-    .schedule-section { flex-direction: column; text-align: center; }
-}
-
-@media (max-width: 768px) {
-    .main-content { margin-left: 0; padding: 20px; }
-    .sidebar, .sidebar-accent { display: none; }
-    .topbar { margin-left: 0; }
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .header-buttons { width: 100%; }
 }
 </style>
 {% endblock %}
@@ -497,19 +456,19 @@ body {
             </a>
         </li>
         <li>
-            <a href="#">
-                <svg viewBox="0 0 24 24">
-                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
-                </svg>
-                Payments
-            </a>
+             <a href="#">
+                 <svg viewBox="0 0 24 24">
+                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                 </svg>
+                 Payments
+             </a>
         </li>
         <li>
             <a href="#">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/>
                 </svg>
-                Activity Logs
+                 Activity Logs
             </a>
         </li>
     </ul>
@@ -524,7 +483,7 @@ body {
 <!-- TOPBAR -->
 <div class="topbar">
     <div class="topbar-left">
-        Tour Management
+        Food Management
     </div>
     <div class="topbar-right">
         <div class="datetime-display">
@@ -539,93 +498,93 @@ body {
     <!-- HEADER -->
     <div class="page-header">
         <h2 class="section-title">
-            Tour Details
+            Food Details
         </h2>
         <div class="header-buttons">
-            <a href="{{ path('app_tour_index') }}" class="btn-hollow">
+            <a href="{{ path('app_food_index') }}" class="btn-hollow">
                 <i class="fas fa-arrow-left"></i> Back to list
             </a>
-            <a href="{{ path('app_tour_edit', {'id': tour.id}) }}" class="btn-solid">
-                <i class="fas fa-edit"></i> Edit Tour
+            <a href="{{ path('app_food_edit', {'id': food.id}) }}" class="btn-solid">
+                <i class="fas fa-edit"></i> Edit Food
             </a>
-            {{ include('tour/_delete_form.html.twig') }}
+            {{ include('food/_delete_form.html.twig') }}
         </div>
     </div>
 
     <!-- SUMMARY CARD -->
-    <div class="tour-card">
+    <div class="food-card">
         <!-- HERO / SUMMARY -->
-        <div class="tour-hero">
-            <div class="tour-id">
-                <div class="tour-icon">
-                    <i class="fas fa-mountain-sun"></i>
+        <div class="food-hero">
+            <div class="food-id">
+                <div class="food-icon">
+                    <i class="fas fa-utensils"></i>
                 </div>
-                <div class="tour-meta">
-                    <h3>{{ tour.name }}</h3>
-                    <div class="tour-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        {{ tour.location }}
-                    </div>
+                <div class="food-meta">
+                    <h3>{{ food.name }}</h3>
                     <div class="badges">
-                        <span class="duration-badge">
-                            <i class="fas fa-clock"></i> {{ tour.duration }}
+                        {% set categoryClass = food.category is defined and food.category ? food.category|lower|replace({' ': '-'}) : 'default' %}
+                        <span class="category-badge {{ categoryClass }}">
+                            <i class="fas fa-tag"></i> {{ food.category ?? 'Uncategorized' }}
                         </span>
 
-                        {% set status = tour.status is defined and tour.status ? tour.status|lower : 'available' %}
-                        {% set statusClass = status in ['available','booked','cancelled','pending','completed'] ? status : 'available' %}
+                        {% set status = food.status is defined and food.status ? food.status|lower|replace({' ': '-'}) : 'available' %}
+                        {% set statusClass = status in ['available','out-of-stock','limited','coming-soon','discontinued','seasonal'] ? status : 'available' %}
                         <span class="status-badge {{ statusClass }}">
                             {% if statusClass == 'available' %}<i class="fas fa-check-circle"></i>{% endif %}
-                            {% if statusClass == 'booked' %}<i class="fas fa-calendar-check"></i>{% endif %}
-                            {% if statusClass == 'cancelled' %}<i class="fas fa-times-circle"></i>{% endif %}
-                            {% if statusClass == 'pending' %}<i class="fas fa-hourglass-half"></i>{% endif %}
-                            {% if statusClass == 'completed' %}<i class="fas fa-flag-checkered"></i>{% endif %}
-                            {{ tour.status ?? 'Available' }}
+                            {% if statusClass == 'out-of-stock' %}<i class="fas fa-times-circle"></i>{% endif %}
+                            {% if statusClass == 'limited' %}<i class="fas fa-exclamation-triangle"></i>{% endif %}
+                            {% if statusClass == 'coming-soon' %}<i class="fas fa-clock"></i>{% endif %}
+                            {% if statusClass == 'discontinued' %}<i class="fas fa-ban"></i>{% endif %}
+                            {% if statusClass == 'seasonal' %}<i class="fas fa-snowflake"></i>{% endif %}
+                            {{ food.status ?? 'Available' }}
                         </span>
                     </div>
                 </div>
             </div>
 
-            <div class="tour-quick">
+            <div class="food-quick">
                 <div class="quick-tile">
                     <i class="fas fa-peso-sign"></i>
                     <div>
-                        <div class="quick-label">Price / Person</div>
-                        <div class="quick-value">₱{{ tour.price is defined and tour.price is not null ? tour.price|number_format(2) : '0.00' }}</div>
+                        <div class="quick-label">Price</div>
+                        <div class="quick-value">₱{{ food.price is defined and food.price is not null ? food.price|number_format(2) : '0.00' }}</div>
                     </div>
                 </div>
                 <div class="quick-tile">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-boxes-stacked"></i>
                     <div>
-                        <div class="quick-label">Available Slots</div>
-                        <div class="quick-value">{{ tour.availableSlots }} Slot{{ tour.availableSlots > 1 ? 's' : '' }}</div>
-                    </div>
-                </div>
-                <div class="quick-tile">
-                    <i class="fas fa-clock"></i>
-                    <div>
-                        <div class="quick-label">Duration</div>
-                        <div class="quick-value">{{ tour.duration }}</div>
+                        <div class="quick-label">In Stock</div>
+                        <div class="quick-value">
+                            <div class="stock-indicator">
+                                {{ food.availableStock }} item{{ food.availableStock > 1 ? 's' : '' }}
+                                <div class="stock-bar">
+                                    {% set stockPercent = food.availableStock > 100 ? 100 : food.availableStock %}
+                                    {% set stockLevel = stockPercent >= 50 ? 'high' : (stockPercent >= 20 ? 'medium' : 'low') %}
+                                    <div class="stock-fill {{ stockLevel }}" style="width: {{ stockPercent }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- BODY -->
-        <div class="tour-body">
+        <div class="food-body">
             {# GALLERY: Get images from database #}
             {% set allImages = [] %}
 
             {# Add main image first if it exists #}
-            {% if tour.mainImage %}
-                {% set allImages = allImages|merge([tour.mainImage]) %}
+            {% if food.mainImage %}
+                {% set allImages = allImages|merge([food.mainImage]) %}
             {% endif %}
 
             {# Add gallery images if they exist #}
-            {% if tour.galleryImages is defined and tour.galleryImages and tour.galleryImages|length > 0 %}
-                {% set allImages = allImages|merge(tour.galleryImages) %}
+            {% if food.galleryImages and food.galleryImages|length > 0 %}
+                {% set allImages = allImages|merge(food.galleryImages) %}
             {% endif %}
 
-            <div class="tour-gallery" id="tourGallery">
+            <div class="food-gallery" id="foodGallery">
                 <div class="gallery-main">
                     {% if allImages|length > 0 %}
                         {% if allImages|length > 1 %}
@@ -635,8 +594,8 @@ body {
                         {% endif %}
                         
                         <img id="galleryMainImage" 
-                             src="{{ asset('uploads/tours/' ~ allImages[0]) }}" 
-                             alt="{{ tour.name }}">
+                             src="{{ asset('uploads/foods/' ~ allImages[0]) }}" 
+                             alt="{{ food.name }}">
                         
                         {% if allImages|length > 1 %}
                             <button class="gallery-nav next" type="button" aria-label="Next">
@@ -661,108 +620,79 @@ body {
                                     data-index="{{ loop.index0 }}"
                                     data-image-path="{{ imagePath }}"
                                     aria-label="Image {{ loop.index }}">
-                                <img src="{{ asset('uploads/tours/' ~ imagePath) }}" alt="Thumbnail {{ loop.index }}">
+                                <img src="{{ asset('uploads/foods/' ~ imagePath) }}" alt="Thumbnail {{ loop.index }}">
                             </button>
                         {% endfor %}
                     </div>
                 {% endif %}
             </div>
 
-            {# SCHEDULE #}
-            {% if tour.scheduleDate %}
-                <h3 class="section-heading">
-                    <i class="fas fa-calendar-alt"></i>
-                    Schedule
-                </h3>
-                <div class="schedule-section">
-                    <div class="schedule-icon">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                    <div class="schedule-details">
-                        <h4>Tour Date & Time</h4>
-                        <p class="schedule-date">
-                            {{ tour.scheduleDate|date('F j, Y') }} at {{ tour.scheduleDate|date('g:i A') }}
-                        </p>
-                        <p>{{ tour.scheduleDate|date('l') }} - {{ tour.duration }}</p>
-                    </div>
-                </div>
-            {% endif %}
-
             {# DETAILS GRID #}
             <h3 class="section-heading">
-                <i class="fas fa-info-circle"></i>
-                Tour Information
+                 Food Information
             </h3>
             <div class="details-grid">
                 <div class="detail-item">
                     <span class="detail-label">
-                        <i class="fas fa-tag"></i> Tour Name
+                        <i class="fas fa-hashtag"></i> Food ID
                     </span>
-                    <span class="detail-value">{{ tour.name }}</span>
+                    <span class="detail-value">#{{ food.id }}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">
-                        <i class="fas fa-map-marker-alt"></i> Location
+                        <i class="fas fa-burger"></i> Name
                     </span>
-                    <span class="detail-value">{{ tour.location }}</span>
+                    <span class="detail-value">{{ food.name }}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">
-                        <i class="fas fa-peso-sign"></i> Price / Person
+                        <i class="fas fa-layer-group"></i> Category
                     </span>
-                    <span class="detail-value">₱{{ tour.price|number_format(2) }}</span>
+                    <span class="detail-value">{{ food.category }}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">
-                        <i class="fas fa-clock"></i> Duration
+                        <i class="fas fa-peso-sign"></i> Price
                     </span>
-                    <span class="detail-value">{{ tour.duration }}</span>
+                    <span class="detail-value">₱{{ food.price|number_format(2) }}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">
-                        <i class="fas fa-users"></i> Available Slots
+                        <i class="fas fa-cubes"></i> Available Stock
                     </span>
-                    <span class="detail-value">{{ tour.availableSlots }} Slot{{ tour.availableSlots > 1 ? 's' : '' }}</span>
+                    <span class="detail-value">{{ food.availableStock }} item{{ food.availableStock > 1 ? 's' : '' }}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">
                         <i class="fas fa-circle-check"></i> Status
                     </span>
-                    <span class="detail-value">{{ tour.status }}</span>
+                    <span class="detail-value">{{ food.status }}</span>
                 </div>
-                {% if tour.scheduleDate %}
-                <div class="detail-item">
-                    <span class="detail-label">
-                        <i class="fas fa-calendar"></i> Schedule Date
-                    </span>
-                    <span class="detail-value">{{ tour.scheduleDate|date('M j, Y - g:i A') }}</span>
-                </div>
-                {% endif %}
             </div>
 
             {# DESCRIPTION #}
-            {% if tour.description %}
+            {% if food.description %}
                 <h3 class="section-heading">
                     <i class="fas fa-align-left"></i>
                     Description
                 </h3>
                 <div class="description-section">
-                    <p class="description-text">{{ tour.description }}</p>
+                    <p class="description-text">{{ food.description|nl2br }}</p>
                 </div>
             {% endif %}
-
+            
             {# TIMESTAMPS #}
             <div class="timestamps">
-                {% if tour.createdAt %}
+                {% if food.createdAt %}
                     <div class="timestamp-item">
                         <i class="fas fa-plus-circle"></i>
-                        <span>Created: {{ tour.createdAt|date('M j, Y \\a\\t g:i A') }}</span>
+                        <span>Created: {{ food.createdAt|date('M j, Y \\a\\t g:i A') }}</span>
                     </div>
                 {% endif %}
-                {% if tour.updatedAt %}
+                {% if food.updatedAt %}
                     <div class="timestamp-item">
                         <i class="fas fa-edit"></i>
-                        <span>Last Updated: {{ tour.updatedAt|date('M j, Y \\a\\t g:i A') }}</span>
+                        <span>Last Updated: {{ food.updatedAt|date('M j, Y \\a\\t g:i A') }}</span>
                     </div>
                 {% endif %}
             </div>
@@ -789,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateDateTime, 1000);
 
     // Gallery functionality
-    const galleryEl = document.getElementById('tourGallery');
+    const galleryEl = document.getElementById('foodGallery');
     if (galleryEl) {
         const mainImg = document.getElementById('galleryMainImage');
         const thumbs = Array.from(galleryEl.querySelectorAll('.gallery-thumb'));
@@ -806,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Get the image path from data attribute
             const imagePath = thumbs[idx].getAttribute('data-image-path');
-            const imageUrl = '/uploads/tours/' + imagePath;
+            const imageUrl = '/uploads/foods/' + imagePath;
             mainImg.setAttribute('src', imageUrl);
             
             // Update active thumbnail

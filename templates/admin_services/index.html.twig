@@ -748,6 +748,16 @@
     {% set availableTours = toursList|filter(t => t.status|lower == 'available')|length %}
     {% set bookedTours = toursList|filter(t => t.status|lower == 'booked')|length %}
 
+    {# Foods Data #}
+    {% set foodsList = foods|default([]) %}
+    {% set totalFoods = foodsList|length %}
+    {% set availableFoods = foodsList|filter(f => f.status|lower == 'available')|length %}
+    {% set outOfStockFoods = foodsList|filter(f => f.status|lower == 'out of stock' or f.availableStock == 0)|length %}
+    {% set totalStock = 0 %}
+    {% for food in foodsList %}
+        {% set totalStock = totalStock + food.availableStock %}
+    {% endfor %}
+
     <!-- SERVICE CARDS GRID -->
     <div class="service-card-grid">
         <!-- ROOM SERVICE CARD -->
@@ -859,11 +869,66 @@
                 </div>
             </div>
         </div>
+
+        <!-- FOOD SERVICE CARD -->
+        <div class="service-card">
+            <div class="card-image">
+                <img src="/Images/food-service.jpg" alt="Food Services">
+                <div class="card-image-overlay"></div>
+                <span class="card-category-badge">
+                    <i class="fas fa-star"></i>
+                    Restaurant & Dining
+                </span>
+            </div>
+
+            <div class="card-content">
+                <div class="card-header">
+                    <div class="card-icon-title">
+                        <div class="card-icon"><i class="fas fa-utensils"></i></div>
+                        <h3 class="service-title">Food Services</h3>
+                    </div>
+                    <p class="service-description">
+                        Manage menu items, pricing, categories, and inventory.
+                        Keep track of food availability and ensure quality dining experiences.
+                    </p>
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ totalFoods }}</div>
+                        <div class="stat-label">Menu Items</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ availableFoods }}</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ outOfStockFoods }}</div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+
+                <div class="card-features">
+                    <span class="feature-tag"><i class="fas fa-check"></i> Menu</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Categories</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Pricing</span>
+                    <span class="feature-tag"><i class="fas fa-check"></i> Inventory</span>
+                </div>
+
+                <div class="card-actions">
+                    <a href="{{ path('app_food_index') }}" class="service-btn btn-primary">
+                        <i class="fas fa-cog"></i>
+                        Manage Food
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {% if totalRooms == 0 and totalTours == 0 %}
+    {% if totalRooms == 0 and totalTours == 0 and totalFoods == 0 %}
         <div style="margin-top: 24px; padding: 20px; background: #fff3e0; border-left: 4px solid #c24a16; border-radius: 8px; color:#666; font-size: 14px;">
-            <strong>Getting Started:</strong> No services found yet. Start by adding rooms or tours to begin managing your property.
+            <strong>Getting Started:</strong> No services found yet. Start by adding rooms, tours, or food items to begin managing your property.
         </div>
     {% endif %}
 </div>

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Add New Tour | La Casa Gaudencia{% endblock %}
+{% block title %}Add New User | La Casa Gaudencia{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -138,43 +138,43 @@ body {
 }
 
 /* ===== LOGOUT SECTION ===== */
-    .sidebar-logout {
-        width: 100%;
-        padding: 20px 30px;
-        margin-top: auto;
-        display: flex;
-        justify-content: center;
-        border-top: 1px solid #eee;
-    }
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
 
-    .logout-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 80%;
-        padding: 14px 24px;
-        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
-        border: none;
-        cursor: pointer;
-    }
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    border: none;
+    cursor: pointer;
+}
 
-    .logout-btn:hover {
-        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
-    }
+.logout-btn:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+}
 
-    .logout-btn i {
-        font-size: 16px;
-    }
+.logout-btn i {
+    font-size: 16px;
+}
 
 /* ===== TOPBAR ===== */
 .topbar {
@@ -317,6 +317,10 @@ body {
     margin-bottom: 36px;
 }
 
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
 .section-header {
     display: flex;
     align-items: center;
@@ -357,6 +361,10 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
 }
 
 .form-group label {
@@ -426,123 +434,152 @@ body {
     color: var(--brand-primary);
 }
 
-/* ===== IMAGE UPLOAD ===== */
-.image-upload-area {
-    border: 2px dashed #d0d0d0;
-    border-radius: 10px;
-    padding: 28px;
-    text-align: center;
-    background: #faf9f5;
-    cursor: pointer;
+/* ===== ROLE SELECTION ===== */
+.role-selection-container {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.role-option {
     position: relative;
-    transition: all 0.25s ease;
-}
-
-.image-upload-area:hover,
-.image-upload-area.dragover {
-    border-color: var(--brand-primary);
-    background: rgba(194, 74, 22, 0.03);
-}
-
-.image-upload-area .file-input {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    opacity: 0;
     cursor: pointer;
+    flex: 0 1 250px; 
 }
 
-.upload-icon {
-    width: 64px;
-    height: 64px;
-    background: var(--brand-primary);
-    border-radius: 50%;
+.role-option input[type="checkbox"],
+.role-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.role-card {
+    padding: 20px;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    background: var(--brand-cream);
+    text-align: center;
+    transition: all 0.25s ease;
+    height: 100%;
+}
+
+.role-option input:checked + .role-card {
+    border-color: var(--brand-primary);
+    background: rgba(194, 74, 22, 0.05);
+    box-shadow: 0 0 0 4px rgba(194, 74, 22, 0.1);
+}
+
+.role-option:hover .role-card {
+    border-color: var(--brand-primary);
+}
+
+
+.role-icon-wrapper {
+    display: inline-flex;
+    position: relative;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.role-card .role-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 14px;
-    color: white;
-    font-size: 26px;
+    font-size: 22px;
 }
 
-.upload-text h5 {
-    margin: 0 0 6px;
-    font-family: var(--font-heading);
-    font-size: 15px;
+.role-card.admin .role-icon {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+}
+
+.role-card.staff .role-icon {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+}
+
+.role-card.guest .role-icon {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+}
+
+.role-card .role-title {
     font-weight: 600;
+    font-size: 15px;
+    color: var(--brand-text);
+    margin-bottom: 4px;
 }
 
-.upload-text p {
-    margin: 0;
-    font-size: 12px;
+.role-card .role-description {
+    font-size: 11px;
     color: var(--brand-text-muted);
 }
 
-.upload-text span {
-    color: var(--brand-primary);
-    font-weight: 500;
-}
-
-.upload-text .file-info {
-    font-size: 10px;
-    margin-top: 8px;
-    color: #aaa;
-}
-
-/* ===== IMAGE PREVIEW ===== */
-.image-preview-container {
-    margin-top: 16px;
-}
-
-.image-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-}
-
-.image-preview-item {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    aspect-ratio: 4/3;
-    background: #f0f0f0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.image-preview-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.image-preview-item .remove-btn {
+.role-card .check-indicator {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 26px;
-    height: 26px;
-    background: #dc3545;
-    color: white;
-    border: none;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: #e5e5e5;
     border-radius: 50%;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: white;
+    font-size: 10px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.role-option input:checked + .role-card .check-indicator {
+    background: var(--brand-primary);
+}
+
+/* ===== PASSWORD STRENGTH ===== */
+.password-strength {
+    margin-top: 8px;
+}
+
+.strength-bar {
+    height: 4px;
+    background: #e5e5e5;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.strength-bar .strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-bar.weak .strength-fill {
+    width: 33%;
+    background: #dc3545;
+}
+
+.strength-bar.medium .strength-fill {
+    width: 66%;
+    background: #ffc107;
+}
+
+.strength-bar.strong .strength-fill {
+    width: 100%;
+    background: #28a745;
+}
+
+.strength-text {
     font-size: 11px;
-    transition: all 0.2s ease;
-    opacity: 0;
-}
-
-.image-preview-item:hover .remove-btn {
-    opacity: 1;
-}
-
-.image-preview-item .remove-btn:hover {
-    background: #c82333;
-    transform: scale(1.1);
+    color: var(--brand-text-muted);
 }
 
 /* ===== FORM ACTIONS ===== */
@@ -620,13 +657,75 @@ body {
     color: #c62828;
 }
 
+/* ===== FORM ERRORS ===== */
+.form-error {
+    color: #c62828;
+    font-size: 12px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-error::before {
+    content: '\f06a';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 220px;
+    }
+    .main-content,
+    .topbar {
+        margin-left: 228px;
+    }
+}
+
 @media (max-width: 992px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+    .role-selection-container {
+        grid-template-columns: 1fr;
+    }
     .datetime-display {
         display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    .sidebar-accent {
+        display: none;
+    }
+    .main-content,
+    .topbar {
+        margin-left: 0;
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .role-selection-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .role-option {
+        flex: 0 1 100%;
+        max-width: 250px;
     }
 }
 </style>
@@ -656,7 +755,7 @@ body {
                 Dashboard
             </a>
         </li>
-        <li>
+        <li class="active">
             <a href="{{ path('app_user_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
@@ -664,7 +763,7 @@ body {
                 User Management
             </a>
         </li>
-        <li class="active">
+        <li>
             <a href="{{ path('app_admin_services') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
@@ -681,12 +780,12 @@ body {
             </a>
         </li>
         <li>
-             <a href="#">
-                 <svg viewBox="0 0 24 24">
-                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
-                 </svg>
-                 Payments
-             </a>
+            <a href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
         </li>
         <li>
             <a href="#">
@@ -697,6 +796,7 @@ body {
             </a>
         </li>
     </ul>
+
     <!-- LOGOUT SECTION -->
     <div class="sidebar-logout">
         <a href="{{ path('app_logout') }}" class="logout-btn">
@@ -707,7 +807,7 @@ body {
 
 <!-- TOPBAR -->
 <div class="topbar">
-    <div class="topbar-left">Tour Management</div>
+    <div class="topbar-left">User Management</div>
     <div class="topbar-right">
         <div class="datetime-display">
             <div class="time" id="currentTime">00:00 AM</div>
@@ -731,10 +831,10 @@ body {
 
     <!-- PAGE HEADER -->
     <div class="page-header">
-        <h2 class="section-title">Add New Tour</h2>
-        <a href="{{ path('app_tour_index') }}" class="btn-back">
+        <h2 class="section-title">Add New User</h2>
+        <a href="{{ path('app_user_index') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i>
-            Back to Tours
+            Back to Users
         </a>
     </div>
 
@@ -742,135 +842,131 @@ body {
     <div class="form-container">
         <div class="form-header">
             <div class="header-icon">
-                <i class="fas fa-map-marked-alt"></i>
+                <i class="fas fa-user-plus"></i>
             </div>
             <div class="header-text">
-                <h3>Tour Information</h3>
-                <p>Fill in the details below to add a new tour package</p>
+                <h3>User Information</h3>
+                <p>Fill in the details below to create a new user account</p>
             </div>
         </div>
 
         <div class="form-body">
-            {{ form_start(form, {'attr': {'class': 'tour-form', 'enctype': 'multipart/form-data', 'id': 'tourForm'}}) }}
+            {{ form_start(form, {'attr': {'class': 'user-form', 'id': 'userForm'}}) }}
 
-            <!-- BASIC INFO -->
+            <!-- ACCOUNT INFO -->
             <div class="form-section">
                 <div class="section-header">
-                    <i class="fas fa-info-circle"></i>
-                    <h4>Basic Information</h4>
+                    <i class="fas fa-user-circle"></i>
+                    <h4>Account Information</h4>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Tour Name <span class="required">*</span></label>
-                        {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Island Hopping Adventure'}}) }}
-                        {{ form_errors(form.name) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter a descriptive tour name</span>
+                        <label><i class="fas fa-user"></i> Username <span class="required">*</span></label>
+                        {{ form_widget(form.username, {'attr': {'placeholder': 'Enter username'}}) }}
+                        {{ form_errors(form.username) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Choose a unique username</span>
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-map-marker-alt"></i> Location <span class="required">*</span></label>
-                        {{ form_widget(form.location, {'attr': {'placeholder': 'e.g., Boracay Island, Philippines'}}) }}
-                        {{ form_errors(form.location) }}
+                        <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                        {{ form_widget(form.email, {'attr': {'placeholder': 'user@example.com'}}) }}
+                        {{ form_errors(form.email) }}
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-peso-sign"></i> Price Per Person <span class="required">*</span></label>
-                        {{ form_widget(form.price, {'attr': {'placeholder': '0.00'}}) }}
-                        {{ form_errors(form.price) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-clock"></i> Duration <span class="required">*</span></label>
-                        {{ form_widget(form.duration) }}
-                        {{ form_errors(form.duration) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-calendar-alt"></i> Schedule Date & Time</label>
-                        {{ form_widget(form.scheduleDate) }}
-                        {{ form_errors(form.scheduleDate) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-users"></i> Available Slots <span class="required">*</span></label>
-                        {{ form_widget(form.availableSlots, {'attr': {'placeholder': 'Number of slots'}}) }}
-                        {{ form_errors(form.availableSlots) }}
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-toggle-on"></i> Status <span class="required">*</span></label>
-                        {{ form_widget(form.status) }}
-                        {{ form_errors(form.status) }}
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-id-card"></i> Full Name <span class="required">*</span></label>
+                        {{ form_widget(form.fullName, {'attr': {'placeholder': 'Enter full name'}}) }}
+                        {{ form_errors(form.fullName) }}
                     </div>
                 </div>
             </div>
 
-            <!-- DESCRIPTION -->
+            <!-- PASSWORD -->
             <div class="form-section">
                 <div class="section-header">
-                    <i class="fas fa-align-left"></i>
-                    <h4>Tour Description</h4>
+                    <i class="fas fa-lock"></i>
+                    <h4>Password</h4>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> Password <span class="required">*</span></label>
+                        {{ form_widget(form.plainPassword.first, {'attr': {'placeholder': 'Enter password', 'id': 'password-input'}}) }}
+                        {{ form_errors(form.plainPassword.first) }}
+                        <div class="password-strength">
+                            <div class="strength-bar" id="strength-bar">
+                                <div class="strength-fill"></div>
+                            </div>
+                            <span class="strength-text" id="strength-text">Password strength</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> Confirm Password <span class="required">*</span></label>
+                        {{ form_widget(form.plainPassword.second, {'attr': {'placeholder': 'Confirm password'}}) }}
+                        {{ form_errors(form.plainPassword.second) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Re-enter the password to confirm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROLE SELECTION -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-user-tag"></i>
+                    <h4>User Role</h4>
                 </div>
                 <div class="form-grid single">
                     <div class="form-group">
-                        <label><i class="fas fa-file-alt"></i> Description</label>
-                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe the tour package, itinerary, inclusions...', 'rows': 5}}) }}
-                        {{ form_errors(form.description) }}
-                        <span class="help-text"><i class="fas fa-lightbulb"></i> Provide detailed information about the tour</span>
+                        <label><i class="fas fa-shield-alt"></i> Select Role <span class="required">*</span></label>
+                        <span class="help-text" style="margin-bottom: 16px;"><i class="fas fa-lightbulb"></i> Choose one role for this user</span>
+                        
+                        <div class="role-selection-container">
+    {% for child in form.roles %}
+        {% set roleValue = child.vars.value %}
+        {% set roleClass = 'guest' %}
+        {% set roleIcon = 'fa-user' %}
+        {% set roleTitle = 'Guest' %}
+        {% set roleDesc = 'Standard user access' %}
+        
+        {% if roleValue == 'ROLE_ADMIN' %}
+            {% set roleClass = 'admin' %}
+            {% set roleIcon = 'fa-shield-alt' %}
+            {% set roleTitle = 'Admin' %}
+            {% set roleDesc = 'Full system access' %}
+        {% elseif roleValue == 'ROLE_STAFF' %}
+            {% set roleClass = 'staff' %}
+            {% set roleIcon = 'fa-user-tie' %}
+            {% set roleTitle = 'Staff' %}
+            {% set roleDesc = 'Manage reservations' %}
+        {% endif %}
+        
+        <label class="role-option">
+            {{ form_widget(child) }}
+            <div class="role-card {{ roleClass }}">
+                <div class="role-icon-wrapper">
+                    <div class="role-icon">
+                        <i class="fas {{ roleIcon }}"></i>
                     </div>
+                    <span class="check-indicator"><i class="fas fa-check"></i></span>
                 </div>
+                <div class="role-title">{{ roleTitle }}</div>
+                <div class="role-description">{{ roleDesc }}</div>
             </div>
-
-           <!-- IMAGES -->
-            <div class="form-section">
-                 <div class="section-header">
-                     <i class="fas fa-images"></i>
-                     <h4>Room Images</h4>
-                 </div>
-                <div class="form-grid">
-                    <!-- Main Image -->
-                    <div class="form-group">
-                        <label><i class="fas fa-image"></i> Main Room Image</label>
-                        <div class="image-upload-area" id="mainUploadArea">
-                            {{ form_widget(form.mainImageFile, {'attr': {'class': 'file-input', 'id': 'mainImageInput', 'accept': 'image/*'}}) }}
-                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <div class="upload-text">
-                                <h5>Upload Main Image</h5>
-                                <p>Drag & drop or <span>browse</span></p>
-                                <p class="file-info">JPEG, PNG or WebP (Max 5MB)</p>
-                            </div>
-                        </div>
-                        <div class="image-preview-container">
-                            <div class="image-preview-grid" id="mainImagePreview"></div>
-                        </div>
-                    </div>
-
-                    <!-- Gallery Images -->
-                    <div class="form-group">
-                        <label><i class="fas fa-photo-video"></i> Gallery Images</label>
-                        <div class="image-upload-area" id="galleryUploadArea">
-                            {{ form_widget(form.galleryImageFiles, {'attr': {'class': 'file-input', 'id': 'galleryImagesInput', 'accept': 'image/*', 'multiple': true}}) }}
-                            <div class="upload-icon"><i class="fas fa-images"></i></div>
-                            <div class="upload-text">
-                                <h5>Upload Gallery Images</h5>
-                                <p>Drag & drop or <span>browse</span></p>
-                                <p class="file-info">Multiple files allowed</p>
-                            </div>
-                        </div>
-                        <div class="image-preview-container">
-                            <div class="image-preview-grid" id="galleryImagesPreview"></div>
-                        </div>
+        </label>
+    {% endfor %}
+</div>
+                        {{ form_errors(form.roles) }}
                     </div>
                 </div>
             </div>
 
             <!-- FORM ACTIONS -->
             <div class="form-actions">
-                <a href="{{ path('app_tour_index') }}" class="btn-cancel">
+                <a href="{{ path('app_user_index') }}" class="btn-cancel">
                     <i class="fas fa-times"></i> Cancel
                 </a>
                 <button type="submit" class="btn-submit">
-                    <i class="fas fa-check"></i> Create Tour
+                    <i class="fas fa-user-plus"></i> Create User
                 </button>
             </div>
 
@@ -885,20 +981,8 @@ body {
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ===== DEBUG HELPERS =====
-    function findFileInput(id, uploadArea) {
-        let el = document.getElementById(id);
-        if (el && el.tagName && el.tagName.toLowerCase() === 'input' && el.type === 'file') return el;
-        if (uploadArea) {
-            el = uploadArea.querySelector('input[type="file"]');
-            if (el) return el;
-        }
-        // last resort: any file input on page
-        el = document.querySelector('input[type="file"]');
-        return el;
-    }
 
-    // ===== DATE TIME (unchanged) =====
+    // ===== DATE TIME =====
     function updateDateTime() {
         const now = new Date();
         const timeEl = document.getElementById('currentTime');
@@ -921,138 +1005,57 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
+    // ===== PASSWORD STRENGTH CHECKER =====
+    const passwordInput = document.getElementById('password-input');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
 
-    // ===== IMAGE UPLOAD HANDLER =====
-    class ImageUploader {
-        constructor(inputId, previewId, uploadAreaId, isMultiple = false) {
-            this.uploadArea = document.getElementById(uploadAreaId);
-            this.preview = document.getElementById(previewId);
-            this.inputId = inputId;
-            this.isMultiple = isMultiple;
-            this.files = [];
-            this.input = findFileInput(inputId, this.uploadArea);
+    if (passwordInput && strengthBar && strengthText) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let text = '';
 
-            if (!this.uploadArea) {
-                console.warn('Upload area not found:', uploadAreaId);
-                return;
-            }
-            if (!this.preview) {
-                console.warn('Preview container not found:', previewId);
-                return;
-            }
-            if (!this.input) {
-                console.warn('File input not found for id:', inputId, ' — looking inside upload area.');
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            strengthBar.classList.remove('weak', 'medium', 'strong');
+
+            if (password.length === 0) {
+                text = 'Password strength';
+            } else if (strength <= 2) {
+                strengthBar.classList.add('weak');
+                text = 'Weak password';
+            } else if (strength <= 4) {
+                strengthBar.classList.add('medium');
+                text = 'Medium password';
             } else {
-                // If the input was not inside the upload area, move it there so styling/overlay match
-                if (!this.uploadArea.contains(this.input)) {
-                    // make input visually invisible but inside uploadArea
-                    this.input.style.position = 'absolute';
-                    this.input.style.top = '0';
-                    this.input.style.left = '0';
-                    this.input.style.width = '100%';
-                    this.input.style.height = '100%';
-                    this.input.style.opacity = '0';
-                    this.input.style.cursor = 'pointer';
-                    this.uploadArea.insertBefore(this.input, this.uploadArea.firstChild);
-                }
+                strengthBar.classList.add('strong');
+                text = 'Strong password';
             }
 
-            this.init();
-        }
-
-        init() {
-            // Try to re-find input in case it's rendered later by Symfony JS
-            this.input = findFileInput(this.inputId, this.uploadArea);
-            if (!this.input) {
-                console.error('No file input available for uploader', this.inputId);
-                return;
-            }
-
-            this.input.addEventListener('change', (e) => {
-                console.debug('File input change event for', this.inputId, e.target.files);
-                this.handleFiles(e.target.files);
-            });
-
-            this.uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                this.uploadArea.classList.add('dragover');
-            });
-
-            this.uploadArea.addEventListener('dragleave', () => {
-                this.uploadArea.classList.remove('dragover');
-            });
-
-            this.uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                this.uploadArea.classList.remove('dragover');
-                this.handleFiles(e.dataTransfer.files);
-            });
-        }
-
-        handleFiles(fileList) {
-            const newFiles = Array.from(fileList).filter(file => {
-                if (!file.type.startsWith('image/')) {
-                    alert(`${file.name} is not an image`);
-                    return false;
-                }
-                if (file.size > 5 * 1024 * 1024) {
-                    alert(`${file.name} is too large (max 5MB)`);
-                    return false;
-                }
-                return true;
-            });
-
-            if (this.isMultiple) {
-                this.files = [...this.files, ...newFiles];
-            } else {
-                this.files = newFiles.slice(0, 1);
-            }
-
-            this.renderPreview();
-            this.updateInput();
-        }
-
-        renderPreview() {
-            this.preview.innerHTML = '';
-
-            this.files.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const item = document.createElement('div');
-                    item.className = 'image-preview-item';
-                    item.innerHTML = `
-                        <img src="${e.target.result}" alt="${file.name}">
-                        ${!this.isMultiple ? '<span class="main-image-badge">Main</span>' : `<span class="gallery-badge">${index + 1}</span>`}
-                        <button type="button" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
-                    `;
-
-                    item.querySelector('.remove-btn').addEventListener('click', () => {
-                        this.files.splice(index, 1);
-                        this.renderPreview();
-                        this.updateInput();
-                    });
-
-                    this.preview.appendChild(item);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        updateInput() {
-            try {
-                const dt = new DataTransfer();
-                this.files.forEach(file => dt.items.add(file));
-                this.input.files = dt.files;
-                console.debug('Updated input.files for', this.inputId, this.input.files);
-            } catch (err) {
-                console.error('Could not set input.files programmatically:', err);
-            }
-        }
+            strengthText.textContent = text;
+        });
     }
 
-    // Initialize uploaders with improved lookup
-    new ImageUploader('mainImageInput', 'mainImagePreview', 'mainUploadArea', false);
-    new ImageUploader('galleryImagesInput', 'galleryImagesPreview', 'galleryUploadArea', true);
+    // ===== ROLE SINGLE SELECTION (Radio-like behavior for checkboxes) =====
+    const roleCheckboxes = document.querySelectorAll('.role-option input[type="checkbox"]');
+    
+    roleCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Uncheck all other checkboxes
+                roleCheckboxes.forEach(function(otherCheckbox) {
+                    if (otherCheckbox !== checkbox) {
+                        otherCheckbox.checked = false;
+                    }
+                });
+            }
+        });
+    });
 
 });
 </script>
