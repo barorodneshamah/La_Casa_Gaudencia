@@ -22,34 +22,66 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator) {}
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator
+    ) {}
 
     public function authenticate(Request $request): Passport
     {
         $username = $request->getPayload()->getString('username');
 
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
+        $request->getSession()->set(
+            SecurityRequestAttributes::LAST_USERNAME,
+            $username
+        );
 
         return new Passport(
             new UserBadge($username),
-            new PasswordCredentials($request->getPayload()->getString('password')),
+            new PasswordCredentials(
+                $request->getPayload()->getString('password')
+            ),
             [
-                new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
+                new CsrfTokenBadge(
+                    'authenticate',
+                    $request->getPayload()->getString('_csrf_token')
+                ),
                 new RememberMeBadge(),
             ]
         );
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+    public function onAuthenticationSuccess(
+        Request $request,
+        TokenInterface $token,
+        string $firewallName
+    ): ?Response {
+        // Redirect to originally requested page
+        if ($targetPath = $this->getTargetPath(
+            $request->getSession(),
+            $firewallName
+        )) {
             return new RedirectResponse($targetPath);
         }
 
-        // For example:
-        return new RedirectResponse($this->urlGenerator->generate('app_home'));
-        // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
-    } 
+        $user  = $token->getUser();
+        $roles = $user->getRoles();
+
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            return new RedirectResponse(
+                $this->urlGenerator->generate('app_admin_dashboard')
+            );
+        }
+
+        if (in_array('ROLE_STAFF', $roles, true)) {
+            return new RedirectResponse(
+                $this->urlGenerator->generate('app_staff_dashboard')
+            );
+        }
+
+        return new RedirectResponse(
+            $this->urlGenerator->generate('app_home')
+        );
+    }
 
     protected function getLoginUrl(Request $request): string
     {

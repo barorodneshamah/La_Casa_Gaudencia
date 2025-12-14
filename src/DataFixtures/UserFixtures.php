@@ -21,7 +21,7 @@ class UserFixtures extends Fixture
         // Admin
         $admin = new User();
         $admin->setUsername('admin');
-        $admin->setEmail('admin@example.com');
+        $admin->setEmail('admin@address.com');
         $admin->setFullName('Administrator');
         $admin->setRoles([User::ROLE_ADMIN]);
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'admin123'));
@@ -30,7 +30,7 @@ class UserFixtures extends Fixture
         // Staff
         $staff = new User();
         $staff->setUsername('staff');
-        $staff->setEmail('staff@example.com');
+        $staff->setEmail('staff@address.com');
         $staff->setFullName('Staff Member');
         $staff->setRoles([User::ROLE_STAFF]);
         $staff->setPassword($this->passwordHasher->hashPassword($staff, 'staff123'));

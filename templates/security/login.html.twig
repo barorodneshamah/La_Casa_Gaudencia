@@ -1,60 +1,197 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!
-{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block body %}
-	<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: var(--color-background);">
-		<div style="background-color: white; padding: 3rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 500px; width: 100%;">
-			<h1 style="color: var(--color-primary); font-family: var(--font-family-display); font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2rem;">Sign In</h1>
+<style>
+    body {
+        background-color: #7d6d5bff;
+    }
 
-			{% if error %}
-				<div style="background-color: #fee; border: 1px solid #fcc; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #c33;">
-					{{ error.messageKey|trans(error.messageData, 'security') }}
-				</div>
-			{% endif %}
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+    }
 
-			{% if app.user %}
-				<div style="background-color: #e7f5ff; border: 1px solid #91caff; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #0958d9;">
-					You are logged in as
-					{{ app.user.userIdentifier }},
-					<a href="{{ path('app_logout') }}" style="color: var(--color-primary); font-weight: 600; text-decoration: underline;">Logout</a>
-				</div>
-			{% endif %}
+    .login-card {
+        width: 900px;
+        height: 420px;
+        background: white;
+        border-radius: 1.2rem;
+        display: flex;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
 
-			<form method="post" class="fs-form" style="width: 100%; padding: 0;">
-				<div class="fs-field">
-					<label for="inputUsername" class="fs-label">Username</label>
-					<input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="fs-input" placeholder="Enter your username" autocomplete="username" required autofocus>
-				</div>
 
-				<div class="fs-field">
-					<label for="inputPassword" class="fs-label">Password</label>
-					<input type="password" name="password" id="inputPassword" class="fs-input" placeholder="Enter your password" autocomplete="current-password" required>
-				</div>
+.login-left {
+    width: 50%;
+    padding: 3rem 2.5rem;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden; 
+}
 
-				<div class="fs-checkbox-field" style="margin-top: 1rem;">
-					<div class="fs-checkbox-wrapper">
-						<input type="checkbox" name="_remember_me" id="rememberMe" class="fs-checkbox">
-					</div>
-					<div style="flex: 1;">
-						<label for="rememberMe" class="fs-label">Remember me</label>
-					</div>
-				</div>
+.login-left::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/images/B1.png') center/cover no-repeat;
+    opacity: 1; 
+    z-index: 0;
+}
 
-				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-				<div class="fs-button-group" style="margin-top: 2rem;">
-					<button class="fs-button" type="submit" style="width: 100%;">
-						Sign in
-					</button>
-				</div>
-			</form>
+.login-left * {
+    position: relative;
+    z-index: 1;
+}
 
-			<p style="text-align: center; margin-top: 1.5rem; color: var(--color-text-muted);">
-				Don't have an account?
-				<a href="/register" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">Register</a>
-			</p>
-		</div>
-	</div>
+    .login-title {
+        font-family: var(--font-family-display);
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #B84920;
+    }
+
+    .login-input {
+        width: 100%;
+        margin-bottom: 1rem;
+        background: #E9E9E9;
+        border: none;
+        padding: .75rem 1rem;
+        border-radius: .4rem;
+        font-size: .9rem;
+    }
+
+    .login-btn {
+        background: #B84920;
+        color: white;
+        border: none;
+        padding: .6rem 1.5rem;
+        width: 100%;
+        border-radius: .4rem;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .login-btn:hover {
+        background: #9E3D18;
+    }
+
+    .register-link {
+        margin-top: 1.3rem;
+        text-align: center;
+        font-size: .85rem;
+    }
+
+    .register-link a {
+        color: #B84920;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+
+.login-right {
+    width: 50%;
+    position: relative;
+    overflow: hidden;
+    background: #C55325; 
+    color: white;
+    padding: 2.5rem;
+    border-radius: 5rem 0 0 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+.login-right::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/Images/B1.png') center/cover no-repeat;
+    opacity: 0.25; 
+    z-index: 0;
+}
+.login-right * {
+    position: relative;
+    z-index: 1; 
+}
+
+    .welcome-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: .5px;
+        font-family: var(--font-family-display);
+    }
+
+    .logo-card {
+        width: 240px;
+        height: 150px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: .8rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-card img {
+        width: 130px;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        
+        <div class="login-left">
+            <h2 class="login-title">Sign In</h2>
+
+            {% if error %}
+                <div style="background:#fee;border:1px solid #fcc;padding:.7rem;border-radius:.4rem;margin-bottom:1rem;color:#c33;">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                <input type="text" name="username" placeholder="Username or Email"
+                       value="{{ last_username }}" class="login-input" required>
+
+                <input type="password" name="password" placeholder="Password"
+                       class="login-input" required>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+
+            <p class="register-link">
+                Don't have an account?
+                <a href="{{ path('app_register') }}">Register</a>
+            </p>
+        </div>
+
+       
+        <div class="login-right">
+            <div class="welcome-title">Welcome Back, User!</div>
+
+            <div class="logo-card">
+                <img src="/images/WEB.png" alt="La Casa Gaudencia">
+            </div>
+        </div>
+
+    </div>
+</div>
 {% endblock %}

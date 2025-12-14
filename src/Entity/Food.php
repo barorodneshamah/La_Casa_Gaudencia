@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\FoodRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,6 +41,12 @@ class Food
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $galleryImages = [];
 
+    /**
+     * @var Collection<int, Package>
+     */
+    #[ORM\ManyToMany(targetEntity: Package::class, mappedBy: 'foods')]
+    private Collection $packages;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -48,6 +56,7 @@ class Food
     public function __construct()
     {
         $this->galleryImages = [];
+        $this->packages = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -179,6 +188,78 @@ class Food
         }
         return array_merge($images, $this->galleryImages ?? []);
     }
+
+    // ========== PACKAGE RELATIONSHIP ==========
+
+    /**
+     * @return Collection<int, Package>
+     */
+    public function getPackages(): Collection
+    {
+        return $this->packages;
+    }
+
+    public function addPackage(Package $package): static
+    {
+        if (!$this->packages->contains($package)) {
+            $this->packages->add($package);
+            $package->addFood($this);
+        }
+        return $this;
+    }
+
+    public function removePackage(Package $package): static
+    {
+        if ($this->packages->removeElement($package)) {
+            $package->removeFood($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Check if food is part of any package
+     */
+    public function isInPackage(): bool
+    {
+        return !$this->packages->isEmpty();
+    }
+
+    /**
+     * Get active packages containing this food
+     */
+    public function getActivePackages(): Collection
+    {
+        return $this->packages->filter(function (Package $package) {
+            return $package->isValid();
+        });
+    }
+
+    /**
+     * Check if food is part of a specific package
+     */
+    public function isInSpecificPackage(Package $package): bool
+    {
+        return $this->packages->contains($package);
+    }
+
+    /**
+     * Get quantity needed for packages (for stock management)
+     */
+    public function getPackageReservedQuantity(): int
+    {
+        $reserved = 0;
+        
+        foreach ($this->getActivePackages() as $package) {
+            $config = $package->getItemConfig('food', $this->id);
+            $quantity = $config['quantity'] ?? 1;
+            $remainingSlots = $package->getRemainingSlots() ?? 0;
+            $reserved += $quantity * $remainingSlots;
+        }
+        
+        return $reserved;
+    }
+
+    // ========== TIMESTAMPS ==========
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {

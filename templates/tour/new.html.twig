@@ -642,12 +642,21 @@ body {
     <div class="brand">
         <img src="/Images/WEB.png" alt="Logo">
         <h1>La Casa Gaudencia</h1>
-        <small>Admin Panel</small>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                Staff Panel
+            {% endif %}
+        </small>
     </div>
 
     <div class="sidebar-separator"></div>
 
     <ul>
+    {# ================= ADMIN MENUS ================= #}
+    {% if is_granted('ROLE_ADMIN') %}
+
         <li>
             <a href="{{ path('app_admin_dashboard') }}">
                 <svg viewBox="0 0 24 24">
@@ -656,6 +665,7 @@ body {
                 Dashboard
             </a>
         </li>
+
         <li>
             <a href="{{ path('app_user_index') }}">
                 <svg viewBox="0 0 24 24">
@@ -664,7 +674,8 @@ body {
                 User Management
             </a>
         </li>
-        <li class="active">
+
+       <li class="active">
             <a href="{{ path('app_admin_services') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
@@ -672,31 +683,73 @@ body {
                 Services
             </a>
         </li>
+
         <li>
-            <a href="#">
+            <a href="{{ path('reservation_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
                 </svg>
                 Reservations
             </a>
         </li>
+
         <li>
-             <a href="#">
-                 <svg viewBox="0 0 24 24">
-                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
-                 </svg>
-                 Payments
-             </a>
-        </li>
-        <li>
-            <a href="#">
+            <a href="{{ path('app_payment_dashboard') }}">
                 <svg viewBox="0 0 24 24">
-                    <path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/>
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_activity_log_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                 </svg>
                 Activity Logs
             </a>
         </li>
-    </ul>
+
+    {# ================= STAFF MENUS ================= #}
+    {% elseif is_granted('ROLE_STAFF') %}
+
+        <li>
+            <a href="{{ path('app_staff_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+       <li class="active">
+            <a href="{{ path('staff_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                 </svg>
+                Payments
+            </a>
+        </li>
+    {% endif %}
+</ul>
     <!-- LOGOUT SECTION -->
     <div class="sidebar-logout">
         <a href="{{ path('app_logout') }}" class="logout-btn">

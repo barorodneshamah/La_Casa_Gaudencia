@@ -138,43 +138,43 @@ body {
 }
 
 /* ===== LOGOUT SECTION ===== */
-    .sidebar-logout {
-        width: 100%;
-        padding: 20px 30px;
-        margin-top: auto;
-        display: flex;
-        justify-content: center;
-        border-top: 1px solid #eee;
-    }
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
 
-    .logout-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 80%;
-        padding: 14px 24px;
-        background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
-        border: none;
-        cursor: pointer;
-    }
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    border: none;
+    cursor: pointer;
+}
 
-    .logout-btn:hover {
-        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
-    }
+.logout-btn:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+}
 
-    .logout-btn i {
-        font-size: 16px;
-    }
+.logout-btn i {
+    font-size: 16px;
+}
 
 /* ===== TOPBAR ===== */
 .topbar {
@@ -465,17 +465,9 @@ body {
     grid-template-columns: 1fr;
 }
 
-.form-grid.triple {
-    grid-template-columns: repeat(3, 1fr);
-}
-
 .form-group {
     display: flex;
     flex-direction: column;
-}
-
-.form-group.full-width {
-    grid-column: 1 / -1;
 }
 
 .form-group label {
@@ -543,6 +535,35 @@ body {
 
 .help-text i {
     color: var(--brand-primary);
+}
+
+/* ===== HIGHLIGHT TAGS ===== */
+.highlight-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.highlight-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: rgba(194, 74, 22, 0.06);
+    border: 1px solid rgba(194, 74, 22, 0.2);
+    border-radius: 18px;
+    font-size: 12px;
+    color: var(--brand-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.highlight-tag:hover,
+.highlight-tag.selected {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
 }
 
 /* ===== IMAGE UPLOAD ===== */
@@ -636,11 +657,83 @@ body {
     object-fit: cover;
 }
 
+/* ===== DELETE IMAGE BUTTON (X BUTTON) ===== */
+.btn-delete-image {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-delete-image i {
+    color: white;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.btn-delete-image:hover {
+    background: #c82333;
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+}
+
+.btn-delete-image:active {
+    transform: scale(1.05);
+}
+
+/* ===== REMOVE BUTTON FOR NEW UPLOADS ===== */
+.remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.remove-btn i {
+    color: white;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+}
+
+.remove-btn:active {
+    transform: scale(1.05);
+}
+
 /* ===== BADGES & LABELS ===== */
 .image-badge {
     position: absolute;
     top: 8px;
-    right: 8px;
+    left: 8px;
     padding: 4px 8px;
     border-radius: 8px;
     font-size: 11px;
@@ -675,7 +768,7 @@ body {
 
 .gallery-badge {
     position: absolute;
-    top: 6px;
+    bottom: 6px;
     left: 6px;
     background: rgba(0,0,0,0.6);
     color: white;
@@ -691,7 +784,7 @@ body {
 
 .gallery-number {
     position: absolute;
-    top: 6px;
+    bottom: 6px;
     left: 6px;
     background: rgba(0,0,0,0.6);
     color: white;
@@ -703,31 +796,6 @@ body {
     justify-content: center;
     font-size: 10px;
     font-weight: 600;
-}
-
-/* ===== DELETE IMAGE BUTTON ===== */
-.btn-delete-image {
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-    width: 28px;
-    height: 28px;
-    background: rgba(220, 53, 69, 0.9);
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    transition: all 0.2s ease;
-    z-index: 10;
-}
-
-.btn-delete-image:hover {
-    background: #c82333;
-    transform: scale(1.1);
 }
 
 /* ===== FORM ACTIONS ===== */
@@ -939,9 +1007,6 @@ body {
     .form-grid {
         grid-template-columns: 1fr;
     }
-    .form-grid.triple {
-        grid-template-columns: 1fr;
-    }
     .datetime-display {
         display: none;
     }
@@ -987,6 +1052,11 @@ body {
     .image-preview-grid {
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     }
+    
+    .highlight-tag {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
 }
 </style>
 {% endblock %}
@@ -1001,12 +1071,21 @@ body {
     <div class="brand">
         <img src="/Images/WEB.png" alt="Logo">
         <h1>La Casa Gaudencia</h1>
-        <small>Admin Panel</small>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                Staff Panel
+            {% endif %}
+        </small>
     </div>
 
     <div class="sidebar-separator"></div>
 
     <ul>
+    {# ================= ADMIN MENUS ================= #}
+    {% if is_granted('ROLE_ADMIN') %}
+
         <li>
             <a href="{{ path('app_admin_dashboard') }}">
                 <svg viewBox="0 0 24 24">
@@ -1015,6 +1094,7 @@ body {
                 Dashboard
             </a>
         </li>
+
         <li>
             <a href="{{ path('app_user_index') }}">
                 <svg viewBox="0 0 24 24">
@@ -1023,7 +1103,8 @@ body {
                 User Management
             </a>
         </li>
-        <li class="active">
+
+       <li class="active">
             <a href="{{ path('app_admin_services') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
@@ -1031,31 +1112,73 @@ body {
                 Services
             </a>
         </li>
+
         <li>
-            <a href="#">
+            <a href="{{ path('reservation_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
                 </svg>
                 Reservations
             </a>
         </li>
+
         <li>
-            <a href="#">
+            <a href="{{ path('app_payment_dashboard') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
                 </svg>
                 Payments
             </a>
         </li>
+
         <li>
-            <a href="#">
+            <a href="{{ path('app_activity_log_index') }}">
                 <svg viewBox="0 0 24 24">
-                    <path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/>
+                    <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                 </svg>
                 Activity Logs
             </a>
         </li>
-    </ul>
+
+    {# ================= STAFF MENUS ================= #}
+    {% elseif is_granted('ROLE_STAFF') %}
+
+        <li>
+            <a href="{{ path('app_staff_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+       <li class="active">
+            <a href="{{ path('staff_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                 </svg>
+                Payments
+            </a>
+        </li>
+    {% endif %}
+</ul>
     <!-- LOGOUT SECTION -->
     <div class="sidebar-logout">
         <a href="{{ path('app_logout') }}" class="logout-btn">
@@ -1220,11 +1343,11 @@ body {
                 </div>
             </div>
 
-            <!-- DESCRIPTION -->
+            <!-- DESCRIPTION & HIGHLIGHTS -->
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-align-left"></i>
-                    <h4>Description</h4>
+                    <h4>Description & Highlights</h4>
                 </div>
                 <div class="form-grid single">
                     <div class="form-group">
@@ -1233,6 +1356,44 @@ body {
                         {{ form_errors(form.description) }}
                         <span class="help-text"><i class="fas fa-lightbulb"></i> Provide a detailed description to attract guests</span>
                     </div>
+
+                    {% if form.highlights is defined %}
+                    <div class="form-group">
+                        <label><i class="fas fa-star"></i> Tour Highlights</label>
+                        {{ form_widget(form.highlights, {'attr': {'placeholder': 'Snorkeling, Beach BBQ, Sunset View...', 'rows': 3, 'id': 'highlightsInput'}}) }}
+                        {{ form_errors(form.highlights) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Click a tag below to add it</span>
+
+                        <div class="highlight-tags-container">
+                            <div class="highlight-tag" data-value="Snorkeling">Snorkeling</div>
+                            <div class="highlight-tag" data-value="Island Hopping">Island Hopping</div>
+                            <div class="highlight-tag" data-value="Beach BBQ">Beach BBQ</div>
+                            <div class="highlight-tag" data-value="Sunset View">Sunset View</div>
+                            <div class="highlight-tag" data-value="Diving">Diving</div>
+                            <div class="highlight-tag" data-value="Kayaking">Kayaking</div>
+                            <div class="highlight-tag" data-value="Swimming">Swimming</div>
+                            <div class="highlight-tag" data-value="Hiking">Hiking</div>
+                            <div class="highlight-tag" data-value="Cultural Tour">Cultural Tour</div>
+                            <div class="highlight-tag" data-value="Food Tasting">Food Tasting</div>
+                            <div class="highlight-tag" data-value="Photography">Photography</div>
+                            <div class="highlight-tag" data-value="Wildlife Watching">Wildlife Watching</div>
+                            <div class="highlight-tag" data-value="Waterfall Visit">Waterfall Visit</div>
+                            <div class="highlight-tag" data-value="Cave Exploration">Cave Exploration</div>
+                            <div class="highlight-tag" data-value="Boat Ride">Boat Ride</div>
+                            <div class="highlight-tag" data-value="Fishing">Fishing</div>
+                            <div class="highlight-tag" data-value="Camping">Camping</div>
+                            <div class="highlight-tag" data-value="Bonfire">Bonfire</div>
+                            <div class="highlight-tag" data-value="Stargazing">Stargazing</div>
+                            <div class="highlight-tag" data-value="Spa & Wellness">Spa & Wellness</div>
+                            <div class="highlight-tag" data-value="Local Guide">Local Guide</div>
+                            <div class="highlight-tag" data-value="Lunch Included">Lunch Included</div>
+                            <div class="highlight-tag" data-value="Breakfast Included">Breakfast Included</div>
+                            <div class="highlight-tag" data-value="Dinner Included">Dinner Included</div>
+                            <div class="highlight-tag" data-value="Transport Included">Transport Included</div>
+                            <div class="highlight-tag" data-value="Equipment Provided">Equipment Provided</div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -1256,9 +1417,9 @@ body {
                             </div>
                         </div>
                         <div class="image-preview-container">
-                            <div class="image-preview-grid">
+                            <div class="image-preview-grid" id="currentMainImageGrid">
                                 {% if tour.mainImage %}
-                                    <div class="image-preview-item">
+                                    <div class="image-preview-item" id="currentMainImage">
                                         <img src="{{ asset('uploads/tours/' ~ tour.mainImage) }}" alt="Current main image">
                                         <span class="image-badge current-badge">Current</span>
                                         <button type="button"
@@ -1266,7 +1427,7 @@ body {
                                                 title="Delete main image"
                                                 data-action="{{ path('app_tour_delete_image', {'id': tour.id, 'type': 'main', 'index': 0}) }}"
                                                 data-token="{{ csrf_token('delete-image' ~ tour.id) }}">
-                                            <i class="fas fa-trash-alt"></i>
+                                            <i class="fas fa-times"></i>
                                         </button>
                                     </div>
                                 {% endif %}
@@ -1288,10 +1449,10 @@ body {
                             </div>
                         </div>
                         <div class="image-preview-container">
-                            <div class="image-preview-grid">
+                            <div class="image-preview-grid" id="currentGalleryImagesGrid">
                                 {% if tour.galleryImages is defined and tour.galleryImages %}
                                     {% for image in tour.galleryImages %}
-                                        <div class="image-preview-item">
+                                        <div class="image-preview-item" data-gallery-index="{{ loop.index0 }}">
                                             <img src="{{ asset('uploads/tours/' ~ image) }}" alt="Gallery image {{ loop.index }}">
                                             <span class="gallery-number">{{ loop.index }}</span>
                                             <span class="image-badge current-badge">Current</span>
@@ -1300,7 +1461,7 @@ body {
                                                     title="Delete gallery image"
                                                     data-action="{{ path('app_tour_delete_image', {'id': tour.id, 'type': 'gallery', 'index': loop.index0}) }}"
                                                     data-token="{{ csrf_token('delete-image' ~ tour.id) }}">
-                                                <i class="fas fa-trash-alt"></i>
+                                                <i class="fas fa-times"></i>
                                             </button>
                                         </div>
                                     {% endfor %}
@@ -1369,6 +1530,7 @@ document.addEventListener('DOMContentLoaded', function() {
             el = uploadArea.querySelector('input[type="file"]');
             if (el) return el;
         }
+        // last resort: any file input on page
         el = document.querySelector('input[type="file"]');
         return el;
     }
@@ -1417,7 +1579,61 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ===== IMAGE UPLOAD HANDLER =====
+    // ===== HIGHLIGHT TAGS =====
+    (function(){ 
+        const highlightTags = document.querySelectorAll('.highlight-tag'); 
+        if (!highlightTags.length) return; 
+        const highlightsEl = document.getElementById('highlightsInput') || document.querySelector('[name$="[highlights]"]') || document.querySelector('[name*="highlights"]'); 
+        if (!highlightsEl) { 
+            console.warn('Highlight tags: target input not found'); 
+            return; 
+        } 
+        const tagType = highlightsEl.tagName.toLowerCase(); 
+        const getValues = () => { 
+            if (tagType === 'select') { 
+                return Array.from(highlightsEl.options).filter(o => o.selected).map(o => o.value).filter(Boolean); 
+            } 
+            return (highlightsEl.value || '').split(',').map(s => s.trim()).filter(Boolean); 
+        }; 
+        const setValues = (arr) => { 
+            if (tagType === 'select') { 
+                arr.forEach(v=>{ 
+                    if (!Array.from(highlightsEl.options).some(o=>o.value===v)){ 
+                        const opt = document.createElement('option'); 
+                        opt.value = v; 
+                        opt.text = v; 
+                        highlightsEl.appendChild(opt); 
+                    } 
+                }); 
+                Array.from(highlightsEl.options).forEach(o => o.selected = arr.includes(o.value)); 
+            } else { 
+                highlightsEl.value = arr.join(', '); 
+            } 
+            highlightsEl.dispatchEvent(new Event('input', {bubbles:true})); 
+            highlightsEl.dispatchEvent(new Event('change', {bubbles:true})); 
+        }; 
+        const initial = getValues(); 
+        highlightTags.forEach(tag => { 
+            if (initial.includes(tag.dataset.value)) tag.classList.add('selected'); 
+        }); 
+        highlightTags.forEach(tag => { 
+            tag.addEventListener('click', () => { 
+                const value = String(tag.dataset.value || '').trim(); 
+                if (!value) return; 
+                let current = getValues(); 
+                if (!current.includes(value)) { 
+                    current.push(value); 
+                    tag.classList.add('selected'); 
+                } else { 
+                    current = current.filter(v => v !== value); 
+                    tag.classList.remove('selected'); 
+                } 
+                setValues(current); 
+            }); 
+        }); 
+    })();
+
+    // ===== IMAGE UPLOAD HANDLER (improved & debug) =====
     class ImageUploader {
         constructor(inputId, previewId, uploadAreaId, isMultiple = false) {
             this.uploadArea = document.getElementById(uploadAreaId);
@@ -1436,9 +1652,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             if (!this.input) {
-                console.warn('File input not found for id:', inputId);
+                console.warn('File input not found for id:', inputId, ' — looking inside upload area.');
             } else {
+                // If the input was not inside the upload area, move it there so styling/overlay match
                 if (!this.uploadArea.contains(this.input)) {
+                    // make input visually invisible but inside uploadArea
                     this.input.style.position = 'absolute';
                     this.input.style.top = '0';
                     this.input.style.left = '0';
@@ -1454,6 +1672,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         init() {
+            // Try to re-find input in case it's rendered later by Symfony JS
             this.input = findFileInput(this.inputId, this.uploadArea);
             if (!this.input) {
                 console.error('No file input available for uploader', this.inputId);
@@ -1461,6 +1680,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             this.input.addEventListener('change', (e) => {
+                console.debug('File input change event for', this.inputId, e.target.files);
                 this.handleFiles(e.target.files);
             });
 
@@ -1515,7 +1735,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <img src="${e.target.result}" alt="${file.name}">
                         ${!this.isMultiple ? '<span class="main-image-badge">Main</span>' : `<span class="gallery-badge">${index + 1}</span>`}
                         <span class="image-badge new-badge">New</span>
-                        <button type="button" class="btn-delete-image remove-btn" title="Remove"><i class="fas fa-times"></i></button>
+                        <button type="button" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
                     `;
 
                     item.querySelector('.remove-btn').addEventListener('click', () => {
@@ -1535,23 +1755,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dt = new DataTransfer();
                 this.files.forEach(file => dt.items.add(file));
                 this.input.files = dt.files;
+                console.debug('Updated input.files for', this.inputId, this.input.files);
             } catch (err) {
                 console.error('Could not set input.files programmatically:', err);
             }
         }
     }
 
-    // Initialize uploaders
+    // Initialize uploaders with improved lookup
     new ImageUploader('mainImageInput', 'mainImagePreview', 'mainUploadArea', false);
     new ImageUploader('galleryImagesInput', 'galleryImagesPreview', 'galleryUploadArea', true);
 
     // ===== DELETE IMAGE BUTTONS =====
-    document.querySelectorAll('.btn-delete-image:not(.remove-btn)').forEach(btn => {
+    document.querySelectorAll('.btn-delete-image').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-            if (!confirm('Delete this image?')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (!confirm('Are you sure you want to delete this image?')) return;
+            
             const action = btn.dataset.action;
             const token = btn.dataset.token;
-            if (!action) return;
+            const imageItem = btn.closest('.image-preview-item');
+            
+            // Add loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
             try {
                 const res = await fetch(action, {
                     method: 'POST',
@@ -1561,16 +1791,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: new URLSearchParams({ _token: token })
                 });
+                
                 if (res.ok) {
-                    location.reload();
+                    // Animate removal
+                    imageItem.style.transition = 'all 0.3s ease';
+                    imageItem.style.opacity = '0';
+                    imageItem.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        imageItem.remove();
+                    }, 300);
                 } else {
                     const text = await res.text();
                     console.error('Delete failed', res.status, text);
-                    alert('Failed to delete image.');
+                    alert('Failed to delete image. Please try again.');
+                    btn.innerHTML = '<i class="fas fa-times"></i>';
+                    btn.disabled = false;
                 }
             } catch (err) {
                 console.error('Delete error', err);
-                alert('Failed to delete image.');
+                alert('Failed to delete image. Please check your connection.');
+                btn.innerHTML = '<i class="fas fa-times"></i>';
+                btn.disabled = false;
             }
         });
     });

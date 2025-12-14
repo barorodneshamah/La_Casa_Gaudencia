@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ isNew ? 'New Reservation' : 'Edit Reservation' }}{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {# Header #}
+            <div class="mb-4">
+                <a href="{{ isNew ? path('reservation_index') : path('reservation_show', {id: reservation.id}) }}" 
+                   class="text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+                <h1 class="mt-2">{{ isNew ? 'New Reservation' : 'Edit Reservation' }}</h1>
+                {% if not isNew %}
+                    <span class="text-muted">{{ reservation.reservationNumber }}</span>
+                {% endif %}
+            </div>
+
+            {# Form #}
+            {{ form_start(form, {attr: {class: 'needs-validation', novalidate: 'novalidate'}}) }}
+            
+            <div class="card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Guest & Service</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            {{ form_row(form.guest, {attr: {class: 'form-select'}}) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.serviceType, {attr: {class: 'form-select'}}) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.serviceName, {attr: {class: 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_row(form.serviceDetails, {attr: {class: 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-calendar me-2"></i>Dates & Guests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            {{ form_row(form.checkInDate, {attr: {class: 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.checkOutDate, {attr: {class: 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.numberOfGuests, {attr: {class: 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-money-bill me-2"></i>Payment & Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            {{ form_row(form.totalAmount, {attr: {class: 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.status, {attr: {class: 'form-select'}}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.paymentStatus, {attr: {class: 'form-select'}}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Notes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            {{ form_row(form.specialRequests, {attr: {class: 'form-control'}}) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_row(form.adminNotes, {attr: {class: 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Submit Buttons #}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> 
+                    {{ isNew ? 'Create Reservation' : 'Update Reservation' }}
+                </button>
+                <a href="{{ isNew ? path('reservation_index') : path('reservation_show', {id: reservation.id}) }}" 
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Simple form validation
+(function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
+{% endblock %}
