@@ -1,0 +1,2207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Package | La Casa Gaudencia{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-cream: #fcfbf7;
+    --brand-black: #000000;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f7f5edff;
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+}
+
+/* ===== ACCENT BAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    z-index: 30;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.brand img {
+    width: 75px;
+    height: 75px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+}
+
+.brand h1 {
+    font-family: 'Playfair Display', serif;
+    color: #c24a16;
+    font-size: 22px;
+    letter-spacing: .5px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.brand small {
+    color: #777;
+    font-size: 12px;
+    letter-spacing: .75px;
+    font-weight: 500;
+}
+
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 10px 0 15px 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+.sidebar ul li svg {
+    width: 20px;
+    height: 20px;
+    fill: #888;
+    transition: .25s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+}
+
+.sidebar ul li a:hover svg,
+.sidebar ul li.active a svg {
+    fill: white !important;
+}
+
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 268px;
+    background: #c24a16;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.topbar-left {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: .7px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.datetime-display {
+    text-align: right;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+
+.datetime-display .time {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.datetime-display .date {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 1px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 268px;
+    padding: 32px;
+    min-height: calc(100vh - 70px);
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.page-header .section-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 26px;
+    color: var(--brand-primary);
+    font-weight: 600;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-back {
+    padding: 11px 22px;
+    border: 2px solid var(--brand-primary);
+    color: var(--brand-primary);
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+}
+
+.btn-back:hover {
+    background: var(--brand-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+/* ===== PACKAGE INFO CARD ===== */
+.package-info-card {
+    background: linear-gradient(135deg, #fff5f0 0%, #fff8f5 100%);
+    border: 2px solid rgba(194, 74, 22, 0.15);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.package-info-card .package-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+    overflow: hidden;
+}
+
+.package-info-card .package-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.package-info-card .package-details {
+    flex: 1;
+}
+
+.package-info-card .package-details h3 {
+    margin: 0 0 6px 0;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    color: var(--brand-text);
+}
+
+.package-info-card .package-details .package-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.package-info-card .package-details .package-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--brand-text-muted);
+}
+
+.package-info-card .package-details .package-meta span i {
+    color: var(--brand-primary);
+}
+
+.package-info-card .status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.package-info-card .status-badge.active {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.package-info-card .status-badge.inactive {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.package-info-card .status-badge.draft {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+    border: 1px solid #ffcc80;
+}
+
+.package-info-card .featured-badge {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    color: #f9a825;
+    border: 1px solid #ffd54f;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ===== FORM STYLES ===== */
+.form-container {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.form-header {
+    background: #faf9f5;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.form-header .header-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--brand-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+}
+
+.form-header .header-text h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.form-header .header-text p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--brand-text-muted);
+}
+
+.form-body {
+    padding: 32px;
+}
+
+.form-section {
+    margin-bottom: 36px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid rgba(194, 74, 22, 0.1);
+}
+
+.section-header i {
+    width: 34px;
+    height: 34px;
+    background: rgba(194, 74, 22, 0.08);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-primary);
+}
+
+.section-header h4 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.form-grid.single {
+    grid-template-columns: 1fr;
+}
+
+.form-grid.triple {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand-text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-group label .required {
+    color: var(--brand-primary);
+}
+
+.form-group label i {
+    color: var(--brand-text-muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--brand-text);
+    background: var(--brand-cream);
+    transition: all 0.25s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(194, 74, 22, 0.08);
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.help-text {
+    font-size: 11px;
+    color: var(--brand-text-muted);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.help-text i {
+    color: var(--brand-primary);
+}
+
+/* ===== CHECKBOX TOGGLE ===== */
+.checkbox-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--brand-cream);
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.checkbox-toggle:hover {
+    border-color: var(--brand-primary);
+}
+
+.checkbox-toggle input {
+    width: 20px !important;
+    height: 20px !important;
+    padding: 0 !important;
+    accent-color: var(--brand-primary);
+}
+
+.checkbox-toggle .toggle-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brand-text);
+}
+
+.checkbox-toggle .toggle-text small {
+    display: block;
+    font-size: 11px;
+    color: var(--brand-text-muted);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+/* ===== ITEM SELECTION CARDS ===== */
+.items-selection-container {
+    background: #faf9f5;
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px solid #e5e5e5;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.items-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.items-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.items-grid::-webkit-scrollbar-thumb {
+    background: var(--brand-primary);
+    border-radius: 3px;
+}
+
+.item-card {
+    background: white;
+    border: 2px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+.item-card:hover {
+    border-color: var(--brand-primary);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.1);
+}
+
+.item-card.selected {
+    border-color: var(--brand-primary);
+    background: rgba(194, 74, 22, 0.03);
+}
+
+.item-card.selected::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: var(--brand-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+.item-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.item-card-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(194, 74, 22, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-primary);
+    font-size: 16px;
+}
+
+.item-card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--brand-text);
+}
+
+.item-card-subtitle {
+    font-size: 12px;
+    color: var(--brand-text-muted);
+}
+
+.item-card-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--brand-primary);
+    margin-top: 8px;
+}
+
+.item-card-price small {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--brand-text-muted);
+}
+
+.empty-items {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--brand-text-muted);
+    grid-column: 1 / -1;
+}
+
+.empty-items i {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-items p {
+    font-size: 14px;
+}
+
+/* Hide Symfony checkboxes */
+.symfony-checkboxes {
+    display: none !important;
+}
+
+/* ===== IMAGE UPLOAD ===== */
+.image-upload-area {
+    border: 2px dashed #d0d0d0;
+    border-radius: 10px;
+    padding: 28px;
+    text-align: center;
+    background: #faf9f5;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.image-upload-area:hover,
+.image-upload-area.dragover {
+    border-color: var(--brand-primary);
+    background: rgba(194, 74, 22, 0.03);
+}
+
+.image-upload-area .file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--brand-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    color: white;
+    font-size: 26px;
+}
+
+.upload-text h5 {
+    margin: 0 0 6px;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.upload-text p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--brand-text-muted);
+}
+
+.upload-text span {
+    color: var(--brand-primary);
+    font-weight: 500;
+}
+
+.upload-text .file-info {
+    font-size: 10px;
+    margin-top: 8px;
+    color: #aaa;
+}
+
+/* ===== IMAGE PREVIEW ===== */
+.image-preview-container {
+    margin-top: 16px;
+}
+
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.image-preview-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    background: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.image-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== DELETE IMAGE BUTTON (X BUTTON) ===== */
+.btn-delete-image {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-delete-image i {
+    color: white;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.btn-delete-image:hover {
+    background: #c82333;
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+}
+
+.btn-delete-image:active {
+    transform: scale(1.05);
+}
+
+/* ===== REMOVE BUTTON FOR NEW UPLOADS ===== */
+.remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.remove-btn i {
+    color: white;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+}
+
+.remove-btn:active {
+    transform: scale(1.05);
+}
+
+/* ===== BADGES & LABELS ===== */
+.image-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    background: rgba(0,0,0,0.6);
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.image-badge.current-badge {
+    background: var(--brand-primary);
+}
+
+.image-badge.new-badge {
+    background: rgba(0,0,0,0.6);
+}
+
+.main-image-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    background: var(--brand-primary);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.gallery-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.gallery-number {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ===== PRICE CALCULATOR ===== */
+.price-calculator {
+    background: linear-gradient(135deg, #faf9f5 0%, #fff8f5 100%);
+    border: 2px solid rgba(194, 74, 22, 0.15);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.price-calculator-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(194, 74, 22, 0.1);
+}
+
+.price-calculator-header i {
+    color: var(--brand-primary);
+}
+
+.price-calculator-header h5 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+.price-row.total {
+    border-top: 2px solid rgba(194, 74, 22, 0.2);
+    margin-top: 8px;
+    padding-top: 12px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.price-row .label {
+    color: var(--brand-text-muted);
+}
+
+.price-row .value {
+    color: var(--brand-text);
+    font-weight: 600;
+}
+
+.price-row.savings .value {
+    color: #28a745;
+}
+
+.price-row.total .value {
+    color: var(--brand-primary);
+    font-size: 20px;
+}
+
+/* ===== TABS FOR ITEMS ===== */
+.items-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e5e5e5;
+    padding-bottom: 0;
+}
+
+.items-tab {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brand-text-muted);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.items-tab:hover {
+    color: var(--brand-primary);
+}
+
+.items-tab.active {
+    color: var(--brand-primary);
+}
+
+.items-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--brand-primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.items-tab i {
+    margin-right: 8px;
+}
+
+.items-tab .count {
+    background: rgba(194, 74, 22, 0.1);
+    color: var(--brand-primary);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-left: 8px;
+}
+
+.items-tab.active .count {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.items-tab-content {
+    display: none;
+}
+
+.items-tab-content.active {
+    display: block;
+}
+
+/* ===== FORM ACTIONS ===== */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 2px solid rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
+}
+
+.form-actions-left {
+    display: flex;
+    gap: 12px;
+}
+
+.form-actions-right {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-cancel {
+    padding: 13px 26px;
+    border: 2px solid #ddd;
+    color: #666;
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-cancel:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+.btn-delete {
+    padding: 13px 26px;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-submit {
+    padding: 13px 32px;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.25);
+    transition: all 0.25s ease;
+}
+
+.btn-submit:hover {
+    background: #a33d12;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(194, 74, 22, 0.35);
+}
+
+/* ===== FLASH MESSAGES ===== */
+.flash-message {
+    padding: 14px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.flash-message.success {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #2e7d32;
+}
+
+.flash-message.error {
+    background: #ffebee;
+    border: 1px solid #ef9a9a;
+    color: #c62828;
+}
+
+/* ===== DELETE MODAL ===== */
+.delete-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-modal-overlay.show {
+    display: flex;
+}
+
+.delete-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.delete-modal .modal-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #c62828;
+    font-size: 32px;
+}
+
+.delete-modal h3 {
+    margin: 0 0 12px;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--brand-text);
+}
+
+.delete-modal p {
+    margin: 0 0 24px;
+    color: var(--brand-text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.delete-modal .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.delete-modal .btn-modal-cancel {
+    padding: 12px 24px;
+    border: 2px solid #ddd;
+    color: #666;
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.delete-modal .btn-modal-cancel:hover {
+    border-color: #999;
+    color: #333;
+}
+
+.delete-modal .btn-modal-delete {
+    padding: 12px 24px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.delete-modal .btn-modal-delete:hover {
+    background: #c82333;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .form-grid.triple {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .form-grid,
+    .form-grid.triple {
+        grid-template-columns: 1fr;
+    }
+    .datetime-display {
+        display: none;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .form-actions-left,
+    .form-actions-right {
+        width: 100%;
+        justify-content: center;
+    }
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+    .sidebar,
+    .sidebar-accent {
+        display: none;
+    }
+    .topbar {
+        margin-left: 0;
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .package-info-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .package-info-card .package-details .package-meta {
+        justify-content: center;
+    }
+    .image-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                Staff Panel
+            {% endif %}
+        </small>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <ul>
+    {# ================= ADMIN MENUS ================= #}
+    {% if is_granted('ROLE_ADMIN') %}
+
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_user_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                User Management
+            </a>
+        </li>
+
+       <li class="active">
+            <a href="{{ path('app_admin_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_activity_log_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                </svg>
+                Activity Logs
+            </a>
+        </li>
+
+    {# ================= STAFF MENUS ================= #}
+    {% elseif is_granted('ROLE_STAFF') %}
+
+        <li>
+            <a href="{{ path('app_staff_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+       <li class="active">
+            <a href="{{ path('staff_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                 </svg>
+                Payments
+            </a>
+        </li>
+    {% endif %}
+</ul>
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">
+            Log Out
+        </a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">Package Management</div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-message {{ label }}">
+                <i class="fas fa-{{ label == 'success' ? 'check-circle' : 'exclamation-circle' }}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="page-header">
+        <h2 class="section-title">Edit Package</h2>
+        <div class="header-buttons">
+            <a href="{{ path('app_package_index') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Packages
+            </a>
+        </div>
+    </div>
+
+    <div class="package-info-card">
+        <div class="package-icon">
+            {% if package.mainImage %}
+                <img src="{{ asset('uploads/packages/' ~ package.mainImage) }}" alt="{{ package.name }}">
+            {% else %}
+                <i class="fas fa-gift"></i>
+            {% endif %}
+        </div>
+        <div class="package-details">
+            <h3>{{ package.name }}</h3>
+            <div class="package-meta">
+                <span><i class="fas fa-layer-group"></i> {{ package.packageType ?? 'Custom' }}</span>
+                <span><i class="fas fa-clock"></i> {{ package.durationDays ?? 0 }}D / {{ package.durationNights ?? 0 }}N</span>
+                <span><i class="fas fa-users"></i> {{ package.maxGuests ?? '∞' }} Guest(s)</span>
+                <span><i class="fas fa-peso-sign"></i> ₱{{ package.packagePrice|number_format(2) }}</span>
+                <span><i class="fas fa-cubes"></i> {{ package.rooms|length + package.tours|length + package.foods|length }} Items</span>
+            </div>
+        </div>
+        {% if package.isFeatured %}
+            <span class="featured-badge"><i class="fas fa-star"></i> Featured</span>
+        {% endif %}
+        <span class="status-badge {{ package.status|lower }}">{{ package.status }}</span>
+    </div>
+
+    <div class="form-container">
+        <div class="form-header">
+            <div class="header-icon"><i class="fas fa-edit"></i></div>
+            <div class="header-text">
+                <h3>Update Package Information</h3>
+                <p>Modify the details below and save your changes</p>
+            </div>
+        </div>
+
+        <div class="form-body">
+            {{ form_start(form, {'attr': {'class': 'package-form', 'id': 'packageForm', 'enctype': 'multipart/form-data'}}) }}
+
+            <!-- BASIC INFO -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h4>Basic Information</h4>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Package Name <span class="required">*</span></label>
+                        {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Summer Getaway Special'}}) }}
+                        {{ form_errors(form.name) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Enter a catchy package name</span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-layer-group"></i> Package Type <span class="required">*</span></label>
+                        {{ form_widget(form.packageType) }}
+                        {{ form_errors(form.packageType) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-peso-sign"></i> Package Price <span class="required">*</span></label>
+                        {{ form_widget(form.packagePrice, {'attr': {'placeholder': '0.00', 'id': 'packagePriceInput'}}) }}
+                        {{ form_errors(form.packagePrice) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-toggle-on"></i> Status <span class="required">*</span></label>
+                        {{ form_widget(form.status) }}
+                        {{ form_errors(form.status) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-star"></i> Featured Package</label>
+                        <div class="checkbox-toggle">
+                            {{ form_widget(form.isFeatured) }}
+                            <div class="toggle-text">
+                                Mark as Featured
+                                <small>Featured packages appear prominently on the homepage</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DURATION & CAPACITY -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-clock"></i>
+                    <h4>Duration & Capacity</h4>
+                </div>
+                <div class="form-grid triple">
+                    <div class="form-group">
+                        <label><i class="fas fa-sun"></i> Duration (Days)</label>
+                        {{ form_widget(form.durationDays, {'attr': {'placeholder': 'e.g., 3', 'min': 1}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-moon"></i> Duration (Nights)</label>
+                        {{ form_widget(form.durationNights, {'attr': {'placeholder': 'e.g., 2', 'min': 0}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-users"></i> Max Guests</label>
+                        {{ form_widget(form.maxGuests, {'attr': {'placeholder': 'e.g., 4', 'min': 1}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- VALIDITY PERIOD -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h4>Validity Period</h4>
+                </div>
+                <div class="form-grid triple">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-check"></i> Valid From</label>
+                        {{ form_widget(form.validFrom) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-times"></i> Valid Until</label>
+                        {{ form_widget(form.validUntil) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-ticket-alt"></i> Max Redemptions</label>
+                        {{ form_widget(form.maxRedemptions, {'attr': {'placeholder': 'Unlimited'}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESCRIPTION & DETAILS -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-align-left"></i>
+                    <h4>Description & Details</h4>
+                </div>
+                <div class="form-grid single">
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> Package Description</label>
+                        {{ form_widget(form.description, {'attr': {'placeholder': 'Describe what guests will enjoy...', 'rows': 4}}) }}
+                        <span class="help-text"><i class="fas fa-lightbulb"></i> Provide a detailed description to attract guests</span>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle"></i> Inclusions</label>
+                        {{ form_widget(form.inclusions, {'attr': {'placeholder': "What's included...", 'rows': 4}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-times-circle"></i> Exclusions</label>
+                        {{ form_widget(form.exclusions, {'attr': {'placeholder': "What's NOT included...", 'rows': 3}}) }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-gavel"></i> Terms & Conditions</label>
+                        {{ form_widget(form.termsAndConditions, {'attr': {'placeholder': 'Terms and conditions...', 'rows': 4}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- PACKAGE ITEMS -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-cubes"></i>
+                    <h4>Package Items</h4>
+                </div>
+                
+                <div class="items-tabs">
+                    <button type="button" class="items-tab active" data-tab="rooms">
+                        <i class="fas fa-bed"></i> Rooms
+                        <span class="count" id="roomsCount">0</span>
+                    </button>
+                    <button type="button" class="items-tab" data-tab="tours">
+                        <i class="fas fa-map-marked-alt"></i> Tours
+                        <span class="count" id="toursCount">0</span>
+                    </button>
+                    <button type="button" class="items-tab" data-tab="foods">
+                        <i class="fas fa-utensils"></i> Food Items
+                        <span class="count" id="foodsCount">0</span>
+                    </button>
+                </div>
+
+                <!-- ROOMS TAB -->
+                <div class="items-tab-content active" id="roomsTab">
+                    <div class="items-selection-container">
+                        <div class="items-grid" id="roomsGrid">
+                            {% for child in form.rooms %}
+                                {% set price = child.vars.attr['data-price']|default(0) %}
+                                {% set roomType = child.vars.attr['data-type']|default('Room') %}
+                                {% set isChecked = child.vars.checked|default(false) %}
+                                
+                                <div class="item-card {{ isChecked ? 'selected' : '' }}" 
+                                     data-checkbox-id="{{ child.vars.id }}"
+                                     data-price="{{ price }}">
+                                    <div class="item-card-header">
+                                        <div class="item-card-icon">
+                                            <i class="fas fa-bed"></i>
+                                        </div>
+                                        <div>
+                                            <div class="item-card-title">{{ child.vars.label }}</div>
+                                            <div class="item-card-subtitle">{{ roomType }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-price">
+                                        ₱{{ price|number_format(2) }} <small>/ night</small>
+                                    </div>
+                                    <div class="symfony-checkboxes">
+                                        {{ form_widget(child) }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="empty-items">
+                                    <i class="fas fa-bed"></i>
+                                    <p>No rooms available. <a href="{{ path('app_room_new') }}">Add rooms first</a></p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOURS TAB -->
+                <div class="items-tab-content" id="toursTab">
+                    <div class="items-selection-container">
+                        <div class="items-grid" id="toursGrid">
+                            {% for child in form.tours %}
+                                {% set price = child.vars.attr['data-price']|default(0) %}
+                                {% set duration = child.vars.attr['data-duration']|default('') %}
+                                {% set isChecked = child.vars.checked|default(false) %}
+                                
+                                <div class="item-card {{ isChecked ? 'selected' : '' }}"
+                                     data-checkbox-id="{{ child.vars.id }}"
+                                     data-price="{{ price }}">
+                                    <div class="item-card-header">
+                                        <div class="item-card-icon">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                        </div>
+                                        <div>
+                                            <div class="item-card-title">{{ child.vars.label }}</div>
+                                            <div class="item-card-subtitle">{{ duration ?: 'Tour' }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-price">
+                                        ₱{{ price|number_format(2) }} <small>/ person</small>
+                                    </div>
+                                    <div class="symfony-checkboxes">
+                                        {{ form_widget(child) }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="empty-items">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <p>No tours available. <a href="{{ path('app_tour_new') }}">Add tours first</a></p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOODS TAB -->
+                <div class="items-tab-content" id="foodsTab">
+                    <div class="items-selection-container">
+                        <div class="items-grid" id="foodsGrid">
+                            {% for child in form.foods %}
+                                {% set price = child.vars.attr['data-price']|default(0) %}
+                                {% set category = child.vars.attr['data-category']|default('Food') %}
+                                {% set isChecked = child.vars.checked|default(false) %}
+                                
+                                <div class="item-card {{ isChecked ? 'selected' : '' }}"
+                                     data-checkbox-id="{{ child.vars.id }}"
+                                     data-price="{{ price }}">
+                                    <div class="item-card-header">
+                                        <div class="item-card-icon">
+                                            <i class="fas fa-utensils"></i>
+                                        </div>
+                                        <div>
+                                            <div class="item-card-title">{{ child.vars.label }}</div>
+                                            <div class="item-card-subtitle">{{ category }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-price">
+                                        ₱{{ price|number_format(2) }}
+                                    </div>
+                                    <div class="symfony-checkboxes">
+                                        {{ form_widget(child) }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="empty-items">
+                                    <i class="fas fa-utensils"></i>
+                                    <p>No food items available. <a href="{{ path('app_food_new') }}">Add food first</a></p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Calculator -->
+                <div class="price-calculator">
+                    <div class="price-calculator-header">
+                        <i class="fas fa-calculator"></i>
+                        <h5>Price Summary</h5>
+                    </div>
+                    <div class="price-row">
+                        <span class="label">Original Price (Total Items)</span>
+                        <span class="value" id="originalPriceDisplay">₱{{ package.originalPrice|default(0)|number_format(2) }}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="label">Package Price</span>
+                        <span class="value" id="packagePriceDisplay">₱{{ package.packagePrice|number_format(2) }}</span>
+                    </div>
+                    <div class="price-row savings">
+                        <span class="label">You Save</span>
+                        <span class="value" id="savingsDisplay">₱{{ package.savings|default(0)|number_format(2) }} ({{ package.discountPercentage|default(0)|number_format(1) }}%)</span>
+                    </div>
+                    <div class="price-row total">
+                        <span class="label">Final Price</span>
+                        <span class="value" id="finalPriceDisplay">₱{{ package.packagePrice|number_format(2) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMAGES -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-images"></i>
+                    <h4>Package Images</h4>
+                </div>
+                <div class="form-grid">
+                    <!-- Main Image -->
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Main Package Image</label>
+                        <div class="image-upload-area" id="mainUploadArea">
+                            {{ form_widget(form.mainImageFile, {'attr': {'class': 'file-input', 'id': 'mainImageInput', 'accept': 'image/*'}}) }}
+                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div class="upload-text">
+                                <h5>Upload Main Image</h5>
+                                <p>Drag & drop or <span>browse</span></p>
+                                <p class="file-info">JPEG, PNG or WebP (Max 5MB)</p>
+                            </div>
+                        </div>
+                        <div class="image-preview-container">
+                            <div class="image-preview-grid" id="currentMainImageGrid">
+                                {% if package.mainImage %}
+                                    <div class="image-preview-item" id="currentMainImage">
+                                        <img src="{{ asset('uploads/packages/' ~ package.mainImage) }}" alt="Current main image">
+                                        <span class="image-badge current-badge">Current</span>
+                                        <button type="button"
+                                                class="btn-delete-image"
+                                                title="Delete main image"
+                                                data-action="{{ path('app_package_delete_image', {'id': package.id, 'type': 'main', 'index': 0}) }}"
+                                                data-token="{{ csrf_token('delete-image' ~ package.id) }}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="image-preview-grid" id="mainImagePreview"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Images -->
+                    <div class="form-group">
+                        <label><i class="fas fa-photo-video"></i> Gallery Images</label>
+                        <div class="image-upload-area" id="galleryUploadArea">
+                            {{ form_widget(form.galleryImageFiles, {'attr': {'class': 'file-input', 'id': 'galleryImagesInput', 'accept': 'image/*', 'multiple': true}}) }}
+                            <div class="upload-icon"><i class="fas fa-images"></i></div>
+                            <div class="upload-text">
+                                <h5>Upload Gallery Images</h5>
+                                <p>Drag & drop or <span>browse</span></p>
+                                <p class="file-info">Multiple files allowed</p>
+                            </div>
+                        </div>
+                        <div class="image-preview-container">
+                            <div class="image-preview-grid" id="currentGalleryImagesGrid">
+                                {% for image in package.galleryImages %}
+                                    <div class="image-preview-item" data-gallery-index="{{ loop.index0 }}">
+                                        <img src="{{ asset('uploads/packages/' ~ image) }}" alt="Gallery image {{ loop.index }}">
+                                        <span class="gallery-number">{{ loop.index }}</span>
+                                        <span class="image-badge current-badge">Current</span>
+                                        <button type="button"
+                                                class="btn-delete-image"
+                                                title="Delete gallery image"
+                                                data-action="{{ path('app_package_delete_image', {'id': package.id, 'type': 'gallery', 'index': loop.index0}) }}"
+                                                data-token="{{ csrf_token('delete-image' ~ package.id) }}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="image-preview-grid" id="galleryImagesPreview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM ACTIONS -->
+            <div class="form-actions">
+                <div class="form-actions-left">
+                    <button type="button" class="btn-delete" id="deletePackageBtn">
+                        <i class="fas fa-trash-alt"></i> Delete Package
+                    </button>
+                </div>
+                <div class="form-actions-right">
+                    <a href="{{ path('app_package_index') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3>Delete "{{ package.name }}"?</h3>
+        <p>Are you sure you want to delete this package? This action cannot be undone and all associated data will be permanently removed.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" id="cancelDeleteBtn">Cancel</button>
+            <form method="post" action="{{ path('app_package_delete', {'id': package.id}) }}" style="display: inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ package.id) }}">
+                <button type="submit" class="btn-modal-delete">
+                    <i class="fas fa-trash-alt"></i> Yes, Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ===== DEBUG HELPERS =====
+    function findFileInput(id, uploadArea) {
+        let el = document.getElementById(id);
+        if (el && el.tagName && el.tagName.toLowerCase() === 'input' && el.type === 'file') return el;
+        if (uploadArea) {
+            el = uploadArea.querySelector('input[type="file"]');
+            if (el) return el;
+        }
+        el = document.querySelector('input[type="file"]');
+        return el;
+    }
+
+    // ===== DATE TIME =====
+    function updateDateTime() {
+        const now = new Date();
+        const timeEl = document.getElementById('currentTime');
+        const dateEl = document.getElementById('currentDate');
+        if (timeEl && dateEl) {
+            timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // ===== DELETE MODAL =====
+    const deleteBtn = document.getElementById('deletePackageBtn');
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+    if (deleteBtn && deleteModal) {
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('show');
+        });
+
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('show');
+        });
+
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('show');
+            }
+        });
+    }
+
+    // ===== TABS =====
+    document.querySelectorAll('.items-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            document.querySelectorAll('.items-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.items-tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(targetTab + 'Tab').classList.add('active');
+        });
+    });
+
+    // ===== ITEM SELECTION =====
+    document.querySelectorAll('.item-card').forEach(card => {
+        const checkboxId = card.dataset.checkboxId;
+        if (!checkboxId) return;
+        const checkbox = document.getElementById(checkboxId);
+        if (!checkbox) return;
+
+        if (checkbox.checked) card.classList.add('selected');
+
+        card.addEventListener('click', function(e) {
+            checkbox.checked = !checkbox.checked;
+            this.classList.toggle('selected', checkbox.checked);
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            updateCounts();
+            calculatePrices();
+        });
+    });
+
+    function updateCounts() {
+        document.getElementById('roomsCount').textContent = document.querySelectorAll('#roomsGrid .item-card.selected').length;
+        document.getElementById('toursCount').textContent = document.querySelectorAll('#toursGrid .item-card.selected').length;
+        document.getElementById('foodsCount').textContent = document.querySelectorAll('#foodsGrid .item-card.selected').length;
+    }
+
+    function calculatePrices() {
+        let originalPrice = 0;
+        document.querySelectorAll('.item-card.selected').forEach(card => {
+            originalPrice += parseFloat(card.dataset.price) || 0;
+        });
+
+        const packagePriceInput = document.getElementById('packagePriceInput') || document.querySelector('[name$="[packagePrice]"]');
+        const packagePrice = parseFloat(packagePriceInput?.value) || 0;
+        const savings = originalPrice - packagePrice;
+        const discountPercent = originalPrice > 0 ? (savings / originalPrice * 100) : 0;
+
+        document.getElementById('originalPriceDisplay').textContent = '₱' + originalPrice.toFixed(2);
+        document.getElementById('packagePriceDisplay').textContent = '₱' + packagePrice.toFixed(2);
+        document.getElementById('savingsDisplay').textContent = '₱' + Math.max(0, savings).toFixed(2) + ' (' + Math.max(0, discountPercent).toFixed(1) + '%)';
+        document.getElementById('finalPriceDisplay').textContent = '₱' + packagePrice.toFixed(2);
+    }
+
+    const packagePriceInput = document.getElementById('packagePriceInput') || document.querySelector('[name$="[packagePrice]"]');
+    if (packagePriceInput) packagePriceInput.addEventListener('input', calculatePrices);
+
+    updateCounts();
+    calculatePrices();
+
+    // ===== IMAGE UPLOAD HANDLER (improved & debug) =====
+    class ImageUploader {
+        constructor(inputId, previewId, uploadAreaId, isMultiple = false) {
+            this.uploadArea = document.getElementById(uploadAreaId);
+            this.preview = document.getElementById(previewId);
+            this.inputId = inputId;
+            this.isMultiple = isMultiple;
+            this.files = [];
+            this.input = findFileInput(inputId, this.uploadArea);
+
+            if (!this.uploadArea) {
+                console.warn('Upload area not found:', uploadAreaId);
+                return;
+            }
+            if (!this.preview) {
+                console.warn('Preview container not found:', previewId);
+                return;
+            }
+            if (!this.input) {
+                console.warn('File input not found for id:', inputId, ' — looking inside upload area.');
+            } else {
+                if (!this.uploadArea.contains(this.input)) {
+                    this.input.style.position = 'absolute';
+                    this.input.style.top = '0';
+                    this.input.style.left = '0';
+                    this.input.style.width = '100%';
+                    this.input.style.height = '100%';
+                    this.input.style.opacity = '0';
+                    this.input.style.cursor = 'pointer';
+                    this.uploadArea.insertBefore(this.input, this.uploadArea.firstChild);
+                }
+            }
+
+            this.init();
+        }
+
+        init() {
+            this.input = findFileInput(this.inputId, this.uploadArea);
+            if (!this.input) {
+                console.error('No file input available for uploader', this.inputId);
+                return;
+            }
+
+            this.input.addEventListener('change', (e) => {
+                console.debug('File input change event for', this.inputId, e.target.files);
+                this.handleFiles(e.target.files);
+            });
+
+            this.uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                this.uploadArea.classList.add('dragover');
+            });
+
+            this.uploadArea.addEventListener('dragleave', () => {
+                this.uploadArea.classList.remove('dragover');
+            });
+
+            this.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+                this.handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        handleFiles(fileList) {
+            const newFiles = Array.from(fileList).filter(file => {
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name} is not an image`);
+                    return false;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name} is too large (max 5MB)`);
+                    return false;
+                }
+                return true;
+            });
+
+            if (this.isMultiple) {
+                this.files = [...this.files, ...newFiles];
+            } else {
+                this.files = newFiles.slice(0, 1);
+            }
+
+            this.renderPreview();
+            this.updateInput();
+        }
+
+        renderPreview() {
+            this.preview.innerHTML = '';
+
+            this.files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const item = document.createElement('div');
+                    item.className = 'image-preview-item';
+                    item.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        ${!this.isMultiple ? '<span class="main-image-badge">Main</span>' : `<span class="gallery-badge">${index + 1}</span>`}
+                        <span class="image-badge new-badge">New</span>
+                        <button type="button" class="remove-btn" title="Remove"><i class="fas fa-times"></i></button>
+                    `;
+
+                    item.querySelector('.remove-btn').addEventListener('click', () => {
+                        this.files.splice(index, 1);
+                        this.renderPreview();
+                        this.updateInput();
+                    });
+
+                    this.preview.appendChild(item);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        updateInput() {
+            try {
+                const dt = new DataTransfer();
+                this.files.forEach(file => dt.items.add(file));
+                this.input.files = dt.files;
+                console.debug('Updated input.files for', this.inputId, this.input.files);
+            } catch (err) {
+                console.error('Could not set input.files programmatically:', err);
+            }
+        }
+    }
+
+    // Initialize uploaders
+    new ImageUploader('mainImageInput', 'mainImagePreview', 'mainUploadArea', false);
+    new ImageUploader('galleryImagesInput', 'galleryImagesPreview', 'galleryUploadArea', true);
+
+    // ===== DELETE IMAGE BUTTONS =====
+    document.querySelectorAll('.btn-delete-image').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (!confirm('Are you sure you want to delete this image?')) return;
+            
+            const action = btn.dataset.action;
+            const token = btn.dataset.token;
+            const imageItem = btn.closest('.image-preview-item');
+            
+            // Add loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({ _token: token })
+                });
+                
+                if (res.ok) {
+                    // Animate removal
+                    imageItem.style.transition = 'all 0.3s ease';
+                    imageItem.style.opacity = '0';
+                    imageItem.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        imageItem.remove();
+                    }, 300);
+                } else {
+                    const text = await res.text();
+                    console.error('Delete failed', res.status, text);
+                    alert('Failed to delete image. Please try again.');
+                    btn.innerHTML = '<i class="fas fa-times"></i>';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Delete error', err);
+                alert('Failed to delete image. Please check your connection.');
+                btn.innerHTML = '<i class="fas fa-times"></i>';
+                btn.disabled = false;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

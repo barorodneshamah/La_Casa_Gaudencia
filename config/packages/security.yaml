@@ -31,7 +31,7 @@ security:
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
-                path: /home
+                path: 
                 # by default, the feature is enabled by checking a checkbox in the
                 # login form, uncomment the following line to always enable it.
                 #always_remember_me: true
@@ -48,8 +48,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin/dashboard, roles: ROLE_ADMIN }
-        - { path: ^/admin/dashboard, roles: ROLE_SAFF }
-        - { path: ^/home, roles: ROLE_USER }
+        - { path: ^/staff/dashboard, roles: ROLE_STAFF }
+       # - { path: ^/home, roles: ROLE_GUEST }
 
 when@test:
     security:

@@ -3,50 +3,204 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-	<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--color-background);">
-		<div style="background-color: white; padding: 3rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 500px; width: 100%;">
-			<h1 style="color: var(--color-primary); font-family: var(--font-family-display); font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2rem;">Create Account</h1>
+<style>
+    body {
+        background-color: #7d6d5bff;
+    }
 
-			{% if form_errors(registrationForm) %}
-				<div style="background-color: #fee; border: 1px solid #fcc; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #c33;">
-					{{ form_errors(registrationForm) }}
-				</div>
-			{% endif %}
+    .register-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-			{{ form_start(registrationForm, {'attr': {'class': 'fs-form', 'style': 'width: 100%; padding: 0;'}}) }}
+    .register-card {
+        width: 900px;
+        height: 480px;
+        background: white;
+        border-radius: 1.2rem;
+        display: flex;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
 
-			<div class="fs-field">
-				{{ form_label(registrationForm.username, 'Username', {'label_attr': {'class': 'fs-label'}}) }}
-				{{ form_widget(registrationForm.username, {'attr': {'class': 'fs-input', 'placeholder': 'Enter your username'}}) }}
-				{{ form_errors(registrationForm.username) }}
-			</div>
 
-			<div class="fs-field">
-				{{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'fs-label'}}) }}
-				{{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'fs-input', 'placeholder': 'Enter your password'}}) }}
-				{{ form_errors(registrationForm.plainPassword) }}
-			</div>
+    .register-left {
+        width: 50%;
+        padding: 3rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+        background: #ffffff;
+    }
+    .register-left::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('/images/B1.png') center/cover no-repeat;
+        opacity: 1;
+        z-index: 0;
+    }
+    .register-left * {
+        position: relative;
+        z-index: 1;
+    }
 
-			<div class="fs-checkbox-field" style="margin-top: 1rem;">
-				<div class="fs-checkbox-wrapper">
-					{{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'fs-checkbox'}}) }}
-				</div>
-				<div style="flex: 1;">
-					{{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'fs-label'}}) }}
-					{{ form_errors(registrationForm.agreeTerms) }}
-				</div>
-			</div>
+    .register-title {
+        font-family: var(--font-family-display);
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #B84920;
+    }
 
-			<div class="fs-button-group" style="margin-top: 2rem;">
-				<button type="submit" class="fs-button" style="width: 100%;">Register</button>
-			</div>
+    .register-input {
+        width: 100%;
+        margin-bottom: 1rem;
+        background: #E9E9E9;
+        border: none;
+        padding: .75rem 1rem;
+        border-radius: .4rem;
+        font-size: .9rem;
+    }
 
-			{{ form_end(registrationForm) }}
+    .register-btn {
+        background: #B84920;
+        color: white;
+        border: none;
+        padding: .6rem 1.5rem;
+        width: 100%;
+        border-radius: .4rem;
+        cursor: pointer;
+        font-weight: 600;
+    }
 
-			<p style="text-align: center; margin-top: 1.5rem; color: var(--color-text-muted);">
-				Already have an account?
-				<a href="/login" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">Sign in</a>
-			</p>
-		</div>
-	</div>
+    .register-btn:hover {
+        background: #9E3D18;
+    }
+
+    .register-link {
+        margin-top: 1.3rem;
+        text-align: center;
+        font-size: .85rem;
+    }
+
+    .register-link a {
+        color: #B84920;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+
+    .register-right {
+        width: 50%;
+        position: relative;
+        overflow: hidden;
+        background: #C55325;
+        color: white;
+        padding: 2.5rem;
+        border-radius: 5rem 0 0 5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+    .register-right::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('/images/B1.png') center/cover no-repeat;
+        opacity: 0.25; 
+        z-index: 0;
+    }
+    .register-right * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: .5px;
+        font-family: var(--font-family-display);
+    }
+
+    .logo-card {
+        width: 240px;
+        height: 150px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: .8rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-card img {
+        width: 130px;
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+
+        <!-- LEFT - FORM -->
+        <div class="register-left">
+            <h2 class="register-title">Create Account</h2>
+
+            {% if form_errors(registrationForm) %}
+                <div style="background:#fee;border:1px solid #fcc;padding:.7rem;border-radius:.4rem;margin-bottom:1rem;color:#c33;">
+                    {{ form_errors(registrationForm) }}
+                </div>
+            {% endif %}
+
+            {{ form_start(registrationForm) }}
+
+                <div class="fs-field">
+                    {{ form_widget(registrationForm.username, {
+                        attr: { class: 'register-input', placeholder: 'Enter your username' }
+                    }) }}
+                </div>
+
+                <div class="fs-field">
+                    {{ form_widget(registrationForm.plainPassword, {
+                        attr: { class: 'register-input', placeholder: 'Enter your password' }
+                    }) }}
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    {{ form_widget(registrationForm.agreeTerms) }}
+                    {{ form_label(registrationForm.agreeTerms) }}
+                    {{ form_errors(registrationForm.agreeTerms) }}
+                </div>
+
+                <button type="submit" class="register-btn">Register</button>
+
+            {{ form_end(registrationForm) }}
+
+            <p class="register-link">
+                Already have an account?
+                <a href="{{ path('app_login') }}">Sign in</a>
+            </p>
+        </div>
+
+        <!-- RIGHT - PANEL -->
+        <div class="register-right">
+            <div class="welcome-title">Start a New Journey!</div>
+
+            <div class="logo-card">
+                <img src="/images/WEB.png" alt="Logo">
+            </div>
+        </div>
+
+    </div>
+</div>
 {% endblock %}

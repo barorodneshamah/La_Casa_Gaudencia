@@ -345,6 +345,12 @@
         font-size: 11px;
     }
 
+    /* Special Badge for Packages */
+    .card-category-badge.promo-badge {
+        background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+        box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4);
+    }
+
     /* ===== CARD CONTENT SECTION ===== */
     .card-content {
         width: 55%;
@@ -377,6 +383,13 @@
         color: #c24a16;
         font-size: 22px;
         box-shadow: 0 4px 12px rgba(194, 74, 22, 0.15);
+    }
+
+    /* Package Icon Special Color */
+    .card-icon.package-icon {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #7b1fa2;
+        box-shadow: 0 4px 12px rgba(123, 31, 162, 0.15);
     }
 
     .service-title {
@@ -431,6 +444,10 @@
         margin-bottom: 4px;
     }
 
+    .stat-number.purple {
+        color: #7b1fa2;
+    }
+
     .stat-label {
         font-size: 11px;
         color: #888;
@@ -475,6 +492,16 @@
         color: white;
     }
 
+    /* Package Feature Tags */
+    .feature-tag.purple i {
+        color: #7b1fa2;
+    }
+
+    .feature-tag.purple:hover {
+        background: #7b1fa2;
+        border-color: #7b1fa2;
+    }
+
     /* ===== CARD ACTIONS ===== */
     .card-actions {
         display: flex;
@@ -508,6 +535,19 @@
         background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(194, 74, 22, 0.45);
+    }
+
+    /* Package Button Purple */
+    .service-btn.btn-purple {
+        background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(123, 31, 162, 0.35);
+    }
+
+    .service-btn.btn-purple:hover {
+        background: linear-gradient(135deg, #6a1b9a 0%, #7b1fa2 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(123, 31, 162, 0.45);
     }
 
     .service-btn.btn-secondary {
@@ -573,6 +613,16 @@
 
     .service-card.vertical .card-content {
         width: 100%;
+    }
+
+    /* ===== PACKAGE HIGHLIGHT BORDER ===== */
+    .service-card.package-card {
+        border: 2px solid rgba(123, 31, 162, 0.15);
+    }
+
+    .service-card.package-card:hover {
+        box-shadow: 0 20px 50px rgba(123, 31, 162, 0.15);
+        border-color: rgba(123, 31, 162, 0.3);
     }
 
     /* ===== RESPONSIVE ===== */
@@ -665,7 +715,7 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ path('app_user_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
                 </svg>
@@ -681,7 +731,7 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ path('reservation_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
                 </svg>
@@ -689,7 +739,7 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ path('app_payment_dashboard') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
                 </svg>
@@ -697,9 +747,9 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ path('app_activity_log_index') }}">
                 <svg viewBox="0 0 24 24">
-                    <path d="M3 4v16h18V4H3zm2 2h14v12H5V6z"/>
+                    <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                 </svg>
                 Activity Logs
             </a>
@@ -758,12 +808,19 @@
         {% set totalStock = totalStock + food.availableStock %}
     {% endfor %}
 
+    {# Packages Data #}
+    {% set packagesList = packages|default([]) %}
+    {% set totalPackages = packagesList|length %}
+    {% set activePackages = packagesList|filter(p => p.status|lower == 'active')|length %}
+    {% set featuredPackages = packagesList|filter(p => p.isFeatured == true)|length %}
+    {% set expiredPackages = packagesList|filter(p => p.status|lower == 'expired' or p.status|lower == 'inactive')|length %}
+
     <!-- SERVICE CARDS GRID -->
     <div class="service-card-grid">
         <!-- ROOM SERVICE CARD -->
         <div class="service-card">
             <div class="card-image">
-                <img src="/Images/room-service.jpg" alt="Room Services">
+                <img src="/Images/H1.jpg" alt="Room Services">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge">
                     <i class="fas fa-star"></i>
@@ -818,7 +875,7 @@
         <!-- TOUR SERVICE CARD -->
         <div class="service-card">
             <div class="card-image">
-                <img src="/Images/tour-service.jpg" alt="Tour Services">
+                <img src="/Images/Hotel.jpg" alt="Tour Services">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge">
                     <i class="fas fa-star"></i>
@@ -873,7 +930,7 @@
         <!-- FOOD SERVICE CARD -->
         <div class="service-card">
             <div class="card-image">
-                <img src="/Images/food-service.jpg" alt="Food Services">
+                <img src="/Images/culinary.jpg" alt="Food Services">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge">
                     <i class="fas fa-star"></i>
@@ -924,11 +981,66 @@
                 </div>
             </div>
         </div>
+
+        <!-- PACKAGE SERVICE CARD -->
+        <div class="service-card package-card">
+            <div class="card-image">
+                <img src="/Images/Hall.jpg" alt="Package Deals">
+                <div class="card-image-overlay"></div>
+                <span class="card-category-badge promo-badge">
+                    <i class="fas fa-gift"></i>
+                    Promo Packages
+                </span>
+            </div>
+
+            <div class="card-content">
+                <div class="card-header">
+                    <div class="card-icon-title">
+                        <div class="card-icon package-icon"><i class="fas fa-box-open"></i></div>
+                        <h3 class="service-title">Package Deals</h3>
+                    </div>
+                    <p class="service-description">
+                        Create and manage promotional packages that bundle rooms, tours, and meals.
+                        Offer discounted deals and attract more customers with special offers.
+                    </p>
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <div class="stat-number purple">{{ totalPackages }}</div>
+                        <div class="stat-label">Total Packages</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number purple">{{ activePackages }}</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number purple">{{ featuredPackages }}</div>
+                        <div class="stat-label">Featured</div>
+                    </div>
+                </div>
+
+                <div class="card-features">
+                    <span class="feature-tag purple"><i class="fas fa-check"></i> Bundles</span>
+                    <span class="feature-tag purple"><i class="fas fa-check"></i> Discounts</span>
+                    <span class="feature-tag purple"><i class="fas fa-check"></i> Validity</span>
+                    <span class="feature-tag purple"><i class="fas fa-check"></i> Promo Limits</span>
+                </div>
+
+                <div class="card-actions">
+                    <a href="{{ path('app_package_index') }}" class="service-btn btn-purple">
+                        <i class="fas fa-cog"></i>
+                        Manage Packages
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {% if totalRooms == 0 and totalTours == 0 and totalFoods == 0 %}
+    {% if totalRooms == 0 and totalTours == 0 and totalFoods == 0 and totalPackages == 0 %}
         <div style="margin-top: 24px; padding: 20px; background: #fff3e0; border-left: 4px solid #c24a16; border-radius: 8px; color:#666; font-size: 14px;">
-            <strong>Getting Started:</strong> No services found yet. Start by adding rooms, tours, or food items to begin managing your property.
+            <strong>Getting Started:</strong> No services found yet. Start by adding rooms, tours, or food items to begin managing your property. Then create packages to bundle them together!
         </div>
     {% endif %}
 </div>

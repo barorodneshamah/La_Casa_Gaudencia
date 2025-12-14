@@ -1,0 +1,1819 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Package Management{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="/datatables/datatables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-primary-light: #e85d04;
+    --brand-primary-dark: #a53f13;
+    --brand-cream: #fcfbf7;
+    --brand-black: #000000;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== GLOBAL ===== */
+body {
+    background-color: #f7f5edff;
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+}
+
+/* ===== ACCENT BAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    z-index: 30;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+}
+
+/* ===== BRAND ===== */
+.brand {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.brand img {
+    width: 75px;
+    height: 75px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+}
+
+.brand h1 {
+    font-family: 'Playfair Display', serif;
+    color: #c24a16;
+    font-size: 22px;
+    letter-spacing: .5px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.brand small {
+    color: #777;
+    font-size: 12px;
+    letter-spacing: .75px;
+    font-weight: 500;
+}
+
+/* ===== SEPARATOR ===== */
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 10px 0 15px 0;
+}
+
+/* ===== MENU ===== */
+.sidebar ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+
+.sidebar ul li svg {
+    width: 20px;
+    height: 20px;
+    fill: #888;
+    transition: .25s;
+}
+
+/* ===== Hover & Active Menu ===== */
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
+}
+
+.sidebar ul li a:hover svg,
+.sidebar ul li.active a svg {
+    fill: white !important;
+}
+
+/* ===== LOGOUT SECTION ===== */
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+}
+
+.logout-btn i {
+    font-size: 16px;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 268px;
+    background: #c24a16;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.topbar-left {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: .7px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.datetime-display {
+    text-align: right;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+
+.datetime-display .time {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.datetime-display .date {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 1px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 268px;
+    padding: 25px 35px;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+
+.page-header .section-title {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #c24a16;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header .section-title i {
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+/* ===== HEADER BUTTONS ===== */
+.header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-back {
+    padding: 10px 20px;
+    border: 2px solid #c24a16;
+    color: #c24a16;
+    background: white;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-back:hover {
+    background: #c24a16;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+.btn-add {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+}
+
+.btn-add:hover {
+    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+    color: white;
+}
+
+/* ===== TABLE CARD CONTAINER ===== */
+.table-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ===== TABLE HEADER INFO ===== */
+.table-header-info {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    padding: 20px 25px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-header-info .info-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.table-header-info .info-icon {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3);
+}
+
+.table-header-info .info-text h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.table-header-info .info-text p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #888;
+}
+
+.table-header-info .info-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stat-item .stat-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: #c24a16;
+}
+
+.stat-item .stat-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== DATATABLE WRAPPER ===== */
+.datatable-wrapper {
+    padding: 20px 25px;
+}
+
+/* ===== DATATABLE TOP & BOTTOM CONTROLS ===== */
+.datatable-top-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.datatable-bottom-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* ===== SHOW X PACKAGES (LENGTH MENU) ===== */
+.dt-length {
+    display: flex;
+    align-items: center;
+}
+
+.dt-length .dataTables_length {
+    margin: 0 !important;
+}
+
+.dt-length .dataTables_length label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    color: #555 !important;
+    font-weight: 500 !important;
+}
+
+.dt-length .dataTables_length select {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    padding: 10px 35px 10px 15px !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c24a16' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    min-width: 80px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}
+
+.dt-length .dataTables_length select:hover {
+    border-color: #ccc !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+
+.dt-length .dataTables_length select:focus {
+    border-color: #c24a16 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(194, 74, 22, 0.1), 0 4px 15px rgba(194, 74, 22, 0.15) !important;
+}
+
+/* ===== SEARCH INPUT ===== */
+.dt-search {
+    display: flex;
+    align-items: center;
+}
+
+.dt-search .dataTables_filter {
+    margin: 0 !important;
+}
+
+.dt-search .dataTables_filter label {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    position: relative !important;
+    font-size: 0 !important;
+}
+
+.dt-search .dataTables_filter input {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 25px !important;
+    padding: 10px 20px 10px 45px !important;
+    font-size: 14px !important;
+    width: 280px !important;
+    transition: all 0.3s ease !important;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23c24a16' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") no-repeat 15px center !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+    color: #333 !important;
+}
+
+.dt-search .dataTables_filter input:hover {
+    border-color: #ccc !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+
+.dt-search .dataTables_filter input:focus {
+    border-color: #c24a16 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(194, 74, 22, 0.1), 0 4px 15px rgba(194, 74, 22, 0.15) !important;
+    width: 320px !important;
+}
+
+.dt-search .dataTables_filter input::placeholder {
+    color: #aaa !important;
+    font-weight: 400 !important;
+}
+
+/* ===== INFO TEXT ===== */
+.dt-info {
+    display: flex;
+    align-items: center;
+}
+
+.dt-info .dataTables_info {
+    margin: 0 !important;
+    padding: 10px 18px !important;
+    background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%) !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    color: #666 !important;
+    font-weight: 500 !important;
+    border: 1px solid #e8e8e8 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+}
+
+.dt-info .dataTables_info b {
+    color: #c24a16 !important;
+    font-weight: 700 !important;
+}
+
+/* ===== PAGINATION ===== */
+.dt-pagination {
+    display: flex;
+    align-items: center;
+}
+
+.dt-pagination .dataTables_paginate {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.dt-pagination .dataTables_paginate .paginate_button {
+    padding: 10px 16px !important;
+    margin: 0 4px !important;
+    border-radius: 10px !important;
+    border: 2px solid #e0e0e0 !important;
+    background: white !important;
+    color: #555 !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.dt-pagination .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%) !important;
+    color: white !important;
+    border-color: #c24a16 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3) !important;
+}
+
+.dt-pagination .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%) !important;
+    color: white !important;
+    border-color: #c24a16 !important;
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.4) !important;
+    font-weight: 600 !important;
+}
+
+.dt-pagination .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+    background: #f5f5f5 !important;
+    color: #999 !important;
+    border-color: #e0e0e0 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ===== TABLE STYLES ===== */
+table.dataTable {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+table.dataTable thead th {
+    background: linear-gradient(135deg, #d65a24ff 0%, #c24a16 100%);
+    color: white;
+    padding: 16px 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    border: none;
+    position: relative;
+}
+
+table.dataTable thead th:first-child {
+    border-radius: 10px 0 0 0;
+}
+
+table.dataTable thead th:last-child {
+    border-radius: 0 10px 0 0;
+}
+
+table.dataTable thead th:after,
+table.dataTable thead th:before {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+table.dataTable tbody tr {
+    transition: all 0.3s ease;
+}
+
+table.dataTable tbody tr:hover {
+    background: linear-gradient(135deg, #fff5f0 0%, #fff8f5 100%) !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.1);
+}
+
+table.dataTable tbody td {
+    padding: 16px 18px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+    color: #444;
+}
+
+table.dataTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== PACKAGE NAME COLUMN ===== */
+.package-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.package-name .package-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 3px 10px rgba(194, 74, 22, 0.3);
+    overflow: hidden;
+}
+
+.package-name .package-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.package-name .package-info .pkg-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.package-name .package-info .pkg-type {
+    font-size: 12px;
+    color: #c24a16;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* ===== PACKAGE TYPE BADGE ===== */
+.package-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.package-type-badge.weekend {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.package-type-badge.honeymoon {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.package-type-badge.family {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.package-type-badge.adventure {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.package-type-badge.business {
+    background: #eceff1;
+    color: #455a64;
+}
+
+.package-type-badge.holiday {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.package-type-badge.custom {
+    background: #fff5f0;
+    color: #c24a16;
+}
+
+/* ===== PRICE COLUMN ===== */
+.price-cell {
+    text-align: left;
+}
+
+.price-cell .package-price {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2e7d32;
+}
+
+.price-cell .original-price {
+    font-size: 12px;
+    color: #999;
+    text-decoration: line-through;
+    display: block;
+    margin-top: 2px;
+}
+
+.price-cell .discount-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+/* ===== ITEMS COLUMN ===== */
+.items-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.item-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #f5f5f5;
+    border-radius: 15px;
+    font-size: 11px;
+    color: #666;
+    border: 1px solid #e8e8e8;
+    transition: all 0.2s ease;
+}
+
+.item-count:hover {
+    background: #c24a16;
+    color: white;
+    border-color: #c24a16;
+}
+
+.item-count i {
+    font-size: 10px;
+}
+
+.item-count.rooms {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-color: #90caf9;
+}
+
+.item-count.rooms:hover {
+    background: #1565c0;
+    color: white;
+    border-color: #1565c0;
+}
+
+.item-count.tours {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #a5d6a7;
+}
+
+.item-count.tours:hover {
+    background: #2e7d32;
+    color: white;
+    border-color: #2e7d32;
+}
+
+.item-count.foods {
+    background: #fff3e0;
+    color: #ef6c00;
+    border-color: #ffcc80;
+}
+
+.item-count.foods:hover {
+    background: #ef6c00;
+    color: white;
+    border-color: #ef6c00;
+}
+
+/* ===== DURATION COLUMN ===== */
+.duration-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.duration-cell i {
+    color: #c24a16;
+    font-size: 16px;
+}
+
+.duration-cell span {
+    font-weight: 500;
+    color: #555;
+}
+
+/* ===== VALIDITY COLUMN ===== */
+.validity-cell {
+    font-size: 12px;
+    color: #666;
+}
+
+.validity-cell .date-range {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.validity-cell .date-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.validity-cell .date-item i {
+    font-size: 10px;
+    color: #c24a16;
+}
+
+.validity-cell .expired {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.validity-cell .active {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+/* ===== REDEMPTIONS COLUMN ===== */
+.redemptions-cell {
+    text-align: center;
+}
+
+.redemptions-cell .redemption-count {
+    font-weight: 600;
+    color: #c24a16;
+    font-size: 16px;
+}
+
+.redemptions-cell .redemption-max {
+    font-size: 11px;
+    color: #999;
+    display: block;
+}
+
+.redemptions-cell .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.redemptions-cell .progress-bar .progress {
+    height: 100%;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* ===== FEATURED BADGE ===== */
+.featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+    color: #5d4e00;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.featured-badge i {
+    font-size: 10px;
+}
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.status-badge.inactive {
+    background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 100%);
+    color: #546e7a;
+    border: 1px solid #b0bec5;
+}
+
+.status-badge.expired {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.status-badge.draft {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+    border: 1px solid #ffcc80;
+}
+
+.status-badge i {
+    font-size: 10px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-action.btn-view {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+}
+
+.btn-action.btn-view:hover {
+    background: #1565c0;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4);
+}
+
+.btn-action.btn-edit {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+}
+
+.btn-action.btn-edit:hover {
+    background: #ef6c00;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(239, 108, 0, 0.4);
+}
+
+.btn-action.btn-delete {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+}
+
+.btn-action.btn-delete:hover {
+    background: #c62828;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.4);
+}
+
+.btn-action.btn-toggle {
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8de 100%);
+    color: #c24a16;
+}
+
+.btn-action.btn-toggle:hover {
+    background: #c24a16;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(194, 74, 22, 0.4);
+}
+
+.btn-action.btn-featured {
+    background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+    color: #f9a825;
+}
+
+.btn-action.btn-featured:hover {
+    background: #f9a825;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(249, 168, 37, 0.4);
+}
+
+.btn-action.btn-duplicate {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+}
+
+.btn-action.btn-duplicate:hover {
+    background: #2e7d32;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state i {
+    font-size: 60px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    color: #888;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* ===== TOOLTIP ===== */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+    margin-bottom: 8px;
+}
+
+[data-tooltip]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #333;
+    z-index: 100;
+}
+
+/* ===== FLASH MESSAGES ===== */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.flash-message.success {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.flash-message.error {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.flash-message i {
+    font-size: 18px;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+    .datatable-top-controls,
+    .datatable-bottom-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .dt-search .dataTables_filter input {
+        width: 100% !important;
+    }
+    
+    .dt-search .dataTables_filter input:focus {
+        width: 100% !important;
+    }
+    
+    .dt-length,
+    .dt-search,
+    .dt-info,
+    .dt-pagination {
+        justify-content: center;
+    }
+    
+    .table-header-info {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .table-header-info .info-stats {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-buttons {
+        width: 100%;
+    }
+    
+    .header-buttons a {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 220px;
+    }
+    
+    .main-content,
+    .topbar {
+        margin-left: 228px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .sidebar-accent {
+        display: none;
+    }
+    
+    .main-content,
+    .topbar {
+        margin-left: 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                Staff Panel
+            {% endif %}
+        </small>
+    </div>
+
+    <!-- BAR LINE -->
+    <div class="sidebar-separator"></div>
+
+    <ul>
+    {# ================= ADMIN MENUS ================= #}
+    {% if is_granted('ROLE_ADMIN') %}
+
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_user_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                User Management
+            </a>
+        </li>
+
+       <li class="active">
+            <a href="{{ path('app_admin_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
+                Payments
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_activity_log_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                </svg>
+                Activity Logs
+            </a>
+        </li>
+
+    {# ================= STAFF MENUS ================= #}
+    {% elseif is_granted('ROLE_STAFF') %}
+
+        <li>
+            <a href="{{ path('app_staff_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+       <li class="active">
+            <a href="{{ path('staff_services') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                 </svg>
+                Payments
+            </a>
+        </li>
+    {% endif %}
+</ul>
+    
+    <!-- LOGOUT SECTION -->
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">
+            Log Out
+        </a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+    {% if is_granted('ROLE_ADMIN') %}
+        Admin Services
+    {% elseif is_granted('ROLE_STAFF') %}
+        Staff Services
+    {% endif %}
+</div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- FLASH MESSAGES -->
+    {% for label, messages in app.flashes %}
+        <div class="flash-messages">
+            {% for message in messages %}
+                <div class="flash-message {{ label }}">
+                    <i class="fas fa-{{ label == 'success' ? 'check-circle' : 'exclamation-circle' }}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2 class="section-title">
+            Package Management
+        </h2>
+
+        <div class="header-buttons">
+            <a {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_admin_services') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Back to Services
+            </a>
+            {% else %}
+            <a href="{{ path('staff_services') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Back to Services
+            </a>
+            {% endif %}
+            <a href="{{ path('app_package_new') }}" class="btn-add">
+                <i class="fas fa-plus"></i>
+                Create New Package
+            </a>
+        </div>
+    </div>
+
+    <!-- TABLE CONTAINER -->
+    <div class="table-container">
+        
+        <!-- TABLE HEADER INFO -->
+        <div class="table-header-info">
+            <div class="info-left">
+                <div class="info-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div class="info-text">
+                    <h3>All Packages</h3>
+                    <p>Manage promotional packages and bundle deals</p>
+                </div>
+            </div>
+            <div class="info-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ packages|length }}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ packages|filter(p => p.status == 'Active')|length }}</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ packages|filter(p => p.isFeatured == true)|length }}</div>
+                    <div class="stat-label">Featured</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ packages|filter(p => p.status != 'Active')|length }}</div>
+                    <div class="stat-label">Inactive</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATATABLE WRAPPER -->
+        <div class="datatable-wrapper">
+            {% if packages|length > 0 %}
+            <table id="packageTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Includes</th>
+                        <th>Duration</th>
+                        <th>Validity</th>
+                        <th>Redemptions</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for package in packages %}
+                    <tr>
+                        <!-- PACKAGE NAME -->
+                        <td>
+                            <div class="package-name">
+                                <div class="package-icon">
+                                    {% if package.mainImage %}
+                                        <img src="{{ asset('uploads/packages/' ~ package.mainImage) }}" alt="{{ package.name }}">
+                                    {% else %}
+                                        <i class="fas fa-gift"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="package-info">
+                                    <div class="pkg-name">
+                                        {{ package.name }}
+                                        {% if package.isFeatured %}
+                                            <span class="featured-badge">
+                                                <i class="fas fa-star"></i>
+                                                Featured
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="pkg-type">{{ package.packageType ?? 'Custom' }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- PACKAGE TYPE -->
+                        <td>
+                            {% set typeClass = 'custom' %}
+                            {% if package.packageType|lower == 'weekend' %}
+                                {% set typeClass = 'weekend' %}
+                            {% elseif package.packageType|lower == 'honeymoon' %}
+                                {% set typeClass = 'honeymoon' %}
+                            {% elseif package.packageType|lower == 'family' %}
+                                {% set typeClass = 'family' %}
+                            {% elseif package.packageType|lower == 'adventure' %}
+                                {% set typeClass = 'adventure' %}
+                            {% elseif package.packageType|lower == 'business' %}
+                                {% set typeClass = 'business' %}
+                            {% elseif package.packageType|lower == 'holiday' %}
+                                {% set typeClass = 'holiday' %}
+                            {% endif %}
+                            <span class="package-type-badge {{ typeClass }}">
+                                <i class="fas fa-tag"></i>
+                                {{ package.packageType ?? 'Custom' }}
+                            </span>
+                        </td>
+
+                        <!-- PRICE -->
+                        <td>
+                            <div class="price-cell">
+                                <span class="package-price">₱{{ package.packagePrice|number_format(2) }}</span>
+                                {% if package.originalPrice and package.originalPrice > package.packagePrice %}
+                                    <span class="original-price">₱{{ package.originalPrice|number_format(2) }}</span>
+                                    {% if package.discountPercentage %}
+                                        <span class="discount-badge">-{{ package.discountPercentage|number_format(0) }}%</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- INCLUDES -->
+                        <td>
+                            <div class="items-cell">
+                                {% if package.rooms|length > 0 %}
+                                    <span class="item-count rooms">
+                                        <i class="fas fa-bed"></i>
+                                        {{ package.rooms|length }} Room{{ package.rooms|length > 1 ? 's' : '' }}
+                                    </span>
+                                {% endif %}
+                                {% if package.tours|length > 0 %}
+                                    <span class="item-count tours">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        {{ package.tours|length }} Tour{{ package.tours|length > 1 ? 's' : '' }}
+                                    </span>
+                                {% endif %}
+                                {% if package.foods|length > 0 %}
+                                    <span class="item-count foods">
+                                        <i class="fas fa-utensils"></i>
+                                        {{ package.foods|length }} Meal{{ package.foods|length > 1 ? 's' : '' }}
+                                    </span>
+                                {% endif %}
+                                {% if package.rooms|length == 0 and package.tours|length == 0 and package.foods|length == 0 %}
+                                    <span class="item-count">No items</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- DURATION -->
+                        <td>
+                            <div class="duration-cell">
+                                <i class="fas fa-clock"></i>
+                                <span>
+                                    {% if package.durationDays or package.durationNights %}
+                                        {% if package.durationDays %}{{ package.durationDays }}D{% endif %}
+                                        {% if package.durationDays and package.durationNights %}/{% endif %}
+                                        {% if package.durationNights %}{{ package.durationNights }}N{% endif %}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- VALIDITY -->
+                        <td>
+                            <div class="validity-cell">
+                                {% set now = "now"|date("Y-m-d") %}
+                                {% set isExpired = package.validUntil and package.validUntil|date("Y-m-d") < now %}
+                                
+                                <div class="date-range">
+                                    {% if package.validFrom %}
+                                        <span class="date-item">
+                                            <i class="fas fa-calendar-check"></i>
+                                            From: {{ package.validFrom|date('M d, Y') }}
+                                        </span>
+                                    {% endif %}
+                                    {% if package.validUntil %}
+                                        <span class="date-item {{ isExpired ? 'expired' : '' }}">
+                                            <i class="fas fa-calendar-times"></i>
+                                            Until: {{ package.validUntil|date('M d, Y') }}
+                                        </span>
+                                    {% endif %}
+                                    {% if not package.validFrom and not package.validUntil %}
+                                        <span class="active">No Expiry</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- REDEMPTIONS -->
+                        <td>
+                            <div class="redemptions-cell">
+                                <span class="redemption-count">{{ package.currentRedemptions }}</span>
+                                <span class="redemption-max">
+                                    / {{ package.maxRedemptions ?? '∞' }}
+                                </span>
+                                {% if package.maxRedemptions %}
+                                    {% set percentage = (package.currentRedemptions / package.maxRedemptions) * 100 %}
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: {{ percentage > 100 ? 100 : percentage }}%"></div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            {% set statusClass = 'active' %}
+                            {% set statusIcon = 'check-circle' %}
+                            {% if package.status|lower == 'inactive' %}
+                                {% set statusClass = 'inactive' %}
+                                {% set statusIcon = 'pause-circle' %}
+                            {% elseif package.status|lower == 'expired' %}
+                                {% set statusClass = 'expired' %}
+                                {% set statusIcon = 'times-circle' %}
+                            {% elseif package.status|lower == 'draft' %}
+                                {% set statusClass = 'draft' %}
+                                {% set statusIcon = 'edit' %}
+                            {% endif %}
+                            <span class="status-badge {{ statusClass }}">
+                                <i class="fas fa-{{ statusIcon }}"></i>
+                                {{ package.status }}
+                            </span>
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ path('app_package_show', {'id': package.id}) }}" 
+                                   class="btn-action btn-view" 
+                                   data-tooltip="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <a href="{{ path('app_package_edit', {'id': package.id}) }}" 
+                                   class="btn-action btn-edit"
+                                   data-tooltip="Edit Package">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form method="post" 
+                                      action="{{ path('app_package_toggle_status', {'id': package.id}) }}" 
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ package.id) }}">
+                                    <button type="submit" 
+                                            class="btn-action btn-toggle"
+                                            data-tooltip="{{ package.status == 'Active' ? 'Deactivate' : 'Activate' }}">
+                                        <i class="fas fa-{{ package.status == 'Active' ? 'pause' : 'play' }}"></i>
+                                    </button>
+                                </form>
+
+                                <form method="post" 
+                                      action="{{ path('app_package_toggle_featured', {'id': package.id}) }}" 
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('featured' ~ package.id) }}">
+                                    <button type="submit" 
+                                            class="btn-action btn-featured"
+                                            data-tooltip="{{ package.isFeatured ? 'Remove Featured' : 'Set Featured' }}">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                </form>
+
+                                <form method="post" 
+                                      action="{{ path('app_package_duplicate', {'id': package.id}) }}" 
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ package.id) }}">
+                                    <button type="submit" 
+                                            class="btn-action btn-duplicate"
+                                            data-tooltip="Duplicate Package">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </form>
+
+                                <form method="post" 
+                                      action="{{ path('app_package_delete', {'id': package.id}) }}" 
+                                      style="display:inline;" 
+                                      onsubmit="return confirm('Are you sure you want to delete the package \'{{ package.name }}\'?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ package.id) }}">
+                                    <button type="submit" 
+                                            class="btn-action btn-delete"
+                                            data-tooltip="Delete Package">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- EMPTY STATE -->
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h4>No Packages Found</h4>
+                <p>Start by creating your first promotional package to bundle rooms, tours, and meals together.</p>
+                <a href="{{ path('app_package_new') }}" class="btn-add" style="margin-top: 20px;">
+                    <i class="fas fa-plus"></i>
+                    Create First Package
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/jquery/jquery-3.7.1.min.js"></script>
+<script src="/datatables/datatables.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ===== DATE TIME =====
+    function updateDateTime() {
+        const now = new Date();
+        const timeEl = document.getElementById('currentTime');
+        const dateEl = document.getElementById('currentDate');
+        
+        if (timeEl && dateEl) {
+            timeEl.textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+            dateEl.textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+    }
+    
+    // Initial call
+    updateDateTime();
+    
+    // Update every second
+    setInterval(updateDateTime, 1000);
+
+    // Auto-hide flash messages after 5 seconds
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(msg) {
+            msg.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            msg.style.opacity = '0';
+            msg.style.transform = 'translateY(-10px)';
+            setTimeout(function() {
+                msg.remove();
+            }, 500);
+        });
+    }, 5000);
+});
+
+$(document).ready(function() {
+    $('#packageTable').DataTable({
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all"
+        },
+        {
+            "orderable": false,
+            "targets": [8] // Actions column
+        }],
+        order: [[0, 'asc']],
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search packages...",
+            lengthMenu: "Show _MENU_ packages",
+            info: "Showing &nbsp;<b>_START_</b>&nbsp; to &nbsp;<b>_END_</b>&nbsp; of &nbsp;<b>_TOTAL_</b>&nbsp; packages",
+            infoEmpty: "No packages available",
+            infoFiltered: "(filtered from _MAX_ total packages)",
+            paginate: {
+                first: '<i class="fas fa-angle-double-left"></i>',
+                last: '<i class="fas fa-angle-double-right"></i>',
+                next: '<i class="fas fa-chevron-right"></i>',
+                previous: '<i class="fas fa-chevron-left"></i>'
+            }
+        },
+        dom: '<"datatable-top-controls"<"dt-length"l><"dt-search"f>>rt<"datatable-bottom-controls"<"dt-info"i><"dt-pagination"p>>',
+        drawCallback: function() {
+            $(this.api().table().body()).find('tr').each(function(index) {
+                $(this).css({
+                    'opacity': '0',
+                    'transform': 'translateY(15px)'
+                }).delay(30 * index).animate({
+                    'opacity': '1'
+                }, 200).css('transform', 'translateY(0)');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ serviceLabel }}{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    {# Header #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{{ path('reservation_index') }}" class="text-decoration-none text-muted">
+                <i class="fas fa-arrow-left me-1"></i> Back
+            </a>
+            <h1 class="mt-2 mb-0">{{ serviceLabel }}</h1>
+        </div>
+        <a href="{{ path('reservation_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> New
+        </a>
+    </div>
+
+    {# Filters #}
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="PENDING" {{ app.request.query.get('status') == 'PENDING' ? 'selected' }}>Pending</option>
+                        <option value="CONFIRMED" {{ app.request.query.get('status') == 'CONFIRMED' ? 'selected' }}>Confirmed</option>
+                        <option value="CANCELLED" {{ app.request.query.get('status') == 'CANCELLED' ? 'selected' }}>Cancelled</option>
+                        <option value="COMPLETED" {{ app.request.query.get('status') == 'COMPLETED' ? 'selected' }}>Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="paymentStatus" class="form-select">
+                        <option value="">All Payment Status</option>
+                        <option value="UNPAID" {{ app.request.query.get('paymentStatus') == 'UNPAID' ? 'selected' }}>Unpaid</option>
+                        <option value="PARTIAL" {{ app.request.query.get('paymentStatus') == 'PARTIAL' ? 'selected' }}>Partial</option>
+                        <option value="PAID" {{ app.request.query.get('paymentStatus') == 'PAID' ? 'selected' }}>Paid</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <a href="{{ path('reservation_by_service', {type: serviceType}) }}" class="btn btn-outline-secondary">
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Table #}
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reservation #</th>
+                        <th>Guest</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                    <tr>
+                        <td>
+                            <a href="{{ path('reservation_show', {id: reservation.id}) }}" class="fw-bold text-decoration-none">
+                                {{ reservation.reservationNumber }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ reservation.guest.fullName ?? reservation.guest.email }}
+                        </td>
+                        <td>{{ reservation.serviceName ?? '-' }}</td>
+                        <td>
+                            {{ reservation.checkInDate|date('M d, Y') }}
+                            {% if reservation.checkOutDate %}
+                                <br><small class="text-muted">to {{ reservation.checkOutDate|date('M d, Y') }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>₱{{ reservation.totalAmount|number_format(2) }}</strong>
+                            {% if reservation.balanceDue > 0 %}
+                                <br><small class="text-danger">Due: ₱{{ reservation.balanceDue|number_format(2) }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ reservation.statusBadge }}">
+                                {{ reservation.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ reservation.paymentBadge }}">
+                                {{ reservation.paymentStatus }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ path('reservation_show', {id: reservation.id}) }}" 
+                                   class="btn btn-outline-primary" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('reservation_edit', {id: reservation.id}) }}" 
+                                   class="btn btn-outline-secondary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                            No reservations found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# Count #}
+    <div class="mt-3 text-muted">
+        Showing {{ reservations|length }} reservation(s)
+    </div>
+</div>
+{% endblock %}

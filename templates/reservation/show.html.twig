@@ -1,0 +1,619 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ reservation.reservationCode }} - Reservation Details{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-cream: #fcfbf7;
+    --brand-text: #2f2f2f;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: #f7f5edff;
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+}
+
+/* ===== ACCENT BAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    z-index: 30;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+}
+
+.brand { text-align: center; margin-bottom: 30px; }
+.brand img { width: 75px; height: 75px; margin-bottom: 8px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15)); }
+.brand h1 { font-family: 'Playfair Display', serif; color: #c24a16; font-size: 22px; margin: 0; font-weight: 600; }
+.brand small { color: #777; font-size: 12px; font-weight: 500; }
+
+.sidebar-separator { width: 75%; height: 1.5px; background: linear-gradient(to right, transparent, #d1d1d1, transparent); margin: 10px 0 15px 0; }
+
+.sidebar ul { list-style: none; width: 100%; padding: 0; }
+.sidebar ul li a { display: flex; gap: 14px; align-items: center; padding: 14px 35px; font-size: 15px; font-weight: 500; color: #2f2f2f; text-decoration: none; transition: all .25s ease; }
+.sidebar ul li svg { width: 20px; height: 20px; fill: #888; transition: .25s; }
+.sidebar ul li a:hover, .sidebar ul li.active a { background-color: #c24a16; color: white; margin-left: -12px; border-radius: 0 30px 30px 0; padding-left: 48px; box-shadow: 0 4px 12px rgba(194,74,22,0.25); }
+.sidebar ul li a:hover svg, .sidebar ul li.active a svg { fill: white !important; }
+
+.sidebar-logout { width: 100%; padding: 20px 30px; margin-top: auto; display: flex; justify-content: center; border-top: 1px solid #eee; }
+.logout-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 80%; padding: 14px 24px; background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%); color: white; text-decoration: none; border-radius: 12px; font-size: 15px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3); border: none; cursor: pointer; }
+.logout-btn:hover { background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%); transform: translateY(-2px); }
+
+/* ===== TOPBAR ===== */
+.topbar { margin-left: 268px; background: #c24a16; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 35px; color: white; position: sticky; top: 0; z-index: 10; box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+.topbar-left { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; }
+.datetime-display { text-align: right; padding: 6px 14px; background: rgba(255,255,255,0.15); border-radius: 8px; }
+.datetime-display .time { font-size: 14px; font-weight: 600; }
+.datetime-display .date { font-size: 10px; opacity: 0.8; }
+
+/* ===== MAIN CONTENT ===== */
+.main-content { margin-left: 268px; padding: 25px 35px; min-height: calc(100vh - 70px); }
+
+/* ===== PAGE HEADER ===== */
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+.section-title { margin: 0; font-family: 'Playfair Display', serif; font-size: 26px; color: #c24a16; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+.section-title i { font-size: 22px; opacity: 0.9; }
+
+.header-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-back { padding: 10px 20px; border: 2px solid #c24a16; color: #c24a16; background: white; border-radius: 8px; font-weight: 500; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.btn-back:hover { background: #c24a16; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(194, 74, 22, 0.3); }
+
+/* ===== FLASH MESSAGES ===== */
+.alert { padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.alert-success { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); color: #2e7d32; border: 1px solid #a5d6a7; }
+.alert-warning { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); color: #ef6c00; border: 1px solid #ffcc80; }
+.alert-danger { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); color: #c62828; border: 1px solid #ef9a9a; }
+.alert-info { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border: 1px solid #90caf9; }
+.alert .btn-close { margin-left: auto; background: none; border: none; font-size: 18px; cursor: pointer; opacity: 0.6; }
+.alert .btn-close:hover { opacity: 1; }
+
+/* ===== SUMMARY ROW ===== */
+.summary-row { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+.summary-box { flex: 1; min-width: 200px; background: white; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); }
+.summary-box .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; font-weight: 600; }
+.summary-box .value { font-size: 28px; font-weight: 700; }
+.summary-box .value.status-pending { color: #ef6c00; }
+.summary-box .value.status-confirmed { color: #2e7d32; }
+.summary-box .value.status-cancelled { color: #c62828; }
+.summary-box .value.status-completed { color: #1565c0; }
+.summary-box .value.payment-paid { color: #2e7d32; }
+.summary-box .value.payment-unpaid { color: #c62828; }
+.summary-box .value.amount { color: #c24a16; }
+
+/* ===== CONTENT LAYOUT ===== */
+.content-row { display: flex; gap: 25px; flex-wrap: wrap; }
+.content-left { flex: 2; min-width: 450px; }
+.content-right { flex: 1; min-width: 340px; }
+
+/* ===== CARDS ===== */
+.card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 20px; overflow: hidden; }
+.card-header { padding: 18px 24px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; color: #333; }
+.card-header i { color: #c24a16; font-size: 18px; }
+.card-header.bg-info { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-bottom: none; }
+.card-header.bg-info i { color: #1565c0; }
+.card-header.bg-success { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); color: #2e7d32; border-bottom: none; }
+.card-header.bg-success i { color: #2e7d32; }
+.card-header.bg-warning { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); color: #ef6c00; border-bottom: none; }
+.card-header.bg-warning i { color: #ef6c00; }
+.card-header.bg-danger { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); color: #c62828; border-bottom: none; }
+.card-header.bg-danger i { color: #c62828; }
+.card-header.bg-dark { background: linear-gradient(135deg, #37474f 0%, #263238 100%); color: white; border-bottom: none; }
+.card-header.bg-dark i { color: #ffd54f; }
+.card-body { padding: 24px; }
+
+/* ===== INFO GRID ===== */
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.info-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: #fafafa; border-radius: 10px; border: 1px solid #eee; }
+.info-item .label { color: #888; font-size: 13px; font-weight: 500; }
+.info-item .value { color: #333; font-weight: 600; font-size: 14px; }
+
+/* ===== DETAIL ROWS ===== */
+.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+.detail-row:last-child { border-bottom: none; }
+.detail-row .label { color: #666; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.detail-row .label i { color: #c24a16; font-size: 14px; width: 20px; }
+.detail-row .value { color: #333; font-weight: 600; font-size: 14px; }
+
+/* ===== FOOD TABLE ===== */
+.food-table { width: 100%; border-collapse: collapse; }
+.food-table th { background: #f8f8f8; padding: 14px 18px; text-align: left; font-size: 11px; text-transform: uppercase; color: #666; letter-spacing: 0.8px; font-weight: 600; }
+.food-table td { padding: 16px 18px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.food-table tbody tr:last-child td { border-bottom: none; }
+.food-table .total-row { background: linear-gradient(135deg, #fff8f5 0%, #fff5f0 100%); }
+.food-table .total-row td { font-weight: 700; color: #c24a16; border-bottom: none; }
+
+/* ===== SPECIAL REQUESTS ===== */
+.special-requests { background: linear-gradient(135deg, #fffbf0 0%, #fff8e8 100%); border: 1px solid #ffe0b2; border-radius: 12px; padding: 18px 20px; color: #5d4e37; line-height: 1.7; font-size: 14px; }
+
+/* ===== ACTION BUTTONS ===== */
+.btn-action-full { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; width: 100%; margin-bottom: 10px; }
+.btn-success { background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%); color: white; box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3); }
+.btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4); }
+.btn-primary { background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%); color: white; box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4); }
+.btn-danger { background: linear-gradient(135deg, #c62828 0%, #ef5350 100%); color: white; box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3); }
+.btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(198, 40, 40, 0.4); }
+.btn-info { background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%); color: white; box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3); }
+.btn-info:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4); }
+
+/* ===== FORM ELEMENTS ===== */
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 12px; color: #666; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-textarea { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; resize: vertical; min-height: 90px; transition: all 0.3s ease; font-family: inherit; background: #fafafa; }
+.form-textarea:focus { border-color: #c24a16; outline: none; box-shadow: 0 0 0 4px rgba(194, 74, 22, 0.1); background: white; }
+
+.divider { height: 1px; background: linear-gradient(to right, transparent, #ddd, transparent); margin: 8px 0; }
+
+.no-action { text-align: center; padding: 40px 20px; color: #888; }
+.no-action i { font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.4; color: #c24a16; }
+
+.approval-info .info-row { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+.approval-info .info-row:last-child { border-bottom: none; }
+.approval-info .info-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.approval-info .info-value { font-size: 14px; color: #333; font-weight: 500; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .content-left, .content-right { min-width: 100%; }
+}
+@media (max-width: 1024px) {
+    .sidebar { width: 220px; }
+    .main-content, .topbar { margin-left: 228px; }
+}
+@media (max-width: 768px) {
+    .sidebar, .sidebar-accent { display: none; }
+    .main-content, .topbar { margin-left: 0; }
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .summary-row { flex-direction: column; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if is_granted('ROLE_ADMIN') %}Admin Panel{% elseif is_granted('ROLE_STAFF') %}Staff Panel{% endif %}
+        </small>
+    </div>
+    <div class="sidebar-separator"></div>
+
+    <ul>
+    {% if is_granted('ROLE_ADMIN') %}
+        <li><a href="{{ path('app_admin_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
+        <li><a href="{{ path('app_user_index') }}"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/></svg>User Management</a></li>
+        <li><a href="{{ path('app_admin_services') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>Services</a></li>
+        <li class="active"><a href="{{ path('reservation_index') }}"><svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>Reservations</a></li>
+        <li><a href="{{ path('app_payment_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>Payments</a></li>
+        <li><a href="{{ path('app_activity_log_index') }}"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>Activity Logs</a></li>
+    {% elseif is_granted('ROLE_STAFF') %}
+        <li><a href="{{ path('app_staff_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
+        <li><a href="{{ path('staff_services') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>Services</a></li>
+        <li class="active"><a href="{{ path('reservation_index') }}"><svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>Reservations</a></li>
+        <li><a href="{{ path('app_payment_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>Payments</a></li>
+    {% endif %}
+    </ul>
+
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">Log Out</a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">Reservation Details</div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2 class="section-title">
+            <i class="fas fa-ticket-alt"></i>
+            {{ reservation.reservationCode }}
+        </h2>
+        <div class="header-buttons">
+            <a href="{{ path('reservation_index') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% for type, messages in app.flashes %}
+        {% for msg in messages %}
+            <div class="alert alert-{{ type }}">
+                <i class="fas fa-{{ type == 'success' ? 'check-circle' : (type == 'warning' ? 'exclamation-triangle' : 'info-circle') }}"></i>
+                {{ msg }}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- DEMO MODE INDICATOR -->
+    {% if isDummy is defined and isDummy %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Demo Mode:</strong> This is sample data for demonstration purposes.
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+    </div>
+    {% endif %}
+
+    <!-- SUMMARY ROW -->
+    <div class="summary-row">
+        <div class="summary-box">
+            <div class="label">Reservation Status</div>
+            <div class="value status-{{ reservation.status|lower }}">
+                <i class="fas fa-{{ reservation.status == 'PENDING' ? 'clock' : (reservation.status == 'CONFIRMED' ? 'check-circle' : (reservation.status == 'CANCELLED' ? 'times-circle' : 'flag-checkered')) }}"></i>
+                {{ reservation.status }}
+            </div>
+        </div>
+        <div class="summary-box">
+            <div class="label">Payment Status</div>
+            <div class="value payment-{{ reservation.paymentStatus|lower }}">
+                <i class="fas fa-{{ reservation.isPaid ? 'check-circle' : 'times-circle' }}"></i>
+                {{ reservation.paymentStatus }}
+            </div>
+        </div>
+        <div class="summary-box">
+            <div class="label">Total Amount</div>
+            <div class="value amount">₱{{ reservation.totalAmount|number_format(2) }}</div>
+        </div>
+    </div>
+
+    <!-- CONTENT ROW -->
+    <div class="content-row">
+        
+        <!-- LEFT COLUMN -->
+        <div class="content-left">
+
+            <!-- GUEST INFORMATION -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user"></i> Guest Information
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label"><i class="fas fa-envelope"></i> Email</span>
+                            <span class="value">{{ reservation.guest.email }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label"><i class="fas fa-phone"></i> Phone</span>
+                            <span class="value">{{ reservation.contactPhone ?? 'Not provided' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label"><i class="fas fa-users"></i> Guests</span>
+                            <span class="value">{{ reservation.numberOfGuests ?? 1 }} person(s)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label"><i class="fas fa-calendar"></i> Submitted</span>
+                            <span class="value">{{ reservation.createdAt|date('M d, Y h:i A') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROOM RESERVATION -->
+            {% if reservation.room %}
+            <div class="card">
+                <div class="card-header bg-info">
+                    <i class="fas fa-bed"></i> Room Reservation
+                </div>
+                <div class="card-body">
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-door-open"></i> Room Number</span>
+                        <span class="value">{{ reservation.room.roomNumber }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-tag"></i> Room Type</span>
+                        <span class="value">{{ reservation.room.roomType }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-sign-in-alt"></i> Check-in</span>
+                        <span class="value">{{ reservation.checkInDate|date('F d, Y') }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-sign-out-alt"></i> Check-out</span>
+                        <span class="value">{{ reservation.checkOutDate|date('F d, Y') }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-moon"></i> Duration</span>
+                        <span class="value">{{ reservation.nights }} night(s)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-peso-sign"></i> Rate</span>
+                        <span class="value">₱{{ reservation.room.pricePerNight|number_format(2) }}/night</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- TOUR RESERVATION -->
+            {% if reservation.tour %}
+            <div class="card">
+                <div class="card-header bg-success">
+                    <i class="fas fa-map-marked-alt"></i> Tour Reservation
+                </div>
+                <div class="card-body">
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-hiking"></i> Tour Name</span>
+                        <span class="value">{{ reservation.tour.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-map-marker-alt"></i> Location</span>
+                        <span class="value">{{ reservation.tour.location }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-calendar-day"></i> Tour Date</span>
+                        <span class="value">{{ reservation.tourDate|date('F d, Y') }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-user-friends"></i> Participants</span>
+                        <span class="value">{{ reservation.tourParticipants }} person(s)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-peso-sign"></i> Price</span>
+                        <span class="value">₱{{ reservation.tour.price|number_format(2) }}/person</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- PACKAGE -->
+            {% if reservation.package %}
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <i class="fas fa-gift"></i> Package
+                </div>
+                <div class="card-body">
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-box"></i> Package Name</span>
+                        <span class="value">{{ reservation.package.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-peso-sign"></i> Price</span>
+                        <span class="value">₱{{ reservation.package.packagePrice|number_format(2) }}</span>
+                    </div>
+                    {% if reservation.package.description %}
+                    <div class="detail-row">
+                        <span class="label"><i class="fas fa-info-circle"></i> Description</span>
+                        <span class="value">{{ reservation.package.description }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- FOOD ORDERS -->
+            {% if foodDetails|length > 0 %}
+            <div class="card">
+                <div class="card-header bg-danger">
+                    <i class="fas fa-utensils"></i> Food Orders
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <table class="food-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Price</th>
+                                <th style="text-align: right;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set foodTotal = 0 %}
+                            {% for item in foodDetails %}
+                            {% set foodTotal = foodTotal + item.subtotal %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.food.name }}</strong>
+                                    {% if item.food.category is defined %}
+                                        <br><small style="color: #888;">{{ item.food.category }}</small>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">{{ item.quantity }}</td>
+                                <td style="text-align: right;">₱{{ item.food.price|number_format(2) }}</td>
+                                <td style="text-align: right;">₱{{ item.subtotal|number_format(2) }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right;"><strong>Food Total:</strong></td>
+                                <td style="text-align: right;"><strong>₱{{ foodTotal|number_format(2) }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- SPECIAL REQUESTS -->
+            {% if reservation.specialRequests %}
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-comment-alt"></i> Special Requests
+                </div>
+                <div class="card-body">
+                    <div class="special-requests">
+                        <i class="fas fa-quote-left" style="opacity: 0.3; margin-right: 8px;"></i>
+                        {{ reservation.specialRequests }}
+                        <i class="fas fa-quote-right" style="opacity: 0.3; margin-left: 8px;"></i>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="content-right">
+
+            <!-- ACTIONS CARD -->
+            <div class="card" id="actions">
+                <div class="card-header bg-dark">
+                    <i class="fas fa-cogs"></i> Actions
+                </div>
+                <div class="card-body">
+                    {% if reservation.isPending %}
+                        
+                        {% if not reservation.isPaid %}
+                        <form action="{{ path('reservation_mark_paid', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('paid' ~ reservation.id) }}">
+                            <button type="submit" class="btn-action-full btn-success">
+                                <i class="fas fa-money-bill-wave"></i> Mark as PAID
+                            </button>
+                        </form>
+                        <div class="divider"></div>
+                        {% endif %}
+
+                        <form action="{{ path('reservation_approve', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ reservation.id) }}">
+                            <div class="form-group">
+                                <label class="form-label">Admin Notes (Optional)</label>
+                                <textarea name="notes" class="form-textarea" placeholder="Add any notes..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-action-full btn-primary">
+                                <i class="fas fa-check-circle"></i> APPROVE Reservation
+                            </button>
+                        </form>
+
+                        <div class="divider"></div>
+
+                        <form action="{{ path('reservation_reject', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ reservation.id) }}">
+                            <div class="form-group">
+                                <label class="form-label">Rejection Reason *</label>
+                                <textarea name="reason" class="form-textarea" placeholder="Enter reason..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-action-full btn-danger">
+                                <i class="fas fa-times-circle"></i> REJECT Reservation
+                            </button>
+                        </form>
+
+                    {% elseif reservation.isConfirmed %}
+                        
+                        <form action="{{ path('reservation_complete', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('complete' ~ reservation.id) }}">
+                            <button type="submit" class="btn-action-full btn-info">
+                                <i class="fas fa-flag-checkered"></i> Mark as COMPLETED
+                            </button>
+                        </form>
+
+                        {% if not reservation.isPaid %}
+                        <div class="divider"></div>
+                        <form action="{{ path('reservation_mark_paid', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('paid' ~ reservation.id) }}">
+                            <button type="submit" class="btn-action-full btn-success">
+                                <i class="fas fa-money-bill-wave"></i> Mark as PAID
+                            </button>
+                        </form>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="no-action">
+                            <i class="fas fa-ban"></i>
+                            <p>No actions available for this reservation.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- APPROVAL INFO -->
+            {% if reservation.approvedBy %}
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Processing Details
+                </div>
+                <div class="card-body approval-info">
+                    <div class="info-row">
+                        <span class="info-label">Processed By</span>
+                        <span class="info-value">{{ reservation.approvedBy.email }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Processed At</span>
+                        <span class="info-value">{{ reservation.approvedAt|date('M d, Y \\a\\t h:i A') }}</span>
+                    </div>
+                    {% if reservation.adminNotes %}
+                    <div class="info-row">
+                        <span class="info-label">Notes</span>
+                        <span class="info-value">{{ reservation.adminNotes }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateDateTime() {
+        const now = new Date();
+        const timeEl = document.getElementById('currentTime');
+        const dateEl = document.getElementById('currentDate');
+        
+        if (timeEl && dateEl) {
+            timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+    }
+    
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+});
+</script>
+{% endblock %}

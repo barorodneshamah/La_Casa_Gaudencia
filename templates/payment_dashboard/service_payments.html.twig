@@ -1,0 +1,953 @@
+{# templates/payment_dashboard/service_payments.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ serviceLabel }} Payments{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-primary-light: #e85d04;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: #f7f5edff;
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    z-index: 30;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+}
+
+.brand { text-align: center; margin-bottom: 30px; }
+.brand img { width: 75px; height: 75px; margin-bottom: 8px; }
+.brand h1 { font-family: 'Playfair Display', serif; color: #c24a16; font-size: 22px; margin: 0; }
+.brand small { color: #777; font-size: 12px; }
+
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 10px 0 15px 0;
+}
+
+.sidebar ul { list-style: none; width: 100%; padding: 0; }
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+.sidebar ul li svg { width: 20px; height: 20px; fill: #888; transition: .25s; }
+.sidebar ul li a:hover, .sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+}
+.sidebar ul li a:hover svg, .sidebar ul li.active a svg { fill: white !important; }
+
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.logout-btn:hover { transform: translateY(-2px); }
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 268px;
+    background: var(--brand-primary);
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.topbar-left { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px;
+}
+.topbar-left .page-title {
+    font-family: 'Playfair Display', serif; 
+    font-size: 24px; 
+    font-weight: 600; 
+}
+.topbar-right { display: flex; align-items: center; gap: 20px; }
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+.back-btn:hover {
+    background: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.datetime-display {
+    text-align: right;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+.datetime-display .time { font-size: 14px; font-weight: 600; }
+.datetime-display .date { font-size: 10px; color: rgba(255,255,255,0.8); }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 268px;
+    padding: 32px;
+    min-height: calc(100vh - 70px);
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    background: linear-gradient(135deg, #fff 0%, #faf9f5 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(194, 74, 22, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+.page-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: linear-gradient(to bottom, var(--service-color), var(--service-color-light));
+}
+.page-header-content { display: flex; align-items: center; gap: 20px; }
+.page-header-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--service-bg);
+    color: var(--service-color);
+    font-size: 32px;
+}
+.page-header-text h2 { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 28px; 
+    color: var(--brand-text); 
+    margin-bottom: 8px; 
+}
+.page-header-text p { color: var(--brand-text-muted); font-size: 15px; margin: 0; }
+
+/* ===== STATS CARDS ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: var(--stat-color);
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+
+.stat-card.total { --stat-color: #168cc2ff; }
+.stat-card.approved { --stat-color: #059669; }
+.stat-card.pending { --stat-color: #f57f17; }
+.stat-card.rejected { --stat-color: #dc2626; }
+
+.stat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+.stat-card.total .stat-icon { background: linear-gradient(135deg, #168cc2ff, #4ea8de); }
+.stat-card.approved .stat-icon { background: linear-gradient(135deg, #059669, #10b981); }
+.stat-card.pending .stat-icon { background: linear-gradient(135deg, #f57f17, #ffb300); }
+.stat-card.rejected .stat-icon { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+.stat-value { font-size: 28px; font-weight: 700; color: var(--brand-text); margin-bottom: 4px; }
+.stat-label { font-size: 13px; color: var(--brand-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ===== FILTER TABS ===== */
+.filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.filter-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.filter-tab {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.filter-tab.all {
+    background: #f5f5f5;
+    color: #555;
+}
+.filter-tab.all:hover, .filter-tab.all.active {
+    background: #555;
+    color: white;
+}
+.filter-tab.approved {
+    background: #ecfdf5;
+    color: #059669;
+}
+.filter-tab.approved:hover, .filter-tab.approved.active {
+    background: #059669;
+    color: white;
+}
+.filter-tab.pending {
+    background: #fffbeb;
+    color: #f57f17;
+}
+.filter-tab.pending:hover, .filter-tab.pending.active {
+    background: #f57f17;
+    color: white;
+}
+.filter-tab.rejected {
+    background: #fef2f2;
+    color: #dc2626;
+}
+.filter-tab.rejected:hover, .filter-tab.rejected.active {
+    background: #dc2626;
+    color: white;
+}
+.filter-tab .count {
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.filter-tab.all .count { background: #e0e0e0; }
+.filter-tab.approved .count { background: rgba(5, 150, 105, 0.2); }
+.filter-tab.pending .count { background: rgba(245, 127, 23, 0.2); }
+.filter-tab.rejected .count { background: rgba(220, 38, 38, 0.2); }
+.filter-tab.active .count { background: rgba(255,255,255,0.3); }
+
+/* ===== PAYMENTS TABLE ===== */
+.payments-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.payments-header {
+    padding: 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.payments-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--brand-text);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.payments-title i { color: var(--service-color); }
+.payments-count {
+    background: var(--service-bg);
+    color: var(--service-color);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.payments-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.payments-table thead {
+    background: #fafafa;
+}
+.payments-table th {
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #eee;
+}
+.payments-table td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    vertical-align: middle;
+}
+.payments-table tbody tr {
+    transition: all 0.2s;
+}
+.payments-table tbody tr:hover {
+    background: #fafafa;
+}
+.payments-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.transaction-ref {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--service-color);
+    font-size: 13px;
+}
+.guest-info { display: flex; flex-direction: column; gap: 2px; }
+.guest-name { font-weight: 600; color: var(--brand-text); }
+.guest-email { font-size: 12px; color: #888; }
+
+.reservation-info { display: flex; flex-direction: column; gap: 2px; }
+.reservation-ref { font-weight: 600; color: var(--brand-text); font-size: 13px; }
+.reservation-date { font-size: 12px; color: #888; }
+
+.amount { font-weight: 700; color: var(--brand-text); font-size: 16px; }
+
+.payment-method {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f5f5f5;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+.payment-method i { font-size: 14px; }
+.payment-method.gcash { background: #e3f2fd; color: #1565c0; }
+.payment-method.maya { background: #e8f5e9; color: #2e7d32; }
+.payment-method.cash { background: #e8f5e9; color: #2e7d32; }
+.payment-method.bank { background: #f3e5f5; color: #7b1fa2; }
+.payment-method.paypal { background: #e3f2fd; color: #1565c0; }
+.payment-method.card { background: #fff3e0; color: #ef6c00; }
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.status-badge.pending {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    color: #b45309;
+}
+.status-badge.approved {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #047857;
+}
+.status-badge.rejected {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #b91c1c;
+}
+.status-badge.refunded {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: #0369a1;
+}
+
+.action-btns { display: flex; gap: 8px; }
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+.action-btn.view {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+.action-btn.view:hover {
+    background: #0284c7;
+    color: white;
+}
+.action-btn.approve {
+    background: #ecfdf5;
+    color: #059669;
+}
+.action-btn.approve:hover {
+    background: #059669;
+    color: white;
+}
+.action-btn.reject {
+    background: #fef2f2;
+    color: #dc2626;
+}
+.action-btn.reject:hover {
+    background: #dc2626;
+    color: white;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    padding: 60px 40px;
+    text-align: center;
+}
+.empty-state-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--service-bg);
+    color: var(--service-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 24px auto;
+}
+.empty-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--brand-text);
+    margin-bottom: 10px;
+}
+.empty-state p {
+    color: #888;
+    font-size: 15px;
+    margin-bottom: 24px;
+}
+.empty-state .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--service-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.empty-state .btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* ===== PAGINATION ===== */
+.pagination-wrapper {
+    padding: 20px 24px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+}
+.pagination {
+    display: flex;
+    gap: 8px;
+}
+.pagination a, .pagination span {
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+.pagination a {
+    background: #f5f5f5;
+    color: #555;
+}
+.pagination a:hover {
+    background: var(--service-color);
+    color: white;
+}
+.pagination span.current {
+    background: var(--service-color);
+    color: white;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1400px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 992px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .page-header { flex-direction: column; text-align: center; gap: 20px; }
+    .payments-table { display: block; overflow-x: auto; }
+}
+@media (max-width: 768px) {
+    .sidebar, .sidebar-accent { display: none; }
+    .main-content, .topbar { margin-left: 0; }
+    .filter-tabs { flex-direction: column; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- SIDEBAR ACCENT -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                Staff Panel
+            {% endif %}
+        </small>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <ul>
+        {% if is_granted('ROLE_ADMIN') %}
+            <li>
+                <a href="{{ path('app_admin_dashboard') }}">
+                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_user_index') }}">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/></svg>
+                    User Management
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_admin_services') }}">
+                    <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>
+                    Services
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('reservation_index') }}">
+                    <svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>
+                    Reservations
+                </a>
+            </li>
+            <li class="active">
+                <a href="{{ path('app_payment_dashboard') }}">
+                    <svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>
+                    Payments
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_activity_log_index') }}">
+                    <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                    Activity Logs
+                </a>
+            </li>
+        {% elseif is_granted('ROLE_STAFF') %}
+            <li>
+                <a href="{{ path('app_staff_dashboard') }}">
+                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('staff_services') }}">
+                    <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>
+                    Services
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('reservation_index') }}">
+                    <svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>
+                    Reservations
+                </a>
+            </li>
+            <li class="active">
+                <a href="{{ path('app_payment_dashboard') }}">
+                    <svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>
+                    Payments
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">
+        Log Out
+        </a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="{{ path('app_payment_dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <span class="page-title">{{ serviceLabel }}</span>
+    </div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="page-header-content">
+
+            <div class="page-header-text">
+                <h2>{{ serviceLabel }} Payments</h2>
+                <p>Manage and track all payment transactions for {{ serviceLabel|lower }}.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    {% set totalPayments = payments|length %}
+    {% set approvedPayments = payments|filter(p => p.status == 'APPROVED') %}
+    {% set pendingPayments = payments|filter(p => p.status == 'PENDING') %}
+    {% set rejectedPayments = payments|filter(p => p.status == 'REJECTED') %}
+    
+    {% set totalAmount = 0 %}
+    {% set approvedAmount = 0 %}
+    {% set pendingAmount = 0 %}
+    
+    {% for payment in payments %}
+        {% set totalAmount = totalAmount + payment.amount %}
+    {% endfor %}
+    {% for payment in approvedPayments %}
+        {% set approvedAmount = approvedAmount + payment.amount %}
+    {% endfor %}
+    {% for payment in pendingPayments %}
+        {% set pendingAmount = pendingAmount + payment.amount %}
+    {% endfor %}
+
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+            </div>
+            <div class="stat-value">{{ totalPayments }}</div>
+            <div class="stat-label">Total Payments</div>
+        </div>
+        <div class="stat-card approved">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="stat-value">₱{{ approvedAmount|number_format(2) }}</div>
+            <div class="stat-label">Approved ({{ approvedPayments|length }})</div>
+        </div>
+        <div class="stat-card pending">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="stat-value">₱{{ pendingAmount|number_format(2) }}</div>
+            <div class="stat-label">Pending ({{ pendingPayments|length }})</div>
+        </div>
+        <div class="stat-card rejected">
+            <div class="stat-card-header">
+                <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+            </div>
+            <div class="stat-value">{{ rejectedPayments|length }}</div>
+            <div class="stat-label">Rejected</div>
+        </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-section">
+        <div class="filter-tabs">
+            <a href="{{ path('app_payment_by_service', {serviceType: serviceType}) }}" 
+               class="filter-tab all {{ currentStatus is null ? 'active' : '' }}">
+                <i class="fas fa-list"></i> All
+                <span class="count">{{ totalPayments }}</span>
+            </a>
+            <a href="{{ path('app_payment_by_service', {serviceType: serviceType, status: 'APPROVED'}) }}" 
+               class="filter-tab approved {{ currentStatus == 'APPROVED' ? 'active' : '' }}">
+                <i class="fas fa-check-circle"></i> Approved
+                <span class="count">{{ approvedPayments|length }}</span>
+            </a>
+            <a href="{{ path('app_payment_by_service', {serviceType: serviceType, status: 'PENDING'}) }}" 
+               class="filter-tab pending {{ currentStatus == 'PENDING' ? 'active' : '' }}">
+                <i class="fas fa-clock"></i> Pending
+                <span class="count">{{ pendingPayments|length }}</span>
+            </a>
+            <a href="{{ path('app_payment_by_service', {serviceType: serviceType, status: 'REJECTED'}) }}" 
+               class="filter-tab rejected {{ currentStatus == 'REJECTED' ? 'active' : '' }}">
+                <i class="fas fa-times-circle"></i> Rejected
+                <span class="count">{{ rejectedPayments|length }}</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- PAYMENTS TABLE -->
+    <div class="payments-section">
+        <div class="payments-header">
+            <h3 class="payments-title">
+                <i class="fas fa-credit-card"></i>
+                Payment Transactions
+            </h3>
+            <span class="payments-count">{{ payments|length }} payments</span>
+        </div>
+
+        {% if payments|length > 0 %}
+        <table class="payments-table">
+            <thead>
+                <tr>
+                    <th>Transaction</th>
+                    <th>Guest</th>
+                    <th>Reservation</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>
+                        <span class="transaction-ref">{{ payment.transactionReference }}</span>
+                    </td>
+                    <td>
+                        <div class="guest-info">
+                            <span class="guest-name">{{ payment.paidBy.firstName }} {{ payment.paidBy.lastName }}</span>
+                            <span class="guest-email">{{ payment.paidBy.email }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="reservation-info">
+                            <span class="reservation-ref">{{ payment.reservation.referenceNumber }}</span>
+                            <span class="reservation-date">
+                                {{ payment.reservation.checkIn|date('M d, Y') }}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="amount">₱{{ payment.amount|number_format(2) }}</span>
+                    </td>
+                    <td>
+                        {% set methodClass = 'default' %}
+                        {% if payment.paymentMethod == 'GCASH' %}
+                            {% set methodClass = 'gcash' %}
+                        {% elseif payment.paymentMethod == 'MAYA' %}
+                            {% set methodClass = 'maya' %}
+                        {% elseif payment.paymentMethod == 'CASH' %}
+                            {% set methodClass = 'cash' %}
+                        {% elseif payment.paymentMethod == 'BANK_TRANSFER' %}
+                            {% set methodClass = 'bank' %}
+                        {% elseif payment.paymentMethod == 'PAYPAL' %}
+                            {% set methodClass = 'paypal' %}
+                        {% elseif payment.paymentMethod in ['CREDIT_CARD', 'DEBIT_CARD'] %}
+                            {% set methodClass = 'card' %}
+                        {% endif %}
+                        <span class="payment-method {{ methodClass }}">
+                            {% if payment.paymentMethod == 'GCASH' %}
+                                <i class="fas fa-mobile-alt"></i>
+                            {% elseif payment.paymentMethod == 'MAYA' %}
+                                <i class="fas fa-mobile-alt"></i>
+                            {% elseif payment.paymentMethod == 'CASH' %}
+                                <i class="fas fa-money-bill-wave"></i>
+                            {% elseif payment.paymentMethod == 'BANK_TRANSFER' %}
+                                <i class="fas fa-university"></i>
+                            {% elseif payment.paymentMethod == 'PAYPAL' %}
+                                <i class="fab fa-paypal"></i>
+                            {% elseif payment.paymentMethod in ['CREDIT_CARD', 'DEBIT_CARD'] %}
+                                <i class="fas fa-credit-card"></i>
+                            {% else %}
+                                <i class="fas fa-wallet"></i>
+                            {% endif %}
+                            {{ payment.paymentMethodLabel }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge {{ payment.status|lower }}">
+                            {% if payment.status == 'PENDING' %}
+                                <i class="fas fa-clock"></i>
+                            {% elseif payment.status == 'APPROVED' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elseif payment.status == 'REJECTED' %}
+                                <i class="fas fa-times-circle"></i>
+                            {% elseif payment.status == 'REFUNDED' %}
+                                <i class="fas fa-undo"></i>
+                            {% endif %}
+                            {{ payment.status|capitalize }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ payment.createdAt|date('M d, Y') }}<br>
+                        <small style="color: #888;">{{ payment.createdAt|date('h:i A') }}</small>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="{{ path('app_payment_show', {id: payment.id}) }}" 
+                               class="action-btn view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if payment.status == 'PENDING' %}
+                                <a href="{{ path('app_payment_show', {id: payment.id}) }}" 
+                                   class="action-btn approve" title="Review & Approve">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3>No Payments Found</h3>
+            <p>
+                {% if currentStatus %}
+                    There are no {{ currentStatus|lower }} payments for {{ serviceLabel|lower }} at the moment.
+                {% else %}
+                    There are no payment transactions for {{ serviceLabel|lower }} yet.
+                {% endif %}
+            </p>
+            <a href="{{ path('app_payment_dashboard') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateDateTime() {
+        const now = new Date();
+        document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+});
+</script>
+{% endblock %}

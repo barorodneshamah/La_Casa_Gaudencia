@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TourRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -45,6 +47,12 @@ class Tour
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $galleryImages = null;
 
+    /**
+     * @var Collection<int, Package>
+     */
+    #[ORM\ManyToMany(targetEntity: Package::class, mappedBy: 'tours')]
+    private Collection $packages;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -56,6 +64,7 @@ class Tour
         $this->createdAt = new \DateTimeImmutable();
         $this->status = 'Available';
         $this->galleryImages = [];
+        $this->packages = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -179,9 +188,6 @@ class Tour
         return $this;
     }
 
-    /**
-     * Add a single gallery image
-     */
     public function addGalleryImage(string $imageName): static
     {
         if (!in_array($imageName, $this->galleryImages ?? [])) {
@@ -190,20 +196,97 @@ class Tour
         return $this;
     }
 
-    /**
-     * Remove a gallery image
-     */
     public function removeGalleryImage(string $imageName): static
     {
         if ($this->galleryImages) {
             $key = array_search($imageName, $this->galleryImages);
             if ($key !== false) {
                 unset($this->galleryImages[$key]);
-                $this->galleryImages = array_values($this->galleryImages); // Re-index array
+                $this->galleryImages = array_values($this->galleryImages);
             }
         }
         return $this;
     }
+
+    // ========== PACKAGE RELATIONSHIP ==========
+
+    /**
+     * @return Collection<int, Package>
+     */
+    public function getPackages(): Collection
+    {
+        return $this->packages;
+    }
+
+    public function addPackage(Package $package): static
+    {
+        if (!$this->packages->contains($package)) {
+            $this->packages->add($package);
+            $package->addTour($this);
+        }
+        return $this;
+    }
+
+    public function removePackage(Package $package): static
+    {
+        if ($this->packages->removeElement($package)) {
+            $package->removeTour($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Check if tour is part of any package
+     */
+    public function isInPackage(): bool
+    {
+        return !$this->packages->isEmpty();
+    }
+
+    /**
+     * Get active packages containing this tour
+     */
+    public function getActivePackages(): Collection
+    {
+        return $this->packages->filter(function (Package $package) {
+            return $package->isValid();
+        });
+    }
+
+    /**
+     * Check if tour is part of a specific package
+     */
+    public function isInSpecificPackage(Package $package): bool
+    {
+        return $this->packages->contains($package);
+    }
+
+    /**
+     * Get the best package deal for this tour
+     */
+    public function getBestPackageDeal(): ?Package
+    {
+        $activePackages = $this->getActivePackages();
+        
+        if ($activePackages->isEmpty()) {
+            return null;
+        }
+
+        $bestPackage = null;
+        $highestDiscount = 0;
+
+        foreach ($activePackages as $package) {
+            $discount = (float) $package->getDiscountPercentage();
+            if ($discount > $highestDiscount) {
+                $highestDiscount = $discount;
+                $bestPackage = $package;
+            }
+        }
+
+        return $bestPackage;
+    }
+
+    // ========== TIMESTAMPS ==========
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
