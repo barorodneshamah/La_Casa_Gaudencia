@@ -5,10 +5,8 @@ namespace App\EventSubscriber;
 use App\Entity\ActivityLog;
 use App\Entity\User;
 use App\Entity\Tour;
-//use App\Entity\Package;
-//use App\Entity\CustomItinerary;
 use App\Entity\Food;
-//use App\Entity\Booking;
+
 use App\Entity\Room;
 use App\Service\ActivityLogService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;

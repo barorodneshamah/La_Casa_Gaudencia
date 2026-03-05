@@ -55,32 +55,29 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
         TokenInterface $token,
         string $firewallName
     ): ?Response {
-        // Redirect to originally requested page
-        if ($targetPath = $this->getTargetPath(
-            $request->getSession(),
-            $firewallName
-        )) {
-            return new RedirectResponse($targetPath);
-        }
+        // Clear any stored target path
+        $this->removeTargetPath($request->getSession(), $firewallName);
 
         $user  = $token->getUser();
         $roles = $user->getRoles();
 
+        // Determine redirect URL based on role
         if (in_array('ROLE_ADMIN', $roles, true)) {
-            return new RedirectResponse(
-                $this->urlGenerator->generate('app_admin_dashboard')
-            );
+            $url = $this->urlGenerator->generate('app_admin_dashboard');
+        } elseif (in_array('ROLE_STAFF', $roles, true)) {
+            $url = $this->urlGenerator->generate('app_staff_dashboard');
+        } else {
+            $url = $this->urlGenerator->generate('app_home');
         }
 
-        if (in_array('ROLE_STAFF', $roles, true)) {
-            return new RedirectResponse(
-                $this->urlGenerator->generate('app_staff_dashboard')
-            );
-        }
+        $response = new RedirectResponse($url);
+        
+        // Add no-cache headers
+        $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 
-        return new RedirectResponse(
-            $this->urlGenerator->generate('app_home')
-        );
+        return $response;
     }
 
     protected function getLoginUrl(Request $request): string

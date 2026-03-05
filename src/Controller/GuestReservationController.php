@@ -1,5 +1,4 @@
 <?php
-// src/Controller/GuestReservationController.php
 
 namespace App\Controller;
 

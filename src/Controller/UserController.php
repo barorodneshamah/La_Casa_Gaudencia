@@ -22,7 +22,6 @@ final class UserController extends AbstractController
         private EntityManagerInterface $entityManager
     ) {}
 
-    // ==================== LIST ALL USERS ====================
     #[Route('', name: 'app_user_index', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
@@ -31,7 +30,6 @@ final class UserController extends AbstractController
         ]);
     }
 
-    // ==================== CREATE NEW USER ====================
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
@@ -58,7 +56,6 @@ final class UserController extends AbstractController
         ]);
     }
 
-    // ==================== VIEW USER ====================
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(User $user): Response
     {
@@ -67,7 +64,6 @@ final class UserController extends AbstractController
         ]);
     }
 
-    // ==================== EDIT USER ====================
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user): Response
     {
@@ -94,7 +90,6 @@ final class UserController extends AbstractController
         ]);
     }
 
-    // ==================== DELETE USER ====================
     #[Route('/{id}/delete', name: 'app_user_delete', methods: ['POST'])]
     public function delete(Request $request, User $user): Response
     {

@@ -47,7 +47,7 @@ class UserType extends AbstractType
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'mapped' => false, // Not mapped to entity
+                'mapped' => false, 
                 'required' => !$isEdit,
                 'first_options' => [
                     'label' => 'Password',

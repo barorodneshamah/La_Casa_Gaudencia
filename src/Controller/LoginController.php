@@ -12,7 +12,6 @@ class LoginController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // User already logged in → redirect by role
         if ($this->getUser()) {
             if ($this->isGranted('ROLE_ADMIN')) {
                 return $this->redirectToRoute('app_admin_dashboard');

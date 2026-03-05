@@ -1,23 +1,55 @@
+{# templates/base.html.twig #}
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>
-			{% block title %}Welcome!
-			{% endblock %}
-		</title>
-		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-		{% block stylesheets %}
-			{{ encore_entry_link_tags('app') }}
-		{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    {# Prevent caching #}
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    {% block body %}{% endblock %}
+    
+    {% block javascripts %}{% endblock %}
+    
+    {# THIS IS THE KEY - Handles browser back-forward cache #}
+    {% if app.user %}
+    <script>
+        // Method 1: Handle page show event (back-forward cache)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                // Page was loaded from bfcache or via back button
+                window.location.reload(true);
+            }
+        });
 
-		{% block javascripts %}
-
-			{{ encore_entry_script_tags('app') }}
-		{% endblock %}
-	</head>
-	<body>
-
-		{% block body %}{% endblock %}
-	</body>
+        // Method 2: Check on page visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // Verify session is still valid via AJAX
+                fetch('{{ path("app_check_auth") }}', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        window.location.href = '{{ path("app_login") }}';
+                    }
+                })
+                .catch(() => {
+                    window.location.href = '{{ path("app_login") }}';
+                });
+            }
+        });
+    </script>
+    {% endif %}
+</body>
 </html>
