@@ -1,5 +1,8 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+_security_logout:
+    resource: security.route_loader.logout
+    type: service
+
+# ADD THIS ↓ — loads routes from AuthController
+api_controllers:
+    resource: ../src/Controller/AuthController.php
     type: attribute
