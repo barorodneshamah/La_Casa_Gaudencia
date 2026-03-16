@@ -17,7 +17,7 @@
 
     .register-card {
         width: 900px;
-        height: 480px;
+        min-height: 600px;
         background: white;
         border-radius: 1.2rem;
         display: flex;
@@ -25,10 +25,9 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 
-
     .register-left {
         width: 50%;
-        padding: 3rem 2.5rem;
+        padding: 2rem 2.5rem;
         position: relative;
         overflow: hidden;
         background: #ffffff;
@@ -52,7 +51,7 @@
     .register-title {
         font-family: var(--font-family-display);
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.2rem;
         font-size: 1.4rem;
         font-weight: 700;
         color: #B84920;
@@ -60,10 +59,10 @@
 
     .register-input {
         width: 100%;
-        margin-bottom: 1rem;
+        margin-bottom: .7rem;
         background: #E9E9E9;
         border: none;
-        padding: .75rem 1rem;
+        padding: .7rem 1rem;
         border-radius: .4rem;
         font-size: .9rem;
     }
@@ -77,6 +76,7 @@
         border-radius: .4rem;
         cursor: pointer;
         font-weight: 600;
+        margin-top: .5rem;
     }
 
     .register-btn:hover {
@@ -84,7 +84,7 @@
     }
 
     .register-link {
-        margin-top: 1.3rem;
+        margin-top: 1rem;
         text-align: center;
         font-size: .85rem;
     }
@@ -94,7 +94,6 @@
         font-weight: 600;
         text-decoration: none;
     }
-
 
     .register-right {
         width: 50%;
@@ -117,7 +116,7 @@
         width: 100%;
         height: 100%;
         background: url('/images/B1.png') center/cover no-repeat;
-        opacity: 0.25; 
+        opacity: 0.25;
         z-index: 0;
     }
     .register-right * {
@@ -147,6 +146,21 @@
     .logo-card img {
         width: 130px;
     }
+
+    .field-error {
+        color: #c33;
+        font-size: .75rem;
+        margin-top: -0.4rem;
+        margin-bottom: .4rem;
+    }
+
+    .terms-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: .6rem 0;
+        font-size: .85rem;
+    }
 </style>
 
 <div class="register-wrapper">
@@ -156,31 +170,38 @@
         <div class="register-left">
             <h2 class="register-title">Create Account</h2>
 
-            {% if form_errors(registrationForm) %}
-                <div style="background:#fee;border:1px solid #fcc;padding:.7rem;border-radius:.4rem;margin-bottom:1rem;color:#c33;">
-                    {{ form_errors(registrationForm) }}
-                </div>
-            {% endif %}
-
             {{ form_start(registrationForm) }}
 
-                <div class="fs-field">
-                    {{ form_widget(registrationForm.username, {
-                        attr: { class: 'register-input', placeholder: 'Enter your username' }
-                    }) }}
-                </div>
+                {{ form_widget(registrationForm.fullName, {
+                    attr: { class: 'register-input', placeholder: 'Enter your full name' }
+                }) }}
+                <div class="field-error">{{ form_errors(registrationForm.fullName) }}</div>
 
-                <div class="fs-field">
-                    {{ form_widget(registrationForm.plainPassword, {
-                        attr: { class: 'register-input', placeholder: 'Enter your password' }
-                    }) }}
-                </div>
+                {{ form_widget(registrationForm.email, {
+                    attr: { class: 'register-input', placeholder: 'Enter your email' }
+                }) }}
+                <div class="field-error">{{ form_errors(registrationForm.email) }}</div>
 
-                <div style="margin-top: 1rem;">
+                {{ form_widget(registrationForm.username, {
+                    attr: { class: 'register-input', placeholder: 'Enter your username' }
+                }) }}
+                <div class="field-error">{{ form_errors(registrationForm.username) }}</div>
+
+                {{ form_widget(registrationForm.plainPassword, {
+                    attr: { class: 'register-input', placeholder: 'Enter your password' }
+                }) }}
+                <div class="field-error">{{ form_errors(registrationForm.plainPassword) }}</div>
+
+                {{ form_widget(registrationForm.confirmPassword, {
+                    attr: { class: 'register-input', placeholder: 'Confirm your password' }
+                }) }}
+                <div class="field-error">{{ form_errors(registrationForm.confirmPassword) }}</div>
+
+                <div class="terms-row">
                     {{ form_widget(registrationForm.agreeTerms) }}
-                    {{ form_label(registrationForm.agreeTerms) }}
-                    {{ form_errors(registrationForm.agreeTerms) }}
+                    <label>I agree to the terms and conditions</label>
                 </div>
+                <div class="field-error">{{ form_errors(registrationForm.agreeTerms) }}</div>
 
                 <button type="submit" class="register-btn">Register</button>
 

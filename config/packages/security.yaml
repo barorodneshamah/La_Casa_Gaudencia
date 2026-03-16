@@ -54,7 +54,7 @@ security:
         - { path: ^/admin/dashboard, roles: ROLE_ADMIN }
         - { path: ^/staff/dashboard, roles: ROLE_STAFF }
         - { path: ^/product,         roles: ROLE_USER }
-        - { path: ^/home,            roles: ROLE_GUEST }
+        - { path: ^/landing,         roles: PUBLIC_ACCESS }
 
 when@test:
     security:
