@@ -1,0 +1,348 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Message: {{ message.subject }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --primary: #c24a16;
+    --primary-light: #e85d04;
+    --text: #2f2f2f;
+    --text-muted: #888;
+    --bg: #f7f5edff;
+    --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); font-family: 'Poppins', sans-serif; color: var(--text); }
+
+.message-container { max-width: 1200px; margin: 0 auto; padding: 30px; }
+
+/* Back Link */
+.back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--text-muted); text-decoration: none; font-size: 14px;
+    padding: 12px 24px; background: var(--white); border-radius: 50px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all .3s;
+    margin-bottom: 25px;
+}
+.back-link:hover { color: var(--primary); transform: translateX(-5px); }
+
+/* Flash Messages */
+.alert {
+    padding: 16px 20px; border-radius: 12px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+}
+.alert-success { background: #d4edda; color: #155724; }
+.alert-error { background: #f8d7da; color: #721c24; }
+
+/* Grid */
+.view-grid { display: grid; grid-template-columns: 1fr 380px; gap: 25px; }
+
+/* Main Card */
+.main-card {
+    background: var(--white); border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden;
+}
+.card-header {
+    background: linear-gradient(135deg, #c24a16, #e85d04);
+    padding: 35px; color: var(--white); position: relative;
+}
+.card-header::before {
+    content: ""; position: absolute; inset: 0;
+    background: url('/Images/B1.png') repeat; background-size: 80px auto; opacity: .06;
+}
+.card-header > * { position: relative; z-index: 1; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.sender-info { display: flex; align-items: center; gap: 18px; }
+.sender-avatar {
+    width: 70px; height: 70px; background: rgba(255,255,255,0.2);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; border: 3px solid rgba(255,255,255,0.3);
+}
+.sender-details h2 { font-size: 24px; margin-bottom: 6px; font-weight: 600; }
+.sender-contact { display: flex; gap: 20px; font-size: 14px; opacity: .9; flex-wrap: wrap; }
+.sender-contact span { display: flex; align-items: center; gap: 6px; }
+.status-badge {
+    padding: 8px 18px; border-radius: 50px; font-size: 12px;
+    font-weight: 700; text-transform: uppercase;
+}
+.status-unread { background: #ffeaa7; color: #d63031; }
+.status-read { background: rgba(255,255,255,0.2); color: var(--white); }
+.status-replied { background: #55efc4; color: #00b894; }
+.status-archived { background: #b2bec3; color: #2d3436; }
+.meta-row { display: flex; gap: 30px; flex-wrap: wrap; }
+.meta-item { display: flex; align-items: center; gap: 8px; font-size: 14px; opacity: .85; }
+
+.card-body { padding: 35px; }
+.subject-line {
+    font-size: 12px; color: var(--primary); text-transform: uppercase;
+    letter-spacing: 1.5px; font-weight: 700; margin-bottom: 15px;
+}
+.message-content {
+    font-size: 16px; line-height: 1.9; color: var(--text);
+    white-space: pre-wrap; background: #fafafa; padding: 25px;
+    border-radius: 12px; border-left: 4px solid var(--primary);
+}
+
+.card-actions {
+    padding: 25px 35px; background: #f9f9f9;
+    display: flex; gap: 12px; flex-wrap: wrap;
+}
+.btn-action {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 50px; font-size: 14px;
+    font-weight: 600; text-decoration: none; transition: all .3s;
+    cursor: pointer; border: none;
+}
+.btn-reply {
+    background: linear-gradient(135deg, #c24a16, #e85d04);
+    color: var(--white); box-shadow: 0 4px 15px rgba(194,74,22,0.3);
+}
+.btn-reply:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(194,74,22,0.4); }
+.btn-call { background: #27ae60; color: var(--white); }
+.btn-call:hover { background: #219a52; }
+.btn-del { background: #e74c3c; color: var(--white); }
+.btn-del:hover { background: #c0392b; }
+
+/* Sidebar */
+.sidebar-panel { display: flex; flex-direction: column; gap: 20px; }
+.side-card {
+    background: var(--white); border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 25px;
+}
+.side-card h3 {
+    font-size: 16px; color: var(--text); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 15px; border-bottom: 1px solid #eee;
+}
+.side-card h3 i { color: var(--primary); }
+
+/* Status Options */
+.status-options { display: flex; flex-direction: column; gap: 10px; }
+.status-option {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    border-radius: 12px; cursor: pointer; transition: all .3s;
+    border: 2px solid transparent;
+}
+.status-option:hover { background: rgba(194,74,22,0.05); }
+.status-option.selected { border-color: var(--primary); background: rgba(194,74,22,0.05); }
+.status-option input { display: none; }
+.status-dot { width: 14px; height: 14px; border-radius: 50%; }
+.status-dot.unread { background: #e17055; }
+.status-dot.read { background: #636e72; }
+.status-dot.replied { background: #00b894; }
+.status-dot.archived { background: #b2bec3; }
+.status-option span { font-size: 14px; font-weight: 500; }
+.btn-save {
+    width: 100%; margin-top: 15px;
+    background: linear-gradient(135deg, #c24a16, #e85d04);
+    color: var(--white); border: none; padding: 14px;
+    border-radius: 50px; font-weight: 600; cursor: pointer; transition: all .3s;
+}
+.btn-save:hover { transform: translateY(-2px); }
+
+/* Notes */
+.notes-textarea {
+    width: 100%; border: 2px solid #eee; border-radius: 12px;
+    padding: 15px; font-size: 14px; resize: vertical;
+    min-height: 130px; transition: all .3s; font-family: inherit;
+}
+.notes-textarea:focus { border-color: var(--primary); outline: none; }
+.btn-note {
+    width: 100%; margin-top: 12px; background: var(--text);
+    color: var(--white); border: none; padding: 14px;
+    border-radius: 50px; font-weight: 600; cursor: pointer; transition: all .3s;
+}
+.btn-note:hover { background: #1a1a1a; }
+
+/* Info List */
+.info-list { display: flex; flex-direction: column; gap: 14px; }
+.info-item {
+    display: flex; justify-content: space-between; font-size: 14px;
+    padding-bottom: 12px; border-bottom: 1px dashed #eee;
+}
+.info-item:last-child { border-bottom: none; padding-bottom: 0; }
+.info-label { color: var(--text-muted); }
+.info-value { color: var(--text); font-weight: 500; text-align: right; }
+
+/* Responsive */
+@media(max-width: 1024px) { .view-grid { grid-template-columns: 1fr; } }
+@media(max-width: 768px) {
+    .message-container { padding: 15px; }
+    .header-top { flex-direction: column; gap: 15px; }
+    .sender-contact { flex-direction: column; gap: 8px; }
+    .meta-row { flex-direction: column; gap: 10px; }
+    .card-body { padding: 25px; }
+    .card-actions { flex-direction: column; }
+    .btn-action { justify-content: center; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="message-container">
+    <a href="{{ path('app_contact_message_index') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Messages
+    </a>
+
+    <!-- Flash Messages -->
+    {% for label, messages in app.flashes %}
+        {% for msg in messages %}
+            <div class="alert alert-{{ label }}">
+                <i class="fas fa-{{ label == 'success' ? 'check-circle' : 'exclamation-circle' }}"></i>
+                {{ msg }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="view-grid">
+        <!-- Main Content -->
+        <div class="main-card">
+            <div class="card-header">
+                <div class="header-top">
+                    <div class="sender-info">
+                        <div class="sender-avatar">{{ message.fullName|slice(0,1)|upper }}</div>
+                        <div class="sender-details">
+                            <h2>{{ message.fullName }}</h2>
+                            <div class="sender-contact">
+                                <span><i class="fas fa-envelope"></i> {{ message.email }}</span>
+                                {% if message.phone %}
+                                <span><i class="fas fa-phone"></i> {{ message.phone }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="status-badge status-{{ message.status }}">{{ message.status }}</span>
+                </div>
+                <div class="meta-row">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        {{ message.createdAt|date('F d, Y — h:i A') }}
+                    </div>
+                    {% if message.readAt %}
+                    <div class="meta-item">
+                        <i class="fas fa-eye"></i>
+                        Read: {{ message.readAt|date('M d, h:i A') }}
+                    </div>
+                    {% endif %}
+                    {% if message.ipAddress %}
+                    <div class="meta-item">
+                        <i class="fas fa-globe"></i>
+                        IP: {{ message.ipAddress }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body">
+                <p class="subject-line">Subject: {{ message.subject }}</p>
+                <div class="message-content">{{ message.message }}</div>
+            </div>
+
+            <div class="card-actions">
+                <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject }}" class="btn-action btn-reply">
+                    <i class="fas fa-reply"></i> Reply via Email
+                </a>
+                {% if message.phone %}
+                <a href="tel:{{ message.phone }}" class="btn-action btn-call">
+                    <i class="fas fa-phone"></i> Call
+                </a>
+                {% endif %}
+                <form method="post" action="{{ path('app_contact_message_delete', {id: message.id}) }}" onsubmit="return confirm('Delete this message permanently?')" style="display:inline">
+                    <button type="submit" class="btn-action btn-del">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar-panel">
+            <!-- Update Status -->
+            <div class="side-card">
+                <h3><i class="fas fa-tasks"></i> Update Status</h3>
+                <form method="post" action="{{ path('app_contact_message_status', {id: message.id}) }}">
+                    <div class="status-options">
+                        <label class="status-option {{ message.status == 'unread' ? 'selected' : '' }}">
+                            <input type="radio" name="status" value="unread" {{ message.status == 'unread' ? 'checked' : '' }}>
+                            <span class="status-dot unread"></span>
+                            <span>Unread</span>
+                        </label>
+                        <label class="status-option {{ message.status == 'read' ? 'selected' : '' }}">
+                            <input type="radio" name="status" value="read" {{ message.status == 'read' ? 'checked' : '' }}>
+                            <span class="status-dot read"></span>
+                            <span>Read</span>
+                        </label>
+                        <label class="status-option {{ message.status == 'replied' ? 'selected' : '' }}">
+                            <input type="radio" name="status" value="replied" {{ message.status == 'replied' ? 'checked' : '' }}>
+                            <span class="status-dot replied"></span>
+                            <span>Replied</span>
+                        </label>
+                        <label class="status-option {{ message.status == 'archived' ? 'selected' : '' }}">
+                            <input type="radio" name="status" value="archived" {{ message.status == 'archived' ? 'checked' : '' }}>
+                            <span class="status-dot archived"></span>
+                            <span>Archived</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-check"></i> Save Status
+                    </button>
+                </form>
+            </div>
+
+            <!-- Notes -->
+            <div class="side-card">
+                <h3><i class="fas fa-sticky-note"></i> Notes</h3>
+                <form method="post" action="{{ path('app_contact_message_notes', {id: message.id}) }}">
+                    <textarea name="notes" class="notes-textarea" placeholder="Add notes about this message...">{{ message.notes }}</textarea>
+                    <button type="submit" class="btn-note">
+                        <i class="fas fa-save"></i> Save Notes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Details -->
+            <div class="side-card">
+                <h3><i class="fas fa-info-circle"></i> Details</h3>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Message ID</span>
+                        <span class="info-value">#{{ message.id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Received</span>
+                        <span class="info-value">{{ message.createdAt|date('M d, Y') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Time</span>
+                        <span class="info-value">{{ message.createdAt|date('h:i A') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Subject</span>
+                        <span class="info-value">{{ message.subject }}</span>
+                    </div>
+                    {% if message.ipAddress %}
+                    <div class="info-item">
+                        <span class="info-label">IP Address</span>
+                        <span class="info-value">{{ message.ipAddress }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.status-option input').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+        this.closest('.status-option').classList.add('selected');
+    });
+});
+</script>
+{% endblock %}

@@ -40,4 +40,47 @@ class TourRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Find minimum tour price for active tours
+     */
+    public function findMinPrice(): ?float
+    {
+        $qb = $this->createQueryBuilder('t');
+        
+        $result = $qb->select('MIN(t.price) as minPrice')
+            ->where('t.status = :status')
+            ->setParameter('status', 'Available')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result['minPrice'] ? (float) $result['minPrice'] : null;
+    }
+
+    /**
+     * Find available tours for landing page
+     */
+    public function findForLandingPage(int $limit = 4): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.status = :status')
+            ->setParameter('status', 'Available')
+            ->orderBy('t.price', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Count total active tours
+     */
+    public function countActiveTours(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status = :status')
+            ->setParameter('status', 'Available')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

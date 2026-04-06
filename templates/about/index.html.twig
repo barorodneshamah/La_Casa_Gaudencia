@@ -1,0 +1,850 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}About Us — La Casa Gaudencia{% endblock %}
+
+{% block body %}
+<style>
+/* ══════════════════════════════════════════════════════════════════════════════
+   GOOGLE FONTS
+══════════════════════════════════════════════════════════════════════════════ */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600&display=swap");
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════════════════════════════════════════ */
+:root{
+    --primary-color:#c24a16;
+    --primary-dark:#a93e10;
+    --primary-light:#e85d2a;
+    --accent-gold:#d4a853;
+    --accent-cream:#fff8f5;
+    --text-dark:#2c2c2c;
+    --text-light:#666;
+    --white:#ffffff;
+    --bg-pattern:#fcfbf7;
+    --shadow-soft:0 4px 20px rgba(0,0,0,.08);
+    --shadow-medium:0 8px 30px rgba(0,0,0,.12);
+    --shadow-strong:0 12px 40px rgba(0,0,0,.18);
+    --shadow-glow:0 0 40px rgba(194,74,22,.15);
+    --gradient-primary:linear-gradient(135deg,#c24a16 0%,#e85d2a 50%,#d4a853 100%);
+    --gradient-gold:linear-gradient(135deg,#d4a853 0%,#f0c97a 50%,#d4a853 100%);
+    --border-radius-card:20px;
+    --border-radius-lg:30px;
+    
+    /* Section colors */
+    --bg-peach:#fff5f0;
+    --bg-cream:#fffbf7;
+    --bg-light-gold:#fef9f3;
+    --bg-pale-orange:#fff3eb;
+    --bg-ivory:#fefdfb;
+    --bg-blush:#fff8f6;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   GLOBAL RESET
+══════════════════════════════════════════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Lato",sans-serif;background-color:var(--bg-pattern);color:var(--text-dark);line-height:1.6;overflow-x:hidden}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════════════════════════════════════════ */
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(5deg)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:.8}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalSlideIn{from{transform:translateY(-50px) scale(.9);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes drawLine{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════════════════════════════════════════════════════ */
+h1,h2,h3,h4{font-family:"Playfair Display",serif;color:var(--primary-color);font-weight:600}
+p,li,input,button,textarea{font-family:"Roboto",sans-serif}
+section{padding:100px 20px;position:relative}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WAVE DIVIDER - SINGLE LINE STYLE
+══════════════════════════════════════════════════════════════════════════════ */
+.wave-divider{
+    position:absolute;
+    bottom:-2px;
+    left:0;
+    width:100%;
+    overflow:hidden;
+    line-height:0;
+    z-index:10;
+}
+.wave-divider svg{
+    position:relative;
+    display:block;
+    width:100%;
+    height:50px;
+}
+.wave-divider path{
+    fill:none;
+    stroke-width:3;
+    stroke-linecap:round;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   NAVBAR (FROM REFERENCE)
+══════════════════════════════════════════════════════════════════════════════ */
+.navbar{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;background:rgba(252,251,247,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:15px 60px;box-shadow:0 2px 20px rgba(0,0,0,.08);z-index:1000;transition:all .3s ease}
+.navbar.scrolled{padding:10px 60px;background:rgba(252,251,247,.98);box-shadow:0 4px 30px rgba(0,0,0,.12)}
+.navbar::before{content:"";position:absolute;inset:0;background:url('{{ asset("Images/B1.png") }}') repeat-x center;background-size:120px auto;opacity:.08;z-index:0;pointer-events:none}
+.navbar .logo{position:relative;z-index:1;display:flex;align-items:center;gap:12px;font-family:"Playfair Display",serif;font-size:24px;font-weight:700;color:var(--primary-color);text-decoration:none;transition:transform .3s ease}
+.navbar .logo:hover{transform:scale(1.02)}
+.navbar .logo img{height:55px;width:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.1))}
+.navbar .logo span{background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.navbar nav{position:relative;z-index:1}
+.navbar ul{list-style:none;display:flex;align-items:center;gap:10px;margin:0;padding:0}
+.navbar ul li{display:flex;align-items:center}
+.navbar ul li a{display:inline-block;text-decoration:none;color:var(--text-dark);font-weight:500;font-size:15px;padding:10px 18px;border-radius:8px;position:relative;transition:all .3s ease}
+.navbar ul li a:not(.signin-btn):hover{color:var(--primary-color);background:rgba(194,74,22,.08)}
+.navbar ul li a:not(.signin-btn)::after{content:"";position:absolute;left:50%;bottom:5px;width:0;height:2px;background:var(--gradient-primary);border-radius:2px;transition:all .3s ease;transform:translateX(-50%)}
+.navbar ul li a:not(.signin-btn):hover::after{width:60%}
+.navbar ul li .signin-btn{background:var(--gradient-primary);color:var(--white)!important;padding:12px 28px;border-radius:50px;font-weight:600;font-size:14px;letter-spacing:.5px;transition:all .3s ease;box-shadow:0 4px 15px rgba(194,74,22,.3);border:none;margin-left:10px}
+.navbar ul li .signin-btn:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(194,74,22,.4)}
+.navbar ul li .signin-btn::after{display:none}
+.menu-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:1001;padding:10px}
+.menu-toggle span{width:28px;height:3px;background:var(--primary-color);border-radius:3px;transition:all .3s ease}
+.menu-toggle.active span:nth-child(1){transform:rotate(45deg) translate(6px,6px)}
+.menu-toggle.active span:nth-child(2){opacity:0}
+.menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translate(6px,-6px)}
+.navbar ul li a.nav-active{color:var(--primary-color);background:rgba(194,74,22,.08)}
+.navbar ul li a.nav-active::after{width:60%}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FOOTER (FROM REFERENCE)
+══════════════════════════════════════════════════════════════════════════════ */
+footer{position:relative;background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary-color) 40%,#d4703a 70%,var(--primary-light) 100%);color:var(--white);padding:80px 20px 40px;overflow:hidden}
+footer::before{content:"";position:absolute;inset:0;background:url('{{ asset("Images/B1.png") }}') repeat;background-size:80px auto;opacity:.08;z-index:0}
+footer::after{content:"";position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(212,168,83,.15) 0%,transparent 60%);border-radius:50%;pointer-events:none;animation:float 12s ease-in-out infinite}
+.footer-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;text-align:left}
+.footer-section h4{color:var(--white);font-size:20px;margin-bottom:25px;position:relative;padding-bottom:12px}
+.footer-section h4::after{content:"";position:absolute;bottom:0;left:0;width:40px;height:2px;background:linear-gradient(135deg,var(--accent-gold),#fff8f0);border-radius:2px}
+.footer-section p,.footer-section a{color:rgba(255,255,255,.9);font-size:15px;line-height:1.8;text-decoration:none;transition:all .3s ease}
+.footer-section a:hover{color:var(--accent-gold);padding-left:5px}
+.footer-section ul{list-style:none;padding:0}
+.footer-section ul li{margin-bottom:12px}
+.footer-section ul li a{display:flex;align-items:center;gap:10px}
+.footer-section ul li a i{color:var(--accent-gold);width:20px;transition:transform .3s ease}
+.footer-section ul li a:hover i{transform:translateX(5px)}
+.footer-section .contact-item{display:flex;align-items:flex-start;gap:15px;margin-bottom:15px}
+.footer-section .contact-item i{color:var(--accent-gold);font-size:18px;margin-top:3px}
+.social-icons{display:flex;gap:15px;margin-top:20px}
+.social-icons a{width:48px;height:48px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:18px;transition:all .3s ease;position:relative}
+.social-icons a::before{content:"";position:absolute;inset:0;background:var(--white);border-radius:50%;opacity:0;transition:opacity .3s ease;z-index:-1}
+.social-icons a:hover::before{opacity:1}
+.social-icons a:hover{transform:translateY(-5px) scale(1.1);color:var(--primary-color);border-color:var(--white)}
+.footer-bottom{position:relative;z-index:1;text-align:center;padding-top:40px;margin-top:40px;border-top:1px solid rgba(255,255,255,.2)}
+.footer-bottom p{color:rgba(255,255,255,.8);font-size:14px}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   AUTH MODALS (FROM REFERENCE)
+══════════════════════════════════════════════════════════════════════════════ */
+.modal{display:none;position:fixed;z-index:2000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);justify-content:center;align-items:center;opacity:0;transition:opacity .4s ease}
+.modal.show{display:flex;opacity:1}
+.modal-content{background:var(--white);padding:50px 40px;border-radius:var(--border-radius-lg);width:90%;max-width:450px;text-align:center;position:relative;box-shadow:0 25px 80px rgba(0,0,0,.3);animation:modalSlideIn .4s ease;overflow:hidden}
+.modal-content::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:var(--gradient-primary)}
+.modal-content .modal-logo{width:70px;height:70px;margin:0 auto 25px;filter:drop-shadow(0 4px 10px rgba(194,74,22,.2))}
+.modal-content h2{margin-bottom:10px;font-size:30px}
+.modal-content .modal-subtitle{color:var(--text-light);font-size:15px;margin-bottom:30px}
+.modal-perks-hint{background:linear-gradient(135deg,rgba(194,74,22,.05),rgba(212,168,83,.07));border:1px solid rgba(194,74,22,.12);border-radius:14px;padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;gap:14px;text-align:left}
+.modal-perks-hint i{color:var(--accent-gold);font-size:22px;flex-shrink:0}
+.modal-perks-hint p{font-size:13px;color:var(--text-light);line-height:1.5;margin:0}
+.modal-perks-hint p strong{color:var(--primary-color)}
+.modal-content form{display:flex;flex-direction:column;gap:18px;position:relative;z-index:1}
+.input-group{position:relative}
+.input-group i{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--text-light);font-size:16px;transition:color .3s ease}
+.modal-content input{width:100%;padding:16px 18px 16px 50px;border-radius:14px;border:2px solid #eee;font-size:15px;transition:all .3s ease;background:#fafafa}
+.modal-content input:focus{border-color:var(--primary-color);background:var(--white);box-shadow:0 0 0 4px rgba(194,74,22,.1);outline:none}
+.input-group:focus-within i{color:var(--primary-color)}
+.modal-content button{width:100%;padding:16px;background:var(--gradient-primary);color:var(--white);border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;transition:all .3s ease;box-shadow:0 4px 15px rgba(194,74,22,.3);margin-top:10px}
+.modal-content button:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(194,74,22,.4)}
+.modal-close{position:absolute;top:20px;right:25px;font-size:28px;cursor:pointer;color:#ccc;transition:all .3s ease;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;z-index:2}
+.modal-close:hover{color:var(--primary-color);background:rgba(194,74,22,.1);transform:rotate(90deg)}
+.modal-content .switch{margin-top:25px;font-size:14px;color:var(--text-light);position:relative;z-index:1}
+.modal-content .switch a{color:var(--primary-color);font-weight:600;cursor:pointer;text-decoration:none}
+.divider{display:flex;align-items:center;margin:25px 0;color:var(--text-light);font-size:13px;position:relative;z-index:1}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#eee,transparent)}
+.divider span{padding:0 15px}
+.social-login{display:flex;gap:15px;justify-content:center;position:relative;z-index:1}
+.social-login a{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:all .3s ease;text-decoration:none}
+.social-login .google{background:#f5f5f5;color:#db4437}
+.social-login .facebook{background:#f5f5f5;color:#4267b2}
+.social-login a:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 5px 20px rgba(0,0,0,.12)}
+
+
+/* ── PAGE HERO ── */
+.page-hero{min-height:50vh;background:linear-gradient(135deg,rgba(44,44,44,.75),rgba(194,74,22,.5)),url('{{ asset("Images/ground.jpeg") }}') center/cover no-repeat fixed;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:var(--white);padding:160px 40px 100px;position:relative}
+.page-hero .breadcrumb{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:20px;color:rgba(255,255,255,.7)}
+.page-hero .breadcrumb a{color:#f0c97a;text-decoration:none;transition:color .3s}
+.page-hero .breadcrumb a:hover{color:var(--white)}
+.page-hero h1{font-size:52px;font-weight:700;color:var(--white);margin-bottom:15px;animation:fadeInUp .8s ease}
+.page-hero h1 span{color:#f0c97a;font-style:italic}
+.page-hero p{font-size:18px;max-width:650px;color:rgba(255,255,255,.9);animation:fadeInUp .8s ease .2s backwards}
+.page-hero .tagline-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:8px 20px;border-radius:50px;font-size:13px;font-style:italic;color:rgba(255,255,255,.95);margin-top:20px;animation:fadeInUp .8s ease .4s backwards;backdrop-filter:blur(8px)}
+
+/* ── SECTION SHARED ── */
+.section-pad{padding:100px 20px 120px;position:relative}
+.section-header{text-align:center;margin-bottom:60px}
+.section-header .subtitle{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--primary-color);font-weight:600;margin-bottom:18px;display:inline-flex;align-items:center;gap:15px;opacity:.8}
+.section-header .subtitle::before,.section-header .subtitle::after{content:"";width:30px;height:1px;background:var(--primary-color);opacity:.4}
+.section-header h2{font-size:42px;margin:0}
+.section-header .section-desc{max-width:600px;margin:20px auto 0;color:var(--text-light);font-size:15px;line-height:1.8}
+
+/* ── OUR STORY ── */
+.story-section{background:var(--bg-peach)}
+.story-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.story-image-wrap{position:relative}
+.story-image-wrap img{width:100%;border-radius:var(--border-radius-lg);box-shadow:var(--shadow-medium)}
+.story-image-wrap .accent-box{position:absolute;bottom:-20px;right:-20px;width:150px;height:150px;border:3px solid var(--primary-color);opacity:.3;border-radius:var(--border-radius-card);z-index:-1}
+.story-content h3{font-size:26px;margin-bottom:16px;color:var(--text-dark)}
+.story-content p{color:var(--text-light);font-size:15px;line-height:1.8;margin-bottom:16px}
+.story-content .founded-badge{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(194,74,22,.08),rgba(194,74,22,.04));border:1px solid rgba(194,74,22,.15);padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;color:var(--primary-color);margin-top:10px}
+.story-content .founded-badge i{color:var(--primary-color);opacity:.7}
+
+/* ── MISSION & VISION ── */
+.mv-section{background:linear-gradient(135deg,#c24a16 0%,#a93e10 100%);padding:80px 20px 100px;position:relative;overflow:hidden}
+.mv-section::before{content:"";position:absolute;inset:0;background:url('{{ asset("Images/B1.png") }}') repeat;background-size:80px auto;opacity:.06}
+.mv-grid{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:40px;position:relative;z-index:1}
+.mv-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--border-radius-card);padding:40px;backdrop-filter:blur(10px);transition:all .3s}
+.mv-card:hover{background:rgba(255,255,255,.15);transform:translateY(-5px)}
+.mv-card .mv-icon{width:55px;height:55px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.mv-card .mv-icon i{font-size:22px;color:var(--white)}
+.mv-card h3{font-family:"Playfair Display",serif;font-size:22px;color:var(--white);margin-bottom:14px;letter-spacing:1px}
+.mv-card p{color:rgba(255,255,255,.88);font-size:14px;line-height:1.8}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SERVICES - 3 top, 2 centered bottom
+══════════════════════════════════════════════════════════════════════════════ */
+.services-section{background:var(--bg-cream)}
+.services-container{max-width:1100px;margin:0 auto}
+.services-row-top{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
+.services-row-bottom{display:flex;justify-content:center;gap:24px}
+.services-row-bottom .service-card{flex:0 1 340px;max-width:340px}
+.service-card{background:var(--white);padding:35px 25px;border-radius:var(--border-radius-card);text-align:center;box-shadow:var(--shadow-soft);transition:all .4s;border:1px solid rgba(194,74,22,.06);position:relative;overflow:hidden}
+.service-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--gradient-primary);transform:scaleX(0);transition:transform .4s}
+.service-card:hover::before{transform:scaleX(1)}
+.service-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-strong)}
+.service-card .s-icon{width:65px;height:65px;background:linear-gradient(135deg,rgba(194,74,22,.08),rgba(194,74,22,.04));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;transition:all .4s}
+.service-card:hover .s-icon{background:var(--gradient-primary);transform:scale(1.1) rotate(8deg)}
+.service-card .s-icon i{font-size:24px;color:var(--primary-color);transition:color .4s}
+.service-card:hover .s-icon i{color:var(--white)}
+.service-card h4{font-size:17px;margin-bottom:10px;color:var(--text-dark)}
+.service-card p{font-size:13px;color:var(--text-light);line-height:1.7}
+.service-card .coming-soon{display:inline-block;margin-top:10px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--primary-color);background:rgba(194,74,22,.08);padding:4px 12px;border-radius:50px;border:1px solid rgba(194,74,22,.2)}
+
+/* ── MEET THE TEAM ── */
+.team-section{background:var(--bg-light-gold);position:relative;overflow:hidden}
+.team-section::before{content:"";position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,rgba(194,74,22,.06),transparent 70%);border-radius:50%;animation:float 12s ease-in-out infinite}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;max-width:1200px;margin:0 auto}
+.team-card{background:var(--white);border-radius:var(--border-radius-card);overflow:hidden;box-shadow:var(--shadow-soft);transition:all .4s ease;border:1px solid rgba(194,74,22,.08);text-align:center}
+.team-card:hover{transform:translateY(-10px);box-shadow:var(--shadow-strong),var(--shadow-glow)}
+.team-card .card-photo-wrap{position:relative;overflow:hidden;height:280px}
+.team-card .card-photo-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.team-card:hover .card-photo-wrap img{transform:scale(1.06)}
+.team-card .card-photo-wrap .role-badge{position:absolute;bottom:15px;left:15px;background:var(--gradient-primary);color:var(--white);padding:6px 16px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.team-card .card-photo-wrap .overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.35) 100%);opacity:0;transition:opacity .4s}
+.team-card:hover .card-photo-wrap .overlay{opacity:1}
+.team-card .card-info{padding:26px 22px}
+.team-card .card-info h3{font-size:20px;margin-bottom:4px;color:var(--text-dark);transition:color .3s}
+.team-card:hover .card-info h3{color:var(--primary-color)}
+.team-card .card-info .position{font-size:13px;color:var(--primary-color);font-weight:600;margin-bottom:12px;display:block}
+.team-card .card-info p{font-size:13px;color:var(--text-light);line-height:1.7;margin-bottom:16px}
+.team-card .card-socials{display:flex;justify-content:center;gap:10px}
+.team-card .card-socials a{width:36px;height:36px;border-radius:50%;background:rgba(194,74,22,.07);color:var(--primary-color);display:flex;align-items:center;justify-content:center;font-size:14px;text-decoration:none;transition:all .3s}
+.team-card .card-socials a:hover{background:var(--gradient-primary);color:var(--white);transform:translateY(-3px)}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   VALUES - 3 top, 2 centered bottom
+══════════════════════════════════════════════════════════════════════════════ */
+.values-section{background:var(--bg-pale-orange)}
+.values-container{max-width:1000px;margin:0 auto}
+.values-row-top{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
+.values-row-bottom{display:flex;justify-content:center;gap:24px}
+.values-row-bottom .value-card{flex:0 1 320px;max-width:320px}
+.value-card{background:var(--white);padding:35px 25px;border-radius:var(--border-radius-card);text-align:center;box-shadow:var(--shadow-soft);transition:all .4s;border:1px solid rgba(194,74,22,.06);position:relative;overflow:hidden}
+.value-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--gradient-primary);transform:scaleX(0);transition:transform .4s}
+.value-card:hover::before{transform:scaleX(1)}
+.value-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-strong)}
+.value-card .v-icon{width:65px;height:65px;background:rgba(194,74,22,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;transition:all .4s}
+.value-card:hover .v-icon{background:var(--gradient-primary);transform:scale(1.1) rotate(10deg)}
+.value-card .v-icon i{font-size:26px;color:var(--primary-color);transition:color .4s}
+.value-card:hover .v-icon i{color:var(--white)}
+.value-card h4{font-size:17px;margin-bottom:10px;color:var(--text-dark)}
+.value-card p{font-size:13px;color:var(--text-light);line-height:1.6}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ROADMAP - TIMELINE STYLE
+══════════════════════════════════════════════════════════════════════════════ */
+.challenges-section{background:var(--bg-ivory)}
+.roadmap-container{max-width:900px;margin:0 auto;position:relative}
+.roadmap-timeline{position:relative;padding:20px 0}
+.roadmap-timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--primary-color),var(--accent-gold));transform:translateX(-50%);border-radius:3px}
+.roadmap-item{display:flex;align-items:center;margin-bottom:40px;position:relative}
+.roadmap-item:last-child{margin-bottom:0}
+.roadmap-item:nth-child(odd){flex-direction:row}
+.roadmap-item:nth-child(even){flex-direction:row-reverse}
+.roadmap-item .roadmap-content{width:calc(50% - 50px);background:var(--white);padding:28px 30px;border-radius:var(--border-radius-card);box-shadow:var(--shadow-soft);border:1px solid rgba(194,74,22,.08);transition:all .4s}
+.roadmap-item:hover .roadmap-content{transform:translateY(-5px);box-shadow:var(--shadow-medium)}
+.roadmap-item:nth-child(odd) .roadmap-content{margin-right:auto;text-align:right}
+.roadmap-item:nth-child(even) .roadmap-content{margin-left:auto;text-align:left}
+.roadmap-item .roadmap-number{position:absolute;left:50%;transform:translateX(-50%);width:50px;height:50px;background:var(--gradient-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:18px;font-weight:700;font-family:"Playfair Display",serif;box-shadow:0 4px 15px rgba(194,74,22,.3);z-index:2;border:4px solid var(--bg-ivory)}
+.roadmap-content h4{font-size:17px;color:var(--text-dark);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.roadmap-item:nth-child(odd) .roadmap-content h4{justify-content:flex-end}
+.roadmap-item:nth-child(even) .roadmap-content h4{justify-content:flex-start}
+.roadmap-content h4 i{color:var(--primary-color);font-size:18px}
+.roadmap-content p{font-size:13px;color:var(--text-light);line-height:1.7;margin:0}
+
+/* ── CTA BANNER ── */
+.cta-banner{background:linear-gradient(135deg,rgba(44,44,44,.85),rgba(194,74,22,.8)),url('{{ asset("Images/ground.jpeg") }}') center/cover no-repeat fixed;padding:100px 20px;text-align:center;color:var(--white);position:relative;overflow:hidden}
+.cta-banner::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(255,255,255,.06),transparent 70%);border-radius:50%;animation:pulse 5s ease-in-out infinite}
+.cta-banner .cta-inner{position:relative;z-index:1;max-width:700px;margin:0 auto}
+.cta-banner h2{font-size:40px;color:var(--white);margin-bottom:15px}
+.cta-banner p{font-size:17px;color:rgba(255,255,255,.9);margin-bottom:35px}
+.cta-banner .btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--white);color:var(--primary-color);padding:16px 44px;border-radius:50px;font-size:16px;font-weight:700;text-decoration:none;transition:all .4s;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.cta-banner .btn-cta:hover{background:#f0c97a;color:var(--white);transform:translateY(-3px) scale(1.05)}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){
+    .navbar{padding:15px 30px}
+    .navbar.scrolled{padding:10px 30px}
+    .story-grid{grid-template-columns:1fr;gap:40px}
+    .mv-grid{grid-template-columns:1fr;gap:24px}
+    .page-hero h1{font-size:40px}
+    .section-header h2{font-size:36px}
+    .services-row-top{grid-template-columns:repeat(2,1fr)}
+    .services-row-bottom{flex-wrap:wrap}
+    .services-row-bottom .service-card{flex:0 1 calc(50% - 12px)}
+    .team-grid{grid-template-columns:repeat(2,1fr)}
+    .values-row-top{grid-template-columns:repeat(2,1fr)}
+    .values-row-bottom{flex-wrap:wrap}
+    .values-row-bottom .value-card{flex:0 1 calc(50% - 12px)}
+}
+@media(max-width:768px){
+    .navbar{padding:12px 20px}
+    .navbar.scrolled{padding:8px 20px}
+    .navbar .logo{font-size:20px}
+    .navbar .logo img{height:45px}
+    .menu-toggle{display:flex}
+    .navbar nav{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:var(--white);box-shadow:-5px 0 30px rgba(0,0,0,.1);transition:right .4s ease;padding:80px 30px 30px;z-index:999}
+    .navbar nav.active{right:0}
+    .navbar ul{flex-direction:column;gap:5px;align-items:stretch}
+    .navbar ul li a{padding:15px 20px;border-radius:10px;font-size:16px}
+    .navbar ul li .signin-btn{margin:20px 0 0 0;text-align:center}
+    .page-hero{padding:140px 20px 80px}
+    .page-hero h1{font-size:32px}
+    .section-pad{padding:70px 20px 90px}
+    .section-header h2{font-size:32px}
+    .services-row-top,.values-row-top{grid-template-columns:1fr}
+    .services-row-bottom,.values-row-bottom{flex-direction:column;align-items:center}
+    .services-row-bottom .service-card,.values-row-bottom .value-card{flex:0 1 100%;max-width:100%;width:100%}
+    .team-grid{grid-template-columns:1fr}
+    .roadmap-timeline::before{left:25px}
+    .roadmap-item,.roadmap-item:nth-child(even){flex-direction:row}
+    .roadmap-item .roadmap-number{left:25px}
+    .roadmap-item .roadmap-content,.roadmap-item:nth-child(odd) .roadmap-content,.roadmap-item:nth-child(even) .roadmap-content{width:calc(100% - 70px);margin-left:70px;margin-right:0;text-align:left}
+    .roadmap-item:nth-child(odd) .roadmap-content h4,.roadmap-item:nth-child(even) .roadmap-content h4{justify-content:flex-start}
+    .cta-banner h2{font-size:30px}
+    .footer-content{text-align:center}
+    .footer-section h4::after{left:50%;transform:translateX(-50%)}
+    .social-icons{justify-content:center}
+    .modal-content{padding:40px 25px;margin:20px}
+}
+@media(max-width:480px){
+    .page-hero h1{font-size:26px}
+    .team-card .card-photo-wrap{height:250px}
+    .roadmap-item .roadmap-number{width:40px;height:40px;font-size:15px}
+    .roadmap-timeline::before{left:20px}
+    .roadmap-item .roadmap-number{left:20px}
+    .roadmap-item .roadmap-content{width:calc(100% - 55px);margin-left:55px}
+}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════════════════════════════════════════ #}
+<header class="navbar" id="navbar">
+    <a href="{{ path('app_landing') }}" class="logo">
+        <img src="{{ asset('Images/WEB.png') }}" alt="Logo"/>
+        <span>La Casa Gaudencia</span>
+    </a>
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    <nav id="navMenu">
+        <ul>
+            <li><a href="{{ path('app_landing') }}#Home">Home</a></li>
+            <li><a href="{{ path('app_about') }}" class="nav-active">About Us</a></li>
+            <li><a href="{{ path('app_landing') }}#experiences">Share Wall</a></li>
+            <li><a href="{{ path('app_landing') }}#services">Services</a></li>
+            <li><a href="{{ path('app_landing') }}#member">Member Benefits</a></li>
+            <li><a href="{{ path('app_contact') }}">Contact Us</a></li>
+            <li><a href="{{ path('app_login') }}" class="signin-btn open-signin">Sign In</a></li>
+        </ul>
+    </nav>
+</header>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   PAGE HERO
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="page-hero">
+    <div class="breadcrumb">
+        <a href="{{ path('app_landing') }}"><i class="fas fa-home"></i> Home</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>About Us</span>
+    </div>
+    <h1>About <span>La Casa Gaudencia</span></h1>
+    <p>Discover the story, the people, and the passion behind every unforgettable stay.</p>
+    <div class="tagline-badge">
+        <i class="fas fa-quote-left" style="font-size:11px;opacity:.7"></i>
+        A House of Joy, Warmth, and Memories
+        <i class="fas fa-quote-right" style="font-size:11px;opacity:.7"></i>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   OUR STORY
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="section-pad story-section">
+    <div class="story-grid">
+        <div class="story-image-wrap">
+            <img src="{{ asset('Images/ground.jpeg') }}" alt="La Casa Gaudencia"/>
+            <div class="accent-box"></div>
+        </div>
+        <div class="story-content">
+            <div class="section-header" style="text-align:left;margin-bottom:0">
+                <p class="subtitle" style="justify-content:flex-start">Our Journey</p>
+                <h2 style="font-size:36px">A Legacy of Warmth</h2>
+            </div>
+            <h3 style="margin-top:20px">More Than a Hotel — A Home for Travelers</h3>
+            <p>La Casa Gaudencia is more than just a boutique hotel and travel service — it is a home for travelers seeking relaxation, joy, warmth, and lasting memories. We offer a unique experience that blends comfort, culture, and culinary discovery.</p>
+            <p>Through our boutique hotel accommodations, personalized travel planning, cultural tours, and local dining experiences, we create an environment where every guest feels embraced, inspired, and connected to their journey.</p>
+            <p>Our name, <strong>"Gaudencia,"</strong> means <strong>"joy"</strong> in Latin — and that is exactly what we strive to bring to every traveler who walks through our doors, whether through the places they visit, the food they enjoy, or the people they meet along the way.</p>
+            <div class="founded-badge">
+                <i class="fas fa-map-marker-alt"></i> Dumaguete City, Negros Oriental, Philippines
+            </div>
+        </div>
+    </div>
+    <div class="wave-divider">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path d="M0,30 Q150,50 300,30 T600,30 T900,30 T1200,30" stroke="#c24a16" stroke-opacity="0.3"/>
+            <path d="M0,35 Q150,55 300,35 T600,35 T900,35 T1200,35" stroke="#d4a853" stroke-opacity="0.5"/>
+        </svg>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   MISSION & VISION
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="mv-section">
+    <div class="mv-grid">
+        <div class="mv-card">
+            <div class="mv-icon"><i class="fas fa-bullseye"></i></div>
+            <h3>Our Mission</h3>
+            <p>To provide travelers with a welcoming home that combines boutique hospitality, personalized travel planning, and cultural experiences through food exploration — creating joy, warmth, and lasting memories.</p>
+        </div>
+        <div class="mv-card">
+            <div class="mv-icon"><i class="fas fa-eye"></i></div>
+            <h3>Our Vision</h3>
+            <p>A world where every journey feels like home — where travelers not only discover places but also collect unforgettable moments of comfort, connection, and culture.</p>
+        </div>
+    </div>
+    <div class="wave-divider">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path d="M0,30 Q150,10 300,30 T600,30 T900,30 T1200,30" stroke="rgba(255,255,255,0.3)"/>
+            <path d="M0,35 Q150,15 300,35 T600,35 T900,35 T1200,35" stroke="rgba(255,255,255,0.5)"/>
+        </svg>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   CORE SERVICES - 3 top + 2 centered
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="section-pad services-section">
+    <div class="section-header">
+        <p class="subtitle">What We Offer</p>
+        <h2>Core Services</h2>
+        <p class="section-desc">Everything you need for a complete, authentic travel experience — all in one place.</p>
+    </div>
+    <div class="services-container">
+        <div class="services-row-top">
+            <div class="service-card">
+                <div class="s-icon"><i class="fas fa-hotel"></i></div>
+                <h4>Boutique Hotel &amp; Hostel</h4>
+                <p>Comfortable and stylish accommodations designed to make every guest feel truly at home.</p>
+            </div>
+            <div class="service-card">
+                <div class="s-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <h4>Cultural &amp; Adventure Tours</h4>
+                <p>Guided experiences ranging from heritage walks through Dumaguete to exciting outdoor adventures.</p>
+            </div>
+            <div class="service-card">
+                <div class="s-icon"><i class="fas fa-route"></i></div>
+                <h4>Personalized Travel Planning</h4>
+                <p>Custom itineraries carefully crafted to match each traveler's unique interests and journey.</p>
+            </div>
+        </div>
+        <div class="services-row-bottom">
+            <div class="service-card">
+                <div class="s-icon"><i class="fas fa-utensils"></i></div>
+                <h4>Local Dining Experiences</h4>
+                <p>Authentic regional dishes curated for an immersive taste of Filipino culture and culinary tradition.</p>
+            </div>
+            <div class="service-card">
+                <div class="s-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h4>Digital Travel &amp; Booking App</h4>
+                <p>Choose experiences, book tours, and create a digital memory journal — all in one platform.</p>
+                <span class="coming-soon">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+    <div class="wave-divider">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path d="M0,30 Q150,50 300,30 T600,30 T900,30 T1200,30" stroke="#c24a16" stroke-opacity="0.25"/>
+            <path d="M0,35 Q150,55 300,35 T600,35 T900,35 T1200,35" stroke="#d4a853" stroke-opacity="0.4"/>
+        </svg>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   MEET THE TEAM
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="section-pad team-section">
+    <div class="section-header">
+        <p class="subtitle">The People Behind the Magic</p>
+        <h2>Meet Our Team</h2>
+        <p class="section-desc">Passionate individuals dedicated to making every stay extraordinary.</p>
+    </div>
+    <div class="team-grid">
+        <div class="team-card">
+            <div class="card-photo-wrap">
+                <img src="{{ asset('Images/Pic_Nes.jpg') }}" alt="Founder and CEO"/>
+                <span class="role-badge">Leadership</span>
+                <div class="overlay"></div>
+            </div>
+            <div class="card-info">
+                <h3>Neshamah Baroro</h3>
+                <span class="position">Founder &amp; CEO</span>
+                <p>Oversees vision, partnerships, and growth strategy. The driving force behind La Casa Gaudencia's mission to bring joy and warmth to every traveler.</p>
+                <div class="card-socials">
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="team-card">
+            <div class="card-photo-wrap">
+                <img src="{{ asset('Images/Pic_Nesha.jpg') }}" alt="Hotel Manager"/>
+                <span class="role-badge">Operations</span>
+                <div class="overlay"></div>
+            </div>
+            <div class="card-info">
+                <h3>Neshamah Baroro</h3>
+                <span class="position">Hotel Manager</span>
+                <p>Supervises hotel operations, guest services, and staff — ensuring every detail from check-in to check-out is seamless and welcoming.</p>
+                <div class="card-socials">
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="team-card">
+            <div class="card-photo-wrap">
+                <img src="{{ asset('Images/Pic_Neshama.png') }}" alt="Tour Coordinator"/>
+                <span class="role-badge">Tours</span>
+                <div class="overlay"></div>
+            </div>
+            <div class="card-info">
+                <h3>Neshamah Baroro</h3>
+                <span class="position">Tour Coordinator</span>
+                <p>Manages tour schedules, guides, and cultural partnerships. A Dumaguete native who curates unforgettable experiences for every guest.</p>
+                <div class="card-socials">
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="team-card">
+            <div class="card-photo-wrap">
+                <img src="{{ asset('Images/Pic_Nesham.jpg') }}" alt="Dining Coordinator"/>
+                <span class="role-badge">Dining</span>
+                <div class="overlay"></div>
+            </div>
+            <div class="card-info">
+                <h3>Neshamah Baroro</h3>
+                <span class="position">Dining Manager</span>
+                <p>Oversees restaurant operations, guest dining experience, and service staff — ensuring every meal is served with quality, efficiency, and exceptional hospitality.</p>
+                <div class="card-socials">
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="team-card">
+            <div class="card-photo-wrap">
+                <img src="{{ asset('Images/Pic_Nesham.png') }}" alt="Marketing and Guest Relations Lead"/>
+                <span class="role-badge">Marketing</span>
+                <div class="overlay"></div>
+            </div>
+            <div class="card-info">
+                <h3>Neshamah Baroro</h3>
+                <span class="position">Marketing &amp; Guest Relations Lead</span>
+                <p>Promotes the brand, handles guest communication, and manages loyalty programs to strengthen our connection with every traveler.</p>
+                <div class="card-socials">
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="team-card">
+            <div class="card-photo-wrap">
+                <img src="{{ asset('Images/Pic_neshamah.png') }}" alt="Finance and Admin Officer"/>
+                <span class="role-badge">Finance</span>
+                <div class="overlay"></div>
+            </div>
+            <div class="card-info">
+                <h3>Neshamah Baroro</h3>
+                <span class="position">Finance &amp; Admin Officer</span>
+                <p>Manages financial transactions, reports, and compliance — ensuring the business runs efficiently and sustainably behind the scenes.</p>
+                <div class="card-socials">
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wave-divider">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path d="M0,30 Q150,50 300,30 T600,30 T900,30 T1200,30" stroke="#c24a16" stroke-opacity="0.25"/>
+            <path d="M0,35 Q150,55 300,35 T600,35 T900,35 T1200,35" stroke="#d4a853" stroke-opacity="0.4"/>
+        </svg>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   CORE VALUES - 3 top + 2 centered
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="section-pad values-section">
+    <div class="section-header">
+        <p class="subtitle">What Drives Us</p>
+        <h2>Our Core Values</h2>
+    </div>
+    <div class="values-container">
+        <div class="values-row-top">
+            <div class="value-card">
+                <div class="v-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                <h4>Genuine Warmth</h4>
+                <p>Every guest is family. We serve with heart, creating a home away from home for every traveler.</p>
+            </div>
+            <div class="value-card">
+                <div class="v-icon"><i class="fas fa-globe-asia"></i></div>
+                <h4>Cultural Authenticity</h4>
+                <p>We celebrate and share the rich culture of Dumaguete through authentic dining and meaningful experiences.</p>
+            </div>
+            <div class="value-card">
+                <div class="v-icon"><i class="fas fa-gem"></i></div>
+                <h4>Timeless Elegance</h4>
+                <p>Boutique comfort with attention to every aesthetic detail, from our spaces to our service.</p>
+            </div>
+        </div>
+        <div class="values-row-bottom">
+            <div class="value-card">
+                <div class="v-icon"><i class="fas fa-user-cog"></i></div>
+                <h4>Personalization</h4>
+                <p>No two journeys are the same — we tailor itineraries, dining, and experiences to every traveler.</p>
+            </div>
+            <div class="value-card">
+                <div class="v-icon"><i class="fas fa-leaf"></i></div>
+                <h4>Sustainability</h4>
+                <p>Committed to eco-friendly practices and supporting local communities in Negros Oriental.</p>
+            </div>
+        </div>
+    </div>
+    <div class="wave-divider">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path d="M0,30 Q150,50 300,30 T600,30 T900,30 T1200,30" stroke="#c24a16" stroke-opacity="0.25"/>
+            <path d="M0,35 Q150,55 300,35 T600,35 T900,35 T1200,35" stroke="#d4a853" stroke-opacity="0.4"/>
+        </svg>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   GROWTH ROADMAP - TIMELINE STYLE
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="section-pad challenges-section">
+    <div class="section-header">
+        <p class="subtitle">Where We Are Headed</p>
+        <h2>Our Growth Roadmap</h2>
+        <p class="section-desc">To better serve our guests, we are actively developing solutions to these operational opportunities.</p>
+    </div>
+    <div class="roadmap-container">
+        <div class="roadmap-timeline">
+            <div class="roadmap-item">
+                <div class="roadmap-content">
+                    <h4><i class="fas fa-laptop-code"></i> Unified Digital Platform</h4>
+                    <p>Building an integrated system for hotel bookings, tour scheduling, dining reservations, and payments — all in one place.</p>
+                </div>
+                <div class="roadmap-number">1</div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-content">
+                    <h4><i class="fas fa-sync-alt"></i> Real-Time Coordination</h4>
+                    <p>Developing tools to track room availability, tour slots, and staff assignments in real time for smoother operations.</p>
+                </div>
+                <div class="roadmap-number">2</div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-content">
+                    <h4><i class="fas fa-magic"></i> Personalized Digital Experiences</h4>
+                    <p>Investing in technology to deliver customized guest experiences that go beyond traditional hospitality.</p>
+                </div>
+                <div class="roadmap-number">3</div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-content">
+                    <h4><i class="fas fa-globe"></i> Global Outreach</h4>
+                    <p>Strengthening our online presence and analytics to attract and engage international travelers worldwide.</p>
+                </div>
+                <div class="roadmap-number">4</div>
+            </div>
+            <div class="roadmap-item">
+                <div class="roadmap-content">
+                    <h4><i class="fas fa-cogs"></i> Smart Resource Management</h4>
+                    <p>Automating inventory, tour slots, and seasonal package tracking to eliminate manual inefficiencies.</p>
+                </div>
+                <div class="roadmap-number">5</div>
+            </div>
+        </div>
+    </div>
+    <div class="wave-divider">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+            <path d="M0,30 Q150,50 300,30 T600,30 T900,30 T1200,30" stroke="#c24a16" stroke-opacity="0.25"/>
+            <path d="M0,35 Q150,55 300,35 T600,35 T900,35 T1200,35" stroke="#d4a853" stroke-opacity="0.4"/>
+        </svg>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   CTA
+══════════════════════════════════════════════════════════════════════════════ #}
+<section class="cta-banner">
+    <div class="cta-inner">
+        <h2>Ready to Experience La Casa?</h2>
+        <p>Let us welcome you with open arms and create memories that last a lifetime.</p>
+        <a href="{{ path('app_contact') }}" class="btn-cta">
+            <i class="fas fa-paper-plane"></i> Get In Touch
+        </a>
+    </div>
+</section>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════════════════════════════ #}
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>La Casa Gaudencia</h4>
+            <p>A boutique hospitality experience celebrating Filipino warmth, culture, and meaningful travel in the heart of Dumaguete City.</p>
+            <div class="social-icons">
+                <a href="{{ path('app_contact')}}" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="{{ path('app_contact') }}" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="{{ path('app_contact') }}" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                <a href="{{ path('app_contact') }}" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{{ path('app_landing') }}#Home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                <li><a href="{{ path('app_about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                <li><a href="{{ path('app_landing') }}#experiences"><i class="fas fa-chevron-right"></i> Share Wall</a></li>
+                <li><a href="{{ path('app_landing') }}#services"><i class="fas fa-chevron-right"></i> Services</a></li>
+                <li><a href="{{ path('app_contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                <li><a href="{{ path('app_landing') }}#member"><i class="fas fa-chevron-right"></i> Member Benefits</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Contact Us</h4>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>Here and There Building,<br>Dumaguete City, Negros Oriental,<br>Philippines</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <p>@lacasagaudencia.ph</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <p>+63 917 234 5678</p>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-globe"></i>
+                <p>www.lacasagaudencia.ph <span style="font-size:12px;opacity:.7">(coming soon)</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 La Casa Gaudencia. All rights reserved. Crafted with <i class="fas fa-heart" style="color:rgba(255,255,255,.7)"></i> in the Philippines.</p>
+    </div>
+</footer>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   JAVASCRIPT
+══════════════════════════════════════════════════════════════════════════════ #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var navbar = document.getElementById('navbar'),
+        menuToggle = document.getElementById('menuToggle'),
+        navMenu = document.getElementById('navMenu');
+
+    /* ── Navbar scroll effect ── */
+    window.addEventListener('scroll', function () {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ── Mobile menu toggle ── */
+    menuToggle.addEventListener('click', function () {
+        navMenu.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+    });
+    
+    document.querySelectorAll('.navbar ul li a').forEach(function (l) {
+        l.addEventListener('click', function () {
+            navMenu.classList.remove('active');
+            menuToggle.classList.remove('active');
+        });
+    });
+
+    /* ── Scroll-in animation for cards ── */
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry, i) {
+            if (entry.isIntersecting) {
+                setTimeout(function () {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, i * 80);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.team-card, .value-card, .service-card, .roadmap-item, .mv-card, .story-grid > div').forEach(function (el, i) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity .6s ease ' + (i * 0.08) + 's, transform .6s ease ' + (i * 0.08) + 's';
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}

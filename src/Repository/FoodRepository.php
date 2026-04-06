@@ -40,4 +40,47 @@ class FoodRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Find minimum food price for active items
+     */
+    public function findMinPrice(): ?float
+    {
+        $qb = $this->createQueryBuilder('f');
+        
+        $result = $qb->select('MIN(f.price) as minPrice')
+            ->where('f.status = :status')
+            ->setParameter('status', 'Available')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result['minPrice'] ? (float) $result['minPrice'] : null;
+    }
+
+    /**
+     * Find available food items for landing page
+     */
+    public function findForLandingPage(int $limit = 4): array
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.status = :status')
+            ->setParameter('status', 'Available')
+            ->orderBy('f.price', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Count total active food items
+     */
+    public function countActiveFoodItems(): int
+    {
+        return (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('f.status = :status')
+            ->setParameter('status', 'Available')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

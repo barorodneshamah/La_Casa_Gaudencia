@@ -2,17 +2,61 @@
 
 namespace App\Controller;
 
+use App\Repository\RoomRepository;
+use App\Repository\TourRepository;
+use App\Repository\FoodRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
-final class LandingController extends AbstractController
+class LandingController extends AbstractController
 {
+    public function __construct(
+        private RoomRepository $roomRepo,
+        private TourRepository $tourRepo,
+        private FoodRepository $foodRepo
+    ) {}
+
     #[Route('/landing', name: 'app_landing')]
     public function index(): Response
     {
+        // Get minimum prices from database
+        $minRoomPrice = $this->roomRepo->findMinPrice();
+        $minTourPrice = $this->tourRepo->findMinPrice();
+        $minFoodPrice = $this->foodRepo->findMinPrice();
+
+        // Get total counts for dynamic badges
+        $totalRooms = $this->roomRepo->countActiveRooms();
+        $totalTours = $this->tourRepo->countActiveTours();
+        $totalFoodItems = $this->foodRepo->countActiveFoodItems();
+
+        // Get sample data for reference and display
+        $featuredRooms = $this->roomRepo->findForLandingPage(3);
+        $featuredTours = $this->tourRepo->findForLandingPage(3);
+        $featuredFoodItems = $this->foodRepo->findForLandingPage(3);
+
         return $this->render('landing/index.html.twig', [
-            'controller_name' => 'LandingController',
+            'minRoomPrice' => $minRoomPrice,
+            'minTourPrice' => $minTourPrice,
+            'minFoodPrice' => $minFoodPrice,
+            'totalRooms' => $totalRooms,
+            'totalTours' => $totalTours,
+            'totalFoodItems' => $totalFoodItems,
+            'featuredRooms' => $featuredRooms,
+            'featuredTours' => $featuredTours,
+            'featuredFoodItems' => $featuredFoodItems,
         ]);
+    }
+
+    #[Route('/about', name: 'app_about')]
+    public function about(): Response
+    {
+        return $this->render('about/index.html.twig');
+    }
+
+    #[Route('/contact', name: 'app_contact')]
+    public function contact(): Response
+    {
+        return $this->render('contact/index.html.twig');
     }
 }

@@ -1,0 +1,76 @@
+<section class="contact" id="contact">
+    <div class="section-header">
+        <p class="subtitle">Get In Touch</p>
+        <h2>Contact Us</h2>
+        <p class="section-desc">Let us help plan your perfect getaway.</p>
+    </div>
+
+    <div class="contact-container">
+        <div class="contact-info">
+            <div class="contact-info-header">
+                <h3>Let's Start a Conversation</h3>
+                <p>Whether you have a question about accommodations, tours, pricing, or dining, our team is ready to answer.</p>
+            </div>
+            <div class="contact-details">
+                <div class="contact-item">
+                    <div class="icon-box"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="contact-item-content">
+                        <h4>Our Location</h4>
+                        <p>Here and There Building,<br>Dumaguete City, Negros Oriental<br>Philippines 6200</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon-box"><i class="fas fa-phone-alt"></i></div>
+                    <div class="contact-item-content">
+                        <h4>Phone Number</h4>
+                        <a href="tel:+639125786789">+63 912 578 6789</a>
+                        <a href="tel:+63352258899">+63 35 225 8899 (Landline)</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon-box"><i class="fas fa-envelope"></i></div>
+                    <div class="contact-item-content">
+                        <h4>Email Address</h4>
+                        <a href="mailto:lacasagaudencia@gmail.com">lacasagaudencia@gmail.com</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="icon-box"><i class="fas fa-clock"></i></div>
+                    <div class="contact-item-content">
+                        <h4>Business Hours</h4>
+                        <p>Mon – Sun: 8:00 AM – 10:00 PM</p>
+                        <p>Front Desk: 24/7</p>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-social">
+                <h4>Connect With Us</h4>
+                <div class="contact-social-icons">
+                    <a href="{{ path('app_contact')}}" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="{{ path('app_contact') }}" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ path('app_contact') }}" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="{{ path('app_contact') }}" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="{{ path('app_contact') }}" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-map">
+            <h3>Find Us Here</h3>
+            <div class="map-wrapper">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31548.09827386!2d123.2915!3d9.3068!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33ab6f9a4f4c4c4d%3A0x4c4c4c4c4c4c4c4c!2sDumaguete%2C%20Negros%20Oriental!5e0!3m2!1sen!2sph!4v1234567890" allowfullscreen="" loading="lazy"></iframe>
+                <div class="map-overlay-card">
+                    <h4><i class="fas fa-home"></i> La Casa Gaudencia</h4>
+                    <p>Here and There Building, Dumaguete City, Philippines 6200</p>
+                    <a href="https://maps.google.com" target="_blank" class="directions-btn"><i class="fas fa-directions"></i> Get Directions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align:center;margin-top:50px;position:relative;z-index:2;">
+        <a href="{{ path('app_contact') }}" style="display:inline-flex;align-items:center;gap:10px;background:var(--gradient-primary);color:#fff;padding:16px 38px;border-radius:50px;text-decoration:none;font-size:15px;font-weight:600;box-shadow:0 8px 30px rgba(194,74,22,.35);transition:all .4s ease;">
+            <i class="fas fa-paper-plane"></i> Send Us a Message
+        </a>
+    </div>
+</section>

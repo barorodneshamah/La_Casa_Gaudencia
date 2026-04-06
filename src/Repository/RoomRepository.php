@@ -40,4 +40,47 @@ class RoomRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Find minimum room price for active rooms
+     */
+    public function findMinPrice(): ?float
+    {
+        $qb = $this->createQueryBuilder('r');
+        
+        $result = $qb->select('MIN(r.pricePerNight) as minPrice')
+            ->where('r.status = :status')
+            ->setParameter('status', 'Available')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result['minPrice'] ? (float) $result['minPrice'] : null;
+    }
+
+    /**
+     * Find available rooms for landing page (limit to tease)
+     */
+    public function findForLandingPage(int $limit = 4): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.status = :status')
+            ->setParameter('status', 'Available')
+            ->orderBy('r.pricePerNight', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Count total active rooms
+     */
+    public function countActiveRooms(): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->where('r.status = :status')
+            ->setParameter('status', 'Available')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

@@ -1,0 +1,20 @@
+<header class="navbar" id="navbar">
+    <a href="{{ path('app_landing') }}" class="logo">
+        <img src="{{ asset('Images/WEB.png') }}" alt="La Casa Gaudencia Logo" />
+        <span>La Casa Gaudencia</span>
+    </a>
+    <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span>
+    </div>
+    <nav id="navMenu">
+        <ul>
+            <li><a href="{{ path('app_landing') }}#Home">Home</a></li>
+            <li><a href="{{ path('app_about') }}">About Us</a></li>
+            <li><a href="{{ path('app_landing') }}#experiences">Share Wall</a></li>
+            <li><a href="{{ path('app_landing') }}#services">Services</a></li>
+            <li><a href="{{ path('app_landing') }}#member">Member Benefits</a></li>
+            <li><a href="{{ path('app_contact') }}">Contact Us</a></li>
+            <li><a href="{{ path('app_login') }}" class="signin-btn open-signin">Sign In</a></li>
+        </ul>
+    </nav>
+</header>

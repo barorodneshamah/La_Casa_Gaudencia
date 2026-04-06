@@ -1,0 +1,333 @@
+<section class="services" id="services">
+
+    <!-- Decorative Elements -->
+    <div class="ambient-shape ambient-shape-1"></div>
+    <div class="ambient-shape ambient-shape-2"></div>
+    <div class="corner-accent corner-accent-1"></div>
+    <div class="corner-accent corner-accent-2"></div>
+
+    <!-- Section Header -->
+    <div class="section-header">
+        <p class="subtitle">What We Offer</p>
+        <h2>Our Services</h2>
+        <p class="section-desc">
+            Experience a range of thoughtfully curated services designed to make
+            your stay unforgettable.
+        </p>
+    </div>
+
+    <!-- Service Cards -->
+    <div class="service-carousel-wrapper">
+        <div class="service-grid">
+
+            <!-- Service Card 1: Accommodations -->
+            <div class="service-card" data-service="accommodations">
+                <div class="card-shimmer"></div>
+                <div class="service-badge">{{ totalRooms }} Rooms</div>
+
+                <div class="service-card-header">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <h3>Boutique Accommodations</h3>
+                </div>
+
+                <div class="service-card-body">
+                    <p>Stylish, comfortable rooms designed for every type of traveler—from solo adventurers to families.</p>
+
+                    <div class="service-features">
+                        <span class="feature-pill"><i class="fas fa-wifi"></i> Free WiFi</span>
+                        <span class="feature-pill"><i class="fas fa-coffee"></i> Breakfast</span>
+                        <span class="feature-pill"><i class="fas fa-snowflake"></i> AC</span>
+                        <span class="feature-pill"><i class="fas fa-tv"></i> Smart TV</span>
+                        <span class="feature-pill"><i class="fas fa-swimmer"></i> Pool Access</span>
+                    </div>
+                </div>
+
+                <div class="service-card-footer">
+                    <div class="service-pricing">
+                        <div class="price-label">Starting at</div>
+                        <div class="price-amount" data-price="room">₱{{ minRoomPrice|number_format(0, '.', ',') }}</div>
+                        <div class="price-unit">per night</div>
+                    </div>
+                    <button type="button" class="service-cta-btn modern-btn" data-service-view="accommodations">
+                        <span>View Rooms</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service Card 2: Tours -->
+            <div class="service-card" data-service="tours">
+                <div class="card-shimmer"></div>
+                <div class="service-badge badge-popular">{{ totalTours }} Tours</div>
+
+                <div class="service-card-header">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-hiking"></i>
+                    </div>
+                    <h3>Cultural & Adventure Tours</h3>
+                </div>
+
+                <div class="service-card-body">
+                    <p>Heritage walks, authentic local cuisine experiences, and thrilling outdoor adventures await you.</p>
+
+                    <div class="service-features">
+                        <span class="feature-pill"><i class="fas fa-users"></i> Small Groups</span>
+                        <span class="feature-pill"><i class="fas fa-utensils"></i> Meals Inc.</span>
+                        <span class="feature-pill"><i class="fas fa-camera"></i> Photo Ops</span>
+                        <span class="feature-pill"><i class="fas fa-headset"></i> Expert Guides</span>
+                    </div>
+                </div>
+
+                <div class="service-card-footer">
+                    <div class="service-pricing">
+                        <div class="price-label">Starting at</div>
+                        <div class="price-amount" data-price="tour">₱{{ minTourPrice|number_format(0, '.', ',') }}</div>
+                        <div class="price-unit">per person</div>
+                    </div>
+                    <button type="button" class="service-cta-btn modern-btn" data-service-view="tours">
+                        <span>View Tours</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service Card 3: Dining -->
+            <div class="service-card" data-service="dining">
+                <div class="card-shimmer"></div>
+                <div class="service-badge">{{ totalFoodItems }} Dishes</div>
+
+                <div class="service-card-header">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Dining Experience</h3>
+                </div>
+
+                <div class="service-card-body">
+                    <p>Savor authentic Filipino cuisine with fresh local ingredients and traditional cooking methods.</p>
+
+                    <div class="service-features">
+                        <span class="feature-pill"><i class="fas fa-leaf"></i> Fresh Local</span>
+                        <span class="feature-pill"><i class="fas fa-clock"></i> Daily Specials</span>
+                        <span class="feature-pill"><i class="fas fa-glass-cheers"></i> Beverages</span>
+                        <span class="feature-pill"><i class="fas fa-users"></i> Group Dining</span>
+                    </div>
+                </div>
+
+                <div class="service-card-footer">
+                    <div class="service-pricing">
+                        <div class="price-label">Starting at</div>
+                        <div class="price-amount" data-price="food">₱{{ minFoodPrice|number_format(0, '.', ',') }}</div>
+                        <div class="price-unit">per meal</div>
+                    </div>
+                    <button type="button" class="service-cta-btn modern-btn" data-service-view="dining">
+                        <span>View Menu</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service Card 4: Custom Itinerary -->
+            <div class="service-card" data-service="planning">
+                <div class="card-shimmer"></div>
+                <div class="service-badge badge-new">Custom</div>
+
+                <div class="service-card-header">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3>Custom Itinerary</h3>
+                </div>
+
+                <div class="service-card-body">
+                    <p>Create a travel plan with expert help, tailored to your schedule and interests.</p>
+
+                    <div class="service-features">
+                        <span class="feature-pill"><i class="fas fa-route"></i> Personalized</span>
+                        <span class="feature-pill"><i class="fas fa-users"></i> Group Ready</span>
+                        <span class="feature-pill"><i class="fas fa-clock"></i> Flexible</span>
+                        <span class="feature-pill"><i class="fas fa-star"></i> Premium Care</span>
+                    </div>
+                </div>
+
+                <div class="service-card-footer">
+                    <div class="service-pricing">
+                        <div class="price-label">Membership</div>
+                        <div class="price-amount">Free</div>
+                        <div class="price-unit">forever</div>
+                    </div>
+                    <button type="button" class="service-cta-btn modern-btn" data-service-view="planning">
+                        <span>Plan It</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Service Card 5: Share Wall -->
+            <div class="service-card" data-service="sharewall">
+                <div class="card-shimmer"></div>
+                <div class="service-badge badge-new">Community</div>
+
+                <div class="service-card-header">
+                    <div class="service-icon-wrapper">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <h3>Share Wall Experience</h3>
+                </div>
+
+                <div class="service-card-body">
+                    <p>A digital memory journal where guests share travel photos and stories with our community.</p>
+
+                    <div class="service-features">
+                        <span class="feature-pill"><i class="fas fa-heart"></i> 2.4k Likes</span>
+                        <span class="feature-pill"><i class="fas fa-images"></i> 856 Posts</span>
+                        <span class="feature-pill"><i class="fas fa-gift"></i> Free</span>
+                    </div>
+                </div>
+
+                <div class="service-card-footer">
+                    <div class="service-pricing">
+                        <div class="price-label">Membership</div>
+                        <div class="price-amount">Free</div>
+                        <div class="price-unit">forever</div>
+                    </div>
+                    <button type="button" class="service-cta-btn modern-btn" data-service-view="sharewall">
+                        <span>View Wall</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<!-- Service Preview Modals -->
+<!-- Accommodations Modal -->
+<div id="serviceModal-accommodations" class="service-modal">
+    <div class="service-modal-content">
+        <div class="service-modal-header">
+            <button class="service-modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-bed"></i>
+            </div>
+            <h2>Available Rooms</h2>
+            <p>Discover our comfortable accommodations</p>
+        </div>
+        
+        <div class="service-modal-body">
+            <div class="service-modal-notice">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <p>You're viewing a preview of our rooms. <strong>Sign in to unlock all options and member-only discounts!</strong></p>
+                </div>
+            </div>
+            
+            <div id="rooms-grid" class="service-cards-grid">
+                <!-- Cards will be loaded here -->
+            </div>
+            
+            <div class="service-modal-footer">
+                <div class="modal-footer-content">
+                    <div class="signup-prompt">
+                        <h3>Ready to Book Your Stay?</h3>
+                        <p>Create an account to access all rooms, exclusive member pricing, and special offers.</p>
+                    </div>
+                    <a href="{{ path('app_register') }}" class="create-account-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tours Modal -->
+<div id="serviceModal-tours" class="service-modal">
+    <div class="service-modal-content">
+        <div class="service-modal-header">
+            <button class="service-modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-hiking"></i>
+            </div>
+            <h2>Available Tours</h2>
+            <p>Explore our cultural and adventure experiences</p>
+        </div>
+        
+        <div class="service-modal-body">
+            <div class="service-modal-notice">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <p>You're viewing a preview of our tours. <strong>Sign in to unlock all options and member-only discounts!</strong></p>
+                </div>
+            </div>
+            
+            <div id="tours-grid" class="service-cards-grid">
+                <!-- Cards will be loaded here -->
+            </div>
+            
+            <div class="service-modal-footer">
+                <div class="modal-footer-content">
+                    <div class="signup-prompt">
+                        <h3>Ready for Adventure?</h3>
+                        <p>Create an account to access all tours, exclusive member pricing, and special offers.</p>
+                    </div>
+                    <a href="{{ path('app_register') }}" class="create-account-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dining Modal -->
+<div id="serviceModal-dining" class="service-modal">
+    <div class="service-modal-content">
+        <div class="service-modal-header">
+            <button class="service-modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <h2>Our Menu</h2>
+            <p>Savor authentic Filipino cuisine</p>
+        </div>
+        
+        <div class="service-modal-body">
+            <div class="service-modal-notice">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <p>You're viewing a preview of our menu. <strong>Sign in to unlock all options and member-only discounts!</strong></p>
+                </div>
+            </div>
+            
+            <div id="food-grid" class="service-cards-grid">
+                <!-- Cards will be loaded here -->
+            </div>
+            
+            <div class="service-modal-footer">
+                <div class="modal-footer-content">
+                    <div class="signup-prompt">
+                        <h3>Ready to Dine?</h3>
+                        <p>Create an account to access our full menu, exclusive member pricing, and special offers.</p>
+                    </div>
+                    <a href="{{ path('app_register') }}" class="create-account-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
