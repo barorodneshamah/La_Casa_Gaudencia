@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ContactMessageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,6 +46,15 @@ class ContactMessage
 
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
+
+    #[ORM\OneToMany(mappedBy: 'contactMessage', targetEntity: ContactReply::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['createdAt' => 'ASC'])]
+    private Collection $replies;
+
+    public function __construct()
+    {
+        $this->replies = new ArrayCollection();
+    }
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -172,5 +183,29 @@ class ContactMessage
             $this->status = 'read';
             $this->readAt = new \DateTimeImmutable();
         }
+    }
+
+    public function getReplies(): Collection
+    {
+        return $this->replies;
+    }
+
+    public function addReply(ContactReply $reply): static
+    {
+        if (!$this->replies->contains($reply)) {
+            $this->replies->add($reply);
+            $reply->setContactMessage($this);
+        }
+        return $this;
+    }
+
+    public function removeReply(ContactReply $reply): static
+    {
+        if ($this->replies->removeElement($reply)) {
+            if ($reply->getContactMessage() === $this) {
+                $reply->setContactMessage(null);
+            }
+        }
+        return $this;
     }
 }

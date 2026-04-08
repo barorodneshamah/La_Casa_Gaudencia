@@ -4,10 +4,7 @@ framework:
 
     # Trust ngrok / reverse proxy
     trusted_proxies: '127.0.0.1,REMOTE_ADDR'
-    trusted_headers:
-        - x-forwarded-for
-        - x-forwarded-proto
-        - x-forwarded-port
+    trusted_headers: [ 'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
 
     # Enable CSRF protection
     csrf_protection: true

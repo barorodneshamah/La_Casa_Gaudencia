@@ -2099,4 +2099,331 @@ footer::after{content:"";position:absolute;top:-100px;right:-100px;width:400px;h
         font-size: 13px;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FIXES: SERVICE CARD FOOTER & BUTTON OVERFLOW
+   (Overrides the original footer/button declarations above)
+═══════════════════════════════════════════════════════════════ */
+
+/* Fix card footer — align pricing & button on same baseline */
+.service-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+/* Fix pricing stack — always vertical, no wrapping */
+.service-pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.service-pricing .price-label {
+    white-space: nowrap;
+}
+
+.service-pricing .price-amount {
+    white-space: nowrap;
+    font-size: 22px;
+}
+
+.service-pricing .price-unit {
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+/* Fix CTA button — shrinks to fit, text never wraps, arrow never falls off */
+.service-cta-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 10px 14px;
+    font-size: 11.5px;
+    gap: 5px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.service-cta-btn span {
+    white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEW: PLANNING MODAL CARD IMAGES
+═══════════════════════════════════════════════════════════════ */
+
+.planning-card-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.planning-card-img--weekend {
+    background: linear-gradient(135deg, #c24a16 0%, #e85d2a 60%, #d4a853 100%);
+}
+
+.planning-card-img--island {
+    background: linear-gradient(135deg, #27ae60 0%, #1abc9c 100%);
+}
+
+.planning-card-img--luxury {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+}
+
+.planning-icon-wrap {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.planning-icon-wrap i {
+    font-size: 30px;
+    color: #fff;
+}
+
+.card-badge--popular {
+    background: linear-gradient(135deg, var(--accent-gold), #f0c97a);
+    color: #5a3500;
+}
+
+.planning-free-label {
+    color: var(--primary-color);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEW: SHARE WALL MODAL — STATS & CTA BOX
+═══════════════════════════════════════════════════════════════ */
+
+.sharewall-modal-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.sharewall-modal-stat {
+    background: linear-gradient(135deg, rgba(194, 74, 22, .05), rgba(212, 168, 83, .07));
+    border: 1px solid rgba(194, 74, 22, .1);
+    border-radius: 16px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: all .3s ease;
+}
+
+.sharewall-modal-stat:hover {
+    transform: translateY(-3px);
+    border-color: rgba(194, 74, 22, .22);
+    box-shadow: var(--shadow-soft);
+}
+
+.sharewall-modal-stat > i {
+    font-size: 26px;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.sharewall-modal-stat:nth-child(1) > i { color: #e74c3c; }
+.sharewall-modal-stat:nth-child(2) > i { color: #3498db; }
+.sharewall-modal-stat:nth-child(3) > i { color: #27ae60; }
+.sharewall-modal-stat:nth-child(4) > i { color: var(--primary-color); }
+
+.sharewall-modal-stat-num {
+    display: block;
+    font-family: "Playfair Display", serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.sharewall-modal-stat-lbl {
+    display: block;
+    font-size: 12px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.sharewall-modal-cta-box {
+    background: linear-gradient(135deg, rgba(194, 74, 22, .04), rgba(212, 168, 83, .06));
+    border: 1.5px dashed rgba(194, 74, 22, .2);
+    border-radius: 20px;
+    padding: 30px 24px;
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.sharewall-modal-cta-icon {
+    font-size: 36px;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 14px;
+}
+
+.sharewall-modal-cta-box h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 20px;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.sharewall-modal-cta-box p {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEW: SERVICE MODAL — DISPLAY FIX
+   (The original used display:none / .show = display:block which
+    causes the modal to not center. Override with flex centering.)
+═══════════════════════════════════════════════════════════════ */
+
+.service-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.78);
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* use flex so content is truly centered */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.service-modal.show {
+    display: flex;
+}
+
+.service-modal-content {
+    position: static;             /* override the original absolute + translate */
+    transform: none;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: 960px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .28);
+    animation: modalSlideIn .35s cubic-bezier(.34, 1.56, .64, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: scale(.92) translateY(20px); }
+    to   { opacity: 1; transform: scale(1)  translateY(0);     }
+}
+
+/* Enhanced modal header */
+.service-modal-header {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color), #d4703a);
+    padding: 30px 36px 24px;
+    border-radius: 24px 24px 0 0;
+    position: relative;
+    color: #fff;
+    text-align: left;
+}
+
+.service-modal-header h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 26px;
+    color: #fff;
+    margin: 0 0 6px;
+}
+
+.service-modal-header p {
+    color: rgba(255, 255, 255, .8);
+    font-size: 14px;
+    margin: 0;
+}
+
+.service-modal-header .modal-icon {
+    width: 58px;
+    height: 58px;
+    background: rgba(255, 255, 255, .15);
+    border: 1.5px solid rgba(255, 255, 255, .25);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.service-modal-header .modal-icon i {
+    font-size: 24px;
+    color: #fff;
+}
+
+.service-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .3s ease;
+    z-index: 1;
+}
+
+.service-modal-close:hover {
+    background: rgba(255, 255, 255, .3);
+    transform: rotate(90deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEW: SHARE WALL — CARD BUBBLE ANIMATION
+═══════════════════════════════════════════════════════════════ */
+
+@keyframes reviewCardPop {
+    from { opacity: .6; transform: translateY(-14px) scale(.97); }
+    to   { opacity: 1;  transform: translateY(0)    scale(1);    }
+}
+
+.review-card.bubbling {
+    animation: reviewCardPop .5s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* comment input — readonly cursor hint */
+.comment-input-wrap input[readonly] {
+    cursor: pointer;
+    background: rgba(194, 74, 22, .03);
+}
+
+.comment-input-wrap input[readonly]:hover {
+    border-color: rgba(194, 74, 22, .3);
+    background: rgba(194, 74, 22, .06);
+}
+
 </style>

@@ -16,132 +16,136 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api')]
 class ApiRegistrationController extends AbstractController
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private UserPasswordHasherInterface $passwordHasher,
-        private EmailVerificationService $emailVerificationService,
-        private ValidatorInterface $validator
-    ) {}
+public function __construct(
 
-    #[Route('/register', name: 'api_register', methods: ['POST'])]
-    public function register(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
+private EntityManagerInterface $entityManager,
+private UserPasswordHasherInterface $passwordHasher,
+private EmailVerificationService $emailVerificationService,
+private ValidatorInterface $validator
+) {}
 
-        // Validate required fields
-        if (!isset($data['username']) || !isset($data['email']) || !isset($data['password'])) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Username, email, and password are required'
-            ], 400);
-        }
+#[Route('/register', name: 'api_register', methods: ['POST'])]
+public function register(Request $request): JsonResponse
+{
+$data = json_decode($request->getContent(), true);
 
-        // Basic validation
-        if (strlen($data['username']) < 3) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Username must be at least 3 characters long'
-            ], 400);
-        }
+// Validate required fields
+if (!isset($data['username']) || !isset($data['email']) || !isset($data['password'])) {
+return $this->json([
+'success' => false,
+'message' => 'Username, email, and password are required'
+], 400);
+}
 
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid email address'
-            ], 400);
-        }
+// Basic validation
+if (strlen($data['username']) < 3) {
+return $this->json([
+'success' => false,
+'message' => 'Username must be at least 3 characters long'
+], 400);
+}
 
-        if (strlen($data['password']) < 6) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Password must be at least 6 characters long'
-            ], 400);
-        }
+if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+return $this->json([
 
-        // Check if username already exists
-        $existingUser = $this->entityManager
-            ->getRepository(User::class)
-            ->findOneBy(['username' => $data['username']]);
+'success' => false,
+'message' => 'Invalid email address'
+], 400);
+}
 
-        if ($existingUser) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Username already exists'
-            ], 409);
-        }
+if (strlen($data['password']) < 6) {
+return $this->json([
+'success' => false,
+'message' => 'Password must be at least 6 characters long'
+], 400);
+}
 
-        // Check if email already exists
-        $existingEmail = $this->entityManager
-            ->getRepository(User::class)
-            ->findOneBy(['email' => $data['email']]);
+// Check if username already exists
+$existingUser = $this->entityManager
+->getRepository(User::class)
+->findOneBy(['username' => $data['username']]);
 
-        if ($existingEmail) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Email already registered'
-            ], 409);
-        }
+if ($existingUser) {
+return $this->json([
+'success' => false,
+'message' => 'Username already exists'
+], 409);
+}
 
-        // Create new user
-        $user = new User();
-        $user->setUsername($data['username']);
-        $user->setEmail($data['email']);
+// Check if email already exists
+$existingEmail = $this->entityManager
+->getRepository(User::class)
+->findOneBy(['email' => $data['email']]);
 
-        // Hash password
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
-        $user->setPassword($hashedPassword);
+if ($existingEmail) {
+return $this->json([
+'success' => false,
+'message' => 'Email already registered'
+], 409);
+}
 
-        // Set default role
-        $user->setRoles(['ROLE_USER']);
+// Create new user
+$user = new User();
+$user->setUsername($data['username']);
+$user->setEmail($data['email']);
 
-        // Generate verification token
-        $verificationToken = $this->emailVerificationService->generateVerificationToken();
-        $user->setVerificationToken($verificationToken);
-        $user->setIsVerified(false);
+// Hash password
+$hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
+$user->setPassword($hashedPassword);
 
-        // Validate entity
-        $errors = $this->validator->validate($user);
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return $this->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $errorMessages
-            ], 400);
-        }
+// Set default role
+$user->setRoles(['ROLE_USER']);
 
-        // Save user
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+// Generate verification token
+$verificationToken = $this->emailVerificationService->generateVerificationToken();
+$user->setVerificationToken($verificationToken);
+$user->setIsVerified(false);
 
-        // Generate verification URL
-        $verificationUrl = $this->generateUrl(
-            'app_verify_email',
-            ['token' => $verificationToken],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+// Validate entity
+$errors = $this->validator->validate($user);
+if (count($errors) > 0) {
+$errorMessages = [];
+foreach ($errors as $error) {
 
-        // Send verification email
-        try {
-            $this->emailVerificationService->sendVerificationEmail($user, $verificationUrl);
-        } catch (\Exception $e) {
-            // Log error but don't fail registration
-            // User can request resend later
-        }
+$errorMessages[] = $error->getMessage();
+}
+return $this->json([
+'success' => false,
+'message' => 'Validation failed',
+'errors' => $errorMessages
+], 400);
+}
 
-        return $this->json([
-            'success' => true,
-            'message' => 'Registration successful. Please check your email to verify your account.',
-            'user' => [
-                'id' => $user->getId(),
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'isVerified' => $user->isVerified(),
-                'roles' => $user->getRoles()
-            ]
-        ], 201);
-    }
+// Save user
+$this->entityManager->persist($user);
+$this->entityManager->flush();
+
+// Generate verification URL
+$verificationUrl = $this->generateUrl(
+'app_verify_email',
+['token' => $verificationToken],
+UrlGeneratorInterface::ABSOLUTE_URL
+);
+
+// Send verification email
+try {
+$this->emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+} catch (\Exception $e) {
+// Log error but don't fail registration
+// User can request resend later
+}
+
+return $this->json([
+
+'success' => true,
+'message' => 'Registration successful. Please check your email to verify your account.',
+'user' => [
+'id' => $user->getId(),
+'username' => $user->getUsername(),
+'email' => $user->getEmail(),
+'isVerified' => $user->isVerified(),
+'roles' => $user->getRoles()
+]
+], 201);
+}
 }

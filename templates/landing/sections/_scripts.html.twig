@@ -9,19 +9,36 @@ document.addEventListener('DOMContentLoaded', function () {
        SHARE WALL INTERACTIONS
     ══════════════════════════════════════ */
 
+    /* ── helper: bubble card to top of feed ── */
+    function bubbleCardToTop(card) {
+        var feed = document.getElementById('reviewFeed');
+        if (!feed || feed.firstChild === card) return;
+        feed.insertBefore(card, feed.firstChild);
+        card.classList.remove('bubbling');
+        void card.offsetWidth; /* force reflow */
+        card.classList.add('bubbling');
+        setTimeout(function () { card.classList.remove('bubbling'); }, 550);
+    }
+
     /* Like buttons */
     document.querySelectorAll('.like-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
+            /* requires auth — redirect */
+            if (this.getAttribute('data-requires-auth') === 'true') {
+                window.location.href = '{{ path("app_login") }}';
+                return;
+            }
             this.classList.toggle('liked');
             var icon      = this.querySelector('i');
             var countSpan = this.querySelector('span');
             var count     = parseInt(countSpan.textContent);
             if (this.classList.contains('liked')) {
-                icon.className       = 'fas fa-heart';
+                icon.className        = 'fas fa-heart';
                 countSpan.textContent = count + 1;
+                bubbleCardToTop(this.closest('.review-card'));
             } else {
-                icon.className       = 'far fa-heart';
+                icon.className        = 'far fa-heart';
                 countSpan.textContent = count - 1;
             }
         });
@@ -31,10 +48,19 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.comment-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
+            /* requires auth — redirect */
+            if (this.getAttribute('data-requires-auth') === 'true') {
+                window.location.href = '{{ path("app_login") }}';
+                return;
+            }
             this.classList.toggle('active');
             var card     = this.closest('.review-card');
             var comments = card.querySelector('.review-comments');
-            if (comments) comments.classList.toggle('open');
+            if (comments) {
+                var opening = !comments.classList.contains('open');
+                comments.classList.toggle('open');
+                if (opening) bubbleCardToTop(card);
+            }
         });
     });
 
@@ -46,6 +72,10 @@ document.addEventListener('DOMContentLoaded', function () {
             self.classList.add('shared');
             var span       = self.querySelector('span');
             span.textContent = 'Copied!';
+            bubbleCardToTop(self.closest('.review-card'));
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href).catch(function () {});
+            }
             setTimeout(function () {
                 self.classList.remove('shared');
                 span.textContent = 'Share';
@@ -57,9 +87,29 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.bookmark-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
+            /* requires auth — redirect */
+            if (this.getAttribute('data-requires-auth') === 'true') {
+                window.location.href = '{{ path("app_login") }}';
+                return;
+            }
             this.classList.toggle('bookmarked');
             var icon      = this.querySelector('i');
             icon.className = this.classList.contains('bookmarked') ? 'fas fa-bookmark' : 'far fa-bookmark';
+        });
+    });
+
+    /* Comment send buttons — redirect to login */
+    document.querySelectorAll('.send-btn[data-requires-auth="true"]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            window.location.href = '{{ path("app_login") }}';
+        });
+    });
+
+    /* Comment input fields — click redirects to login */
+    document.querySelectorAll('.comment-input-wrap input[readonly]').forEach(function (input) {
+        input.addEventListener('click', function () {
+            window.location.href = '{{ path("app_login") }}';
         });
     });
 
@@ -155,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var statsSection = document.querySelector('.sharewall-stats');
         if (statsSection) statsObserver.observe(statsSection);
-    }cle
+    }
 
     /* ══════════════════════════════════════
        SERVICE MODALS - AJAX Data Loading
@@ -165,26 +215,17 @@ document.addEventListener('DOMContentLoaded', function () {
     let loadedData = {
         accommodations: false,
         tours: false,
-        dining: false
+        dining: false,
+        planning: true,    /* static content, no AJAX needed */
+        sharewall: true    /* static content, no AJAX needed */
     };
 
     function openServiceModal(type) {
-        console.log('Opening modal for type:', type);
-        
-        // Simple test - show alert first
-        alert('Modal triggered for: ' + type);
-        
         var modal = document.getElementById('serviceModal-' + type);
-        console.log('Modal element:', modal);
-        if (!modal) {
-            console.error('Modal not found for type:', type);
-            alert('Modal not found for type: ' + type);
-            return;
-        }
-        
+        if (!modal) return;
+
         serviceModals.forEach(function (m) { m.classList.remove('show'); });
         modal.classList.add('show');
-        console.log('Modal should now be visible');
         document.body.style.overflow = 'hidden';
 
         // Load data if not already loaded

@@ -15,105 +15,109 @@ use Doctrine\ORM\EntityManagerInterface;
 #[Route('/api')]
 class ApiEmailVerificationController extends AbstractController
 {
-    public function __construct(
-        private EmailVerificationService $emailVerificationService,
-        private EntityManagerInterface $entityManager
-    ) {}
+public function __construct(
+private EmailVerificationService $emailVerificationService,
+private EntityManagerInterface $entityManager
+) {}
 
-    /**
-     * Verify email with token
-     */
-    #[Route('/verify-email', name: 'api_verify_email', methods: ['POST'])]
-    public function verifyEmail(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $token = $data['token'] ?? null;
+/**
+* Verify email with token
+*/
+#[Route('/verify-email', name: 'api_verify_email', methods: ['POST'])]
+public function verifyEmail(Request $request): JsonResponse
 
-        if (!$token) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Verification token is required'
-            ], 400);
-        }
+{
+$data = json_decode($request->getContent(), true);
+$token = $data['token'] ?? null;
 
-        $user = $this->emailVerificationService->verifyToken($token);
+if (!$token) {
+return $this->json([
+'success' => false,
+'message' => 'Verification token is required'
+], 400);
+}
 
-        if (!$user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid or expired verification token'
-            ], 400);
-        }
+$user = $this->emailVerificationService->verifyToken($token);
 
-        return $this->json([
-            'success' => true,
-            'message' => 'Email verified successfully',
-            'user' => [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'isVerified' => $user->isVerified()
-            ]
-        ], 200);
-    }
+if (!$user) {
+return $this->json([
+'success' => false,
+'message' => 'Invalid or expired verification token'
+], 400);
+}
 
-    /**
-     * Resend verification email
-     */
-    #[Route('/resend-verification', name: 'api_resend_verification', methods: ['POST'])]
-    public function resendVerification(#[CurrentUser] ?User $user): JsonResponse
-    {
-        if (!$user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Authentication required'
-            ], 401);
-        }
+return $this->json([
+'success' => true,
+'message' => 'Email verified successfully',
+'user' => [
+'id' => $user->getId(),
+'email' => $user->getEmail(),
+'isVerified' => $user->isVerified()
+]
+], 200);
 
-        if ($user->isVerified()) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Email is already verified'
-            ], 400);
-        }
+}
 
-        // Generate new token
-        $verificationToken = $this->emailVerificationService->generateVerificationToken();
-        $user->setVerificationToken($verificationToken);
-        $this->entityManager->flush();
+/**
+* Resend verification email
+*/
+#[Route('/resend-verification', name: 'api_resend_verification', methods: ['POST'])]
+public function resendVerification(#[CurrentUser] ?User $user): JsonResponse
+{
+if (!$user) {
+return $this->json([
+'success' => false,
+'message' => 'Authentication required'
+], 401);
+}
 
-        // Create verification URL (for web verification or deep link)
-        $verificationUrl = $this->generateUrl(
-            'app_verify_email',
-            ['token' => $verificationToken],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+if ($user->isVerified()) {
+return $this->json([
+'success' => false,
+'message' => 'Email is already verified'
+], 400);
+}
 
-        // Send email
-        $this->emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+// Generate new token
+$verificationToken = $this->emailVerificationService->generateVerificationToken();
+$user->setVerificationToken($verificationToken);
+$this->entityManager->flush();
 
-        return $this->json([
-            'success' => true,
-            'message' => 'Verification email sent successfully'
-        ], 200);
-    }
+// Create verification URL (for web verification or deep link)
+$verificationUrl = $this->generateUrl(
 
-    /**
-     * Check verification status
-     */
-    #[Route('/verification-status', name: 'api_verification_status', methods: ['GET'])]
-    public function verificationStatus(#[CurrentUser] ?User $user): JsonResponse
-    {
-        if (!$user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Authentication required'
-            ], 401);
-        }
+'app_verify_email',
+['token' => $verificationToken],
+UrlGeneratorInterface::ABSOLUTE_URL
+);
 
-        return $this->json([
-            'success' => true,
-            'isVerified' => $user->isVerified(),
-            'email' => $user->getEmail()
-        ], 200);
-    }
+// Send email
+$this->emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+
+return $this->json([
+'success' => true,
+'message' => 'Verification email sent successfully'
+], 200);
+}
+
+/**
+* Check verification status
+*/
+#[Route('/verification-status', name: 'api_verification_status', methods: ['GET'])]
+public function verificationStatus(#[CurrentUser] ?User $user): JsonResponse
+{
+if (!$user) {
+return $this->json([
+'success' => false,
+'message' => 'Authentication required'
+], 401);
+}
+
+return $this->json([
+'success' => true,
+
+'isVerified' => $user->isVerified(),
+'email' => $user->getEmail()
+], 200);
+}
 }

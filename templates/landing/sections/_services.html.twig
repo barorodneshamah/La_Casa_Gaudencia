@@ -205,8 +205,11 @@
 
 </section>
 
-<!-- Service Preview Modals -->
-<!-- Accommodations Modal -->
+{# ═══════════════════════════════════════════════════════════
+   SERVICE PREVIEW MODALS
+═══════════════════════════════════════════════════════════ #}
+
+{# ── Accommodations Modal ── #}
 <div id="serviceModal-accommodations" class="service-modal">
     <div class="service-modal-content">
         <div class="service-modal-header">
@@ -219,7 +222,7 @@
             <h2>Available Rooms</h2>
             <p>Discover our comfortable accommodations</p>
         </div>
-        
+
         <div class="service-modal-body">
             <div class="service-modal-notice">
                 <i class="fas fa-info-circle"></i>
@@ -227,11 +230,11 @@
                     <p>You're viewing a preview of our rooms. <strong>Sign in to unlock all options and member-only discounts!</strong></p>
                 </div>
             </div>
-            
+
             <div id="rooms-grid" class="service-cards-grid">
-                <!-- Cards will be loaded here -->
+                {# Cards loaded via JS / API #}
             </div>
-            
+
             <div class="service-modal-footer">
                 <div class="modal-footer-content">
                     <div class="signup-prompt">
@@ -248,7 +251,7 @@
     </div>
 </div>
 
-<!-- Tours Modal -->
+{# ── Tours Modal ── #}
 <div id="serviceModal-tours" class="service-modal">
     <div class="service-modal-content">
         <div class="service-modal-header">
@@ -261,7 +264,7 @@
             <h2>Available Tours</h2>
             <p>Explore our cultural and adventure experiences</p>
         </div>
-        
+
         <div class="service-modal-body">
             <div class="service-modal-notice">
                 <i class="fas fa-info-circle"></i>
@@ -269,11 +272,11 @@
                     <p>You're viewing a preview of our tours. <strong>Sign in to unlock all options and member-only discounts!</strong></p>
                 </div>
             </div>
-            
+
             <div id="tours-grid" class="service-cards-grid">
-                <!-- Cards will be loaded here -->
+                {# Cards loaded via JS / API #}
             </div>
-            
+
             <div class="service-modal-footer">
                 <div class="modal-footer-content">
                     <div class="signup-prompt">
@@ -290,7 +293,7 @@
     </div>
 </div>
 
-<!-- Dining Modal -->
+{# ── Dining Modal ── #}
 <div id="serviceModal-dining" class="service-modal">
     <div class="service-modal-content">
         <div class="service-modal-header">
@@ -303,7 +306,7 @@
             <h2>Our Menu</h2>
             <p>Savor authentic Filipino cuisine</p>
         </div>
-        
+
         <div class="service-modal-body">
             <div class="service-modal-notice">
                 <i class="fas fa-info-circle"></i>
@@ -311,16 +314,216 @@
                     <p>You're viewing a preview of our menu. <strong>Sign in to unlock all options and member-only discounts!</strong></p>
                 </div>
             </div>
-            
+
             <div id="food-grid" class="service-cards-grid">
-                <!-- Cards will be loaded here -->
+                {# Cards loaded via JS / API #}
             </div>
-            
+
             <div class="service-modal-footer">
                 <div class="modal-footer-content">
                     <div class="signup-prompt">
                         <h3>Ready to Dine?</h3>
                         <p>Create an account to access our full menu, exclusive member pricing, and special offers.</p>
+                    </div>
+                    <a href="{{ path('app_register') }}" class="create-account-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── Custom Itinerary Modal ── #}
+<div id="serviceModal-planning" class="service-modal">
+    <div class="service-modal-content">
+        <div class="service-modal-header">
+            <button class="service-modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <h2>Custom Itinerary Planner</h2>
+            <p>Build your perfect Dumaguete adventure — completely free</p>
+        </div>
+
+        <div class="service-modal-body">
+            <div class="service-modal-notice">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <p>Our travel experts craft personalized itineraries. <strong>Sign in or register — it's completely free!</strong></p>
+                </div>
+            </div>
+
+            <div class="service-cards-grid">
+
+                <div class="sample-service-card">
+                    <div class="card-image-wrapper planning-card-img planning-card-img--weekend">
+                        <div class="planning-icon-wrap"><i class="fas fa-sun"></i></div>
+                    </div>
+                    <div class="card-body">
+                        <h4>Weekend Getaway (2D/1N)</h4>
+                        <div class="card-rating">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <span>Perfect for Couples</span>
+                        </div>
+                        <p>Beach, boulevard dining, Silliman heritage walk. Great for first-time visitors wanting a taste of everything.</p>
+                        <div class="card-features">
+                            <span class="feature-tag"><i class="fas fa-users"></i> Couples</span>
+                            <span class="feature-tag"><i class="fas fa-clock"></i> 2 Days</span>
+                            <span class="feature-tag"><i class="fas fa-umbrella-beach"></i> Beach</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">
+                                <span class="price-label">Membership</span>
+                                <span class="price-value planning-free-label">Free</span>
+                            </div>
+                            <a href="{{ path('app_login') }}" class="card-book-btn">
+                                <i class="fas fa-lock"></i> Start Planning
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sample-service-card">
+                    <div class="card-image-wrapper planning-card-img planning-card-img--island">
+                        <div class="planning-icon-wrap"><i class="fas fa-route"></i></div>
+                        <span class="card-badge card-badge--popular">Popular</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Island Explorer (5D/4N)</h4>
+                        <div class="card-rating">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                            <span>Best for Groups</span>
+                        </div>
+                        <p>Apo Island, Twin Lakes, firefly watching, whale shark encounters in Oslob, and cultural immersion.</p>
+                        <div class="card-features">
+                            <span class="feature-tag"><i class="fas fa-users"></i> Groups</span>
+                            <span class="feature-tag"><i class="fas fa-clock"></i> 5 Days</span>
+                            <span class="feature-tag"><i class="fas fa-fish"></i> Snorkeling</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">
+                                <span class="price-label">Membership</span>
+                                <span class="price-value planning-free-label">Free</span>
+                            </div>
+                            <a href="{{ path('app_login') }}" class="card-book-btn">
+                                <i class="fas fa-lock"></i> Start Planning
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sample-service-card">
+                    <div class="card-image-wrapper planning-card-img planning-card-img--luxury">
+                        <div class="planning-icon-wrap"><i class="fas fa-crown"></i></div>
+                    </div>
+                    <div class="card-body">
+                        <h4>Luxury Retreat (7D/6N)</h4>
+                        <div class="card-rating">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <span>Premium Experience</span>
+                        </div>
+                        <p>Fully curated premium experience with private transfers, butler service, spa treatments, and exclusive dining.</p>
+                        <div class="card-features">
+                            <span class="feature-tag"><i class="fas fa-star"></i> Premium</span>
+                            <span class="feature-tag"><i class="fas fa-clock"></i> 7 Days</span>
+                            <span class="feature-tag"><i class="fas fa-spa"></i> Spa</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price">
+                                <span class="price-label">Membership</span>
+                                <span class="price-value planning-free-label">Free</span>
+                            </div>
+                            <a href="{{ path('app_login') }}" class="card-book-btn">
+                                <i class="fas fa-lock"></i> Start Planning
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="service-modal-footer">
+                <div class="modal-footer-content">
+                    <div class="signup-prompt">
+                        <h3>Start Planning — It's Free!</h3>
+                        <p>Create an account and build your dream Dumaguete itinerary in minutes.</p>
+                    </div>
+                    <a href="{{ path('app_register') }}" class="create-account-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── Share Wall Service Modal ── #}
+<div id="serviceModal-sharewall" class="service-modal">
+    <div class="service-modal-content">
+        <div class="service-modal-header">
+            <button class="service-modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-camera-retro"></i>
+            </div>
+            <h2>Share Wall Community</h2>
+            <p>Join thousands of travelers sharing their Dumaguete memories</p>
+        </div>
+
+        <div class="service-modal-body">
+            <div class="service-modal-notice">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <p>The Share Wall is completely free! <strong>Sign in or register to post photos, like &amp; comment on guest stories.</strong></p>
+                </div>
+            </div>
+
+            <div class="sharewall-modal-stats">
+                <div class="sharewall-modal-stat">
+                    <i class="fas fa-heart"></i>
+                    <span class="sharewall-modal-stat-num">2,400+</span>
+                    <span class="sharewall-modal-stat-lbl">Community Likes</span>
+                </div>
+                <div class="sharewall-modal-stat">
+                    <i class="fas fa-images"></i>
+                    <span class="sharewall-modal-stat-num">856+</span>
+                    <span class="sharewall-modal-stat-lbl">Guest Stories</span>
+                </div>
+                <div class="sharewall-modal-stat">
+                    <i class="fas fa-globe"></i>
+                    <span class="sharewall-modal-stat-num">48</span>
+                    <span class="sharewall-modal-stat-lbl">Countries</span>
+                </div>
+                <div class="sharewall-modal-stat">
+                    <i class="fas fa-users"></i>
+                    <span class="sharewall-modal-stat-num">892+</span>
+                    <span class="sharewall-modal-stat-lbl">Happy Guests</span>
+                </div>
+            </div>
+
+            <div class="sharewall-modal-cta-box">
+                <i class="fas fa-pen-fancy sharewall-modal-cta-icon"></i>
+                <h3>Share Your Travel Story</h3>
+                <p>Upload photos, write your experience, and inspire future travelers. It's completely free!</p>
+                <a href="{{ path('app_register') }}" class="create-account-btn">
+                    <i class="fas fa-user-plus"></i> Join the Community
+                </a>
+            </div>
+
+            <div class="service-modal-footer">
+                <div class="modal-footer-content">
+                    <div class="signup-prompt">
+                        <h3>Your Story Matters!</h3>
+                        <p>Create a free account and share your Dumaguete adventure with the world.</p>
                     </div>
                     <a href="{{ path('app_register') }}" class="create-account-btn">
                         <i class="fas fa-user-plus"></i>

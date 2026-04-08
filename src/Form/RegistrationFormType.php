@@ -32,15 +32,23 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
+            // ->add('email', EmailType::class, [
+            //     'constraints' => [
+            //         new NotBlank([
+            //             'message' => 'Please enter your email',
+            //         ]),
+            //         new Email([
+            //             'message' => 'Please enter a valid email address',
+            //         ]),
+            //     ],
+            // ])
             ->add('email', EmailType::class, [
+                'attr' => ['autocomplete' => 'email'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter your email',
+                'message' => 'Please enter an email',
                     ]),
-                    new Email([
-                        'message' => 'Please enter a valid email address',
-                    ]),
-                ],
+               ],
             ])
             ->add('username', TextType::class, [
                 'constraints' => [

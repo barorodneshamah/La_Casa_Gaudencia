@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -50,23 +51,46 @@ class GoogleAuthenticator extends OAuth2Authenticator
                     $user = new User();
                     $user->setUsername($email);
                     $user->setEmail($email);
-                    $user->setIsVerified(false);
-                    // Set a random password (they won't use it for Google login)
+                    $user->setFullName($googleUser->getName());
+                    $user->setIsVerified(true); // Google has verified the email
                     $user->setPassword(bin2hex(random_bytes(32)));
-                    $user->setRoles(['ROLE_USER']);
+                    $user->setRoles(['ROLE_STAFF']);
 
                     $this->entityManager->persist($user);
+                    $this->entityManager->flush();
+                } else {
+                    $user->setIsVerified(true);
+                    if (empty($user->getRoles())) {
+                        $user->setRoles(['ROLE_STAFF']);
+                    }
                     $this->entityManager->flush();
                 }
 
                 return $user;
-            })
+            }),
+            [new RememberMeBadge()]
         );
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        return new RedirectResponse($this->router->generate('app_home'));
+        $user  = $token->getUser();
+        $roles = $user->getRoles();
+
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            $redirectRoute = 'app_admin_dashboard';
+        } elseif (in_array('ROLE_STAFF', $roles, true)) {
+            $redirectRoute = 'app_staff_dashboard';
+        } else {
+            $redirectRoute = 'app_landing';
+        }
+
+        $response = new RedirectResponse($this->router->generate($redirectRoute));
+        $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
+
+        return $response;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response

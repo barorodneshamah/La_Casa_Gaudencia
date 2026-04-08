@@ -16,58 +16,81 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
+    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager,
-        EmailVerificationService $emailService
-    ): JsonResponse {
-
+        EmailVerificationService $emailVerificationService
+    ): Response {
         $user = new User();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
 
-        // Example (adjust to your form)
-        $user->setEmail($request->request->get('email'));
-        $user->setUsername($request->request->get('username'));
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Get the user data from the form
+            $user = $form->getData();
 
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $request->request->get('password')
-        );
+            // Get plain password
+            $plainPassword = $form->get('plainPassword')->getData();
 
-        $user->setPassword($hashedPassword);
+            // Check if user already exists
+            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+            if ($existingUser) {
+                $this->addFlash('error', 'Email already registered.');
+                return $this->redirectToRoute('app_register');
+            }
 
-        // Generate token
-        $token = $emailService->generateVerificationToken();
-        $user->setVerificationToken($token);
-        $user->setIsVerified(false);
+            $existingUsername = $entityManager->getRepository(User::class)->findOneBy(['username' => $user->getUsername()]);
+            if ($existingUsername) {
+                $this->addFlash('error', 'Username already taken.');
+                return $this->redirectToRoute('app_register');
+            }
 
-        // SAVE FIRST
-        $entityManager->persist($user);
-        $entityManager->flush();
+            // Hash password
+            $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+            $user->setPassword($hashedPassword);
 
-        // Generate URL
-        $verificationUrl = $this->generateUrl(
-            'app_verify_email',
-            ['token' => $token],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+            // Generate verification token
+            $verificationToken = $emailVerificationService->generateVerificationToken();
+            $user->setVerificationToken($verificationToken);
+            $user->setIsVerified(false);
 
-        // Send email
-        $emailService->sendVerificationEmail($user, $verificationUrl);
+            try {
+                // Generate verification URL (before saving to DB, for email sending)
+                $verificationUrl = $this->generateUrl(
+                    'app_verify_email',
+                    ['token' => $verificationToken],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                   );
 
-        return new JsonResponse([
-            'success' => true,
-            'message' => 'Registration successful. Please check your email to verify your account.',
-            'user' => [
-                'id' => $user->getId(),
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
-                'isVerified' => $user->isVerified(),
-                'roles' => $user->getRoles()
-            ]
+                // Send verification email BEFORE saving to DB
+                // This way we don't create a user record if email sending fails
+                try {
+                    $emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+                } catch (\Exception $e) {
+                    // Log the error but provide user feedback
+                    $this->addFlash('error', 'Registration failed: Could not send verification email. Please check your email address and try again.');
+                    return $this->redirectToRoute('app_register');
+                }
+
+                // Save user only after email is sent successfully
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Registration successful! Please check your email to verify your account.');
+                return $this->redirectToRoute('app_login');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Registration failed. Please try again.');
+                return $this->redirectToRoute('app_register');
+            }
+        }
+
+        return $this->render('registration/register.html.twig', [
+            'registrationForm' => $form->createView(),
         ]);
     }
 

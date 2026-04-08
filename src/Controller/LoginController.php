@@ -21,7 +21,7 @@ class LoginController extends AbstractController
                 return $this->redirectToRoute('app_staff_dashboard');
             }
 
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_landing');
         }
 
         return $this->render('security/login.html.twig', [

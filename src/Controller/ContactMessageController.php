@@ -3,20 +3,20 @@
 namespace App\Controller;
 
 use App\Entity\ContactMessage;
+use App\Entity\ContactReply;
 use App\Form\ContactMessageType;
 use App\Repository\ContactMessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ContactMessageController extends AbstractController
 {
-    // ========================================
-    // PUBLIC: Contact Form (Landing Page)
-    // ========================================
-    
+
     #[Route('/contact', name: 'app_contact')]
     public function contact(Request $request, EntityManagerInterface $em): Response
     {
@@ -38,10 +38,6 @@ class ContactMessageController extends AbstractController
         ]);
     }
 
-    // ========================================
-    // DASHBOARD: List All Messages
-    // ========================================
-    
     #[Route('/dashboard/messages', name: 'app_contact_message_index')]
     public function index(Request $request, ContactMessageRepository $repo): Response
     {
@@ -57,40 +53,78 @@ class ContactMessageController extends AbstractController
         }
 
         return $this->render('contact_message/index.html.twig', [
-            'messages' => $messages,
-            'stats' => $repo->getStats(),
+            'messages'      => $messages,
+            'stats'         => $repo->getStats(),
             'currentStatus' => $status,
-            'searchQuery' => $search,
-            'unread_count' => $repo->countUnread(),
+            'searchQuery'   => $search,
+            'unread_count'  => $repo->countUnread(),
         ]);
     }
 
-    // ========================================
-    // DASHBOARD: View Single Message
-    // ========================================
-    
     #[Route('/dashboard/messages/{id}', name: 'app_contact_message_show')]
     public function show(ContactMessage $message, EntityManagerInterface $em, ContactMessageRepository $repo): Response
     {
-        // Mark as read when viewing
+        
         $message->markAsRead();
         $em->flush();
 
         return $this->render('contact_message/show.html.twig', [
-            'message' => $message,
+            'message'      => $message,
             'unread_count' => $repo->countUnread(),
         ]);
     }
 
-    // ========================================
-    // DASHBOARD: Update Message Status
-    // ========================================
-    
+    #[Route('/dashboard/messages/{id}/reply', name: 'app_contact_message_reply', methods: ['POST'])]
+    public function reply(
+        ContactMessage $message,
+        Request $request,
+        EntityManagerInterface $em,
+        MailerInterface $mailer
+    ): Response {
+        $replyText = trim($request->request->get('reply_message', ''));
+
+        if (empty($replyText)) {
+            $this->addFlash('error', 'Reply message cannot be empty.');
+            return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
+        }
+
+        // Save reply to database
+        $reply = new ContactReply();
+        $reply->setContactMessage($message);
+        $reply->setRepliedBy($this->getUser());
+        $reply->setReplyMessage($replyText);
+
+        // Update message status to 'replied'
+        $message->setStatus('replied');
+
+        $em->persist($reply);
+        $em->flush();
+
+        // Send email to the original sender
+        try {
+            $email = (new Email())
+                ->from('barorodneshamah.com')
+                ->to($message->getEmail())
+                ->subject('Re: ' . $message->getSubject())
+                ->text(
+                    "Hello {$message->getFullName()},\n\n" .
+                    $replyText .
+                    "\n\n---\nThis is a reply to your message submitted with subject: \"{$message->getSubject()}\""
+                );
+            $mailer->send($email);
+            $this->addFlash('success', 'Reply sent and saved successfully.');
+        } catch (\Exception $e) {
+            $this->addFlash('success', 'Reply saved to database. Note: email delivery failed — check your mailer configuration.');
+        }
+
+        return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
+    }
+
     #[Route('/dashboard/messages/{id}/status', name: 'app_contact_message_status', methods: ['POST'])]
     public function updateStatus(ContactMessage $message, Request $request, EntityManagerInterface $em): Response
     {
         $status = $request->request->get('status');
-        
+
         if (in_array($status, ['unread', 'read', 'replied', 'archived'])) {
             $message->setStatus($status);
             if ($status === 'read' && !$message->getReadAt()) {
@@ -103,10 +137,6 @@ class ContactMessageController extends AbstractController
         return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
     }
 
-    // ========================================
-    // DASHBOARD: Add/Update Notes
-    // ========================================
-    
     #[Route('/dashboard/messages/{id}/notes', name: 'app_contact_message_notes', methods: ['POST'])]
     public function updateNotes(ContactMessage $message, Request $request, EntityManagerInterface $em): Response
     {
@@ -118,10 +148,6 @@ class ContactMessageController extends AbstractController
         return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
     }
 
-    // ========================================
-    // DASHBOARD: Delete Message
-    // ========================================
-    
     #[Route('/dashboard/messages/{id}/delete', name: 'app_contact_message_delete', methods: ['POST'])]
     public function delete(ContactMessage $message, EntityManagerInterface $em): Response
     {
@@ -132,15 +158,11 @@ class ContactMessageController extends AbstractController
         return $this->redirectToRoute('app_contact_message_index');
     }
 
-    // ========================================
-    // DASHBOARD: Bulk Actions
-    // ========================================
-    
     #[Route('/dashboard/messages/bulk-action', name: 'app_contact_message_bulk', methods: ['POST'])]
     public function bulkAction(Request $request, ContactMessageRepository $repo, EntityManagerInterface $em): Response
     {
         $action = $request->request->get('action');
-        $ids = $request->request->all('messages');
+        $ids    = $request->request->all('messages');
 
         if (empty($ids)) {
             $this->addFlash('error', 'No messages selected.');

@@ -10,23 +10,27 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class EmailVerificationController extends AbstractController
 {
-    #[Route('/verify-email', name: 'app_verify_email')]
-    public function verify(
-        Request $request,
-        EmailVerificationService $service
-    ): Response {
-        $token = $request->query->get('token');
+#[Route('/verify-email', name: 'app_verify_email')]
+public function verifyUserEmail(
+Request $request,
+EmailVerificationService $emailVerificationService
+): Response {
+$token = $request->query->get('token');
 
-        if (!$token) {
-            return new Response("Missing token");
-        }
+if (!$token) {
+$this->addFlash('error', 'Verification token is missing.');
+return $this->redirectToRoute('app_register');
+}
 
-        $user = $service->verifyToken($token);
+$user = $emailVerificationService->verifyToken($token);
 
-        if (!$user) {
-            return new Response("Invalid token");
-        }
+if (!$user) {
+$this->addFlash('error', 'Invalid or expired verification token.');
+return $this->redirectToRoute('app_register');
+}
 
-        return new Response("Email verified!");
-    }
+$this->addFlash('success', 'Your email has been verified! You can now log in.');
+
+return $this->redirectToRoute('app_login');
+}
 }

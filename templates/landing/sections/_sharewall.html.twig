@@ -50,7 +50,8 @@
     </div>
 
     <!-- Review Feed -->
-    <div class="review-feed">
+    <div class="review-feed" id="reviewFeed">
+
         {# ── Card 1: Culture ── #}
         <div class="review-card" data-category="culture">
             <div class="review-image-wrapper"
@@ -81,11 +82,11 @@
                 </div>
             </div>
             <div class="review-actions">
-                <button class="action-btn like-btn"><i class="far fa-heart"></i> <span>234</span></button>
-                <button class="action-btn comment-btn"><i class="far fa-comment"></i> <span>18</span></button>
+                <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>234</span></button>
+                <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>18</span></button>
                 <button class="action-btn share-btn"><i class="far fa-share-square"></i> <span>Share</span></button>
                 <div class="action-spacer"></div>
-                <button class="action-btn bookmark-btn"><i class="far fa-bookmark"></i></button>
+                <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
             </div>
             <div class="review-comments">
                 <div class="comment-item">
@@ -105,8 +106,8 @@
                     </div>
                 </div>
                 <div class="comment-input-wrap">
-                    <input type="text" placeholder="Write a comment... (sign in required)" />
-                    <button class="send-btn open-signin"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" placeholder="Write a comment… (sign in required)" readonly />
+                    <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
@@ -140,11 +141,11 @@
                 </div>
             </div>
             <div class="review-actions">
-                <button class="action-btn like-btn"><i class="far fa-heart"></i> <span>189</span></button>
-                <button class="action-btn comment-btn"><i class="far fa-comment"></i> <span>24</span></button>
+                <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>189</span></button>
+                <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>24</span></button>
                 <button class="action-btn share-btn"><i class="far fa-share-square"></i> <span>Share</span></button>
                 <div class="action-spacer"></div>
-                <button class="action-btn bookmark-btn"><i class="far fa-bookmark"></i></button>
+                <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
             </div>
             <div class="review-comments">
                 <div class="comment-item">
@@ -156,8 +157,8 @@
                     </div>
                 </div>
                 <div class="comment-input-wrap">
-                    <input type="text" placeholder="Write a comment... (sign in required)" />
-                    <button class="send-btn open-signin"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" placeholder="Write a comment… (sign in required)" readonly />
+                    <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
@@ -191,11 +192,11 @@
                 </div>
             </div>
             <div class="review-actions">
-                <button class="action-btn like-btn"><i class="far fa-heart"></i> <span>412</span></button>
-                <button class="action-btn comment-btn"><i class="far fa-comment"></i> <span>56</span></button>
+                <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>412</span></button>
+                <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>56</span></button>
                 <button class="action-btn share-btn"><i class="far fa-share-square"></i> <span>Share</span></button>
                 <div class="action-spacer"></div>
-                <button class="action-btn bookmark-btn"><i class="far fa-bookmark"></i></button>
+                <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
             </div>
             <div class="review-comments">
                 <div class="comment-item">
@@ -215,20 +216,21 @@
                     </div>
                 </div>
                 <div class="comment-input-wrap">
-                    <input type="text" placeholder="Write a comment... (sign in required)" />
-                    <button class="send-btn open-signin"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" placeholder="Write a comment… (sign in required)" readonly />
+                    <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Share Your Story CTA -->
     <div class="sharewall-cta">
-        <button class="sharewall-cta-btn open-signin">
+        <a href="{{ path('app_login') }}" class="sharewall-cta-btn">
             <i class="fas fa-pen-fancy"></i> Share Your Story
-        </button>
+        </a>
         <p class="sharewall-cta-hint">
-            <a class="open-signin">Sign in</a> to post memories, like, comment,
+            <a href="{{ path('app_login') }}">Sign in</a> to post memories, like, comment,
             and join our traveler community.
         </p>
     </div>
