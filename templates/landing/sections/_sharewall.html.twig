@@ -50,179 +50,180 @@
     </div>
 
     <!-- Review Feed -->
-    <div class="review-feed" id="reviewFeed">
+<!-- Review Feed -->
+<div class="review-feed" id="reviewFeed">
 
-        {# ── Card 1: Culture ── #}
-        <div class="review-card" data-category="culture">
-            <div class="review-image-wrapper"
-                 data-lightbox="{{ asset('Images/review1.jpg') }}"
-                 data-caption="Sunset stroll at Silliman Hall — Maria Santos">
-                <img src="{{ asset('Images/review1.jpg') }}" class="review-image" alt="Guest Experience" />
-                <div class="review-overlay">
-                    <div class="expand-icon"><i class="fas fa-expand"></i></div>
-                </div>
-                <span class="review-category">Culture</span>
+    {# ── Card 1: Culture ── #}
+    <div class="review-card" data-category="culture" data-card-id="1">
+        <div class="review-image-wrapper"
+             data-lightbox="{{ asset('Images/review1.jpg') }}"
+             data-caption="Sunset stroll at Silliman Hall — Maria Santos">
+            <img src="{{ asset('Images/review1.jpg') }}" class="review-image" alt="Guest Experience" />
+            <div class="review-overlay">
+                <div class="expand-icon"><i class="fas fa-expand"></i></div>
             </div>
-            <div class="review-content">
-                <div class="review-rating">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="review-text">
-                    Staying here felt like being welcomed into a family. The
-                    warmth and attention to detail made our vacation truly
-                    special and memorable.
-                </p>
-                <div class="review-author">
-                    <img src="{{ asset('Images/user1.jpg') }}" alt="Maria" />
-                    <div class="review-author-info">
-                        <span class="name">Maria Santos</span>
-                        <span class="location"><i class="fas fa-map-marker-alt"></i> Barcelona, Spain</span>
-                        <span class="post-date">3 days ago</span>
-                    </div>
-                </div>
+            <span class="review-category">Culture</span>
+        </div>
+        <div class="review-content">
+            <div class="review-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
             </div>
-            <div class="review-actions">
-                <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>234</span></button>
-                <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>18</span></button>
-                <button class="action-btn share-btn"><i class="far fa-share-square"></i> <span>Share</span></button>
-                <div class="action-spacer"></div>
-                <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
-            </div>
-            <div class="review-comments">
-                <div class="comment-item">
-                    <img src="{{ asset('Images/user2.jpg') }}" alt="Kenji" class="comment-avatar" />
-                    <div class="comment-body">
-                        <span class="comment-name">Kenji Y.</span>
-                        <p class="comment-text">Couldn't agree more! The staff made us feel so welcome 🏠❤️</p>
-                        <span class="comment-time">2 days ago</span>
-                    </div>
-                </div>
-                <div class="comment-item">
-                    <img src="{{ asset('Images/user3.jpg') }}" alt="Aiden" class="comment-avatar" />
-                    <div class="comment-body">
-                        <span class="comment-name">Aiden M.</span>
-                        <p class="comment-text">That sunset view from the room is incredible!</p>
-                        <span class="comment-time">1 day ago</span>
-                    </div>
-                </div>
-                <div class="comment-input-wrap">
-                    <input type="text" placeholder="Write a comment… (sign in required)" readonly />
-                    <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
+            <p class="review-text">
+                Staying here felt like being welcomed into a family. The
+                warmth and attention to detail made our vacation truly
+                special and memorable.
+            </p>
+            <div class="review-author">
+                <img src="{{ asset('Images/user1.jpg') }}" alt="Maria" />
+                <div class="review-author-info">
+                    <span class="name">Maria Santos</span>
+                    <span class="location"><i class="fas fa-map-marker-alt"></i> Barcelona, Spain</span>
+                    <span class="post-date">3 days ago</span>
                 </div>
             </div>
         </div>
-
-        {# ── Card 2: Adventure ── #}
-        <div class="review-card" data-category="adventure">
-            <div class="review-image-wrapper"
-                 data-lightbox="{{ asset('Images/review2.jpg') }}"
-                 data-caption="Heritage walk through old Dumaguete — Kenji Yamamoto">
-                <img src="{{ asset('Images/review2.jpg') }}" class="review-image" alt="Cultural Tour" />
-                <div class="review-overlay">
-                    <div class="expand-icon"><i class="fas fa-expand"></i></div>
-                </div>
-                <span class="review-category">Adventure</span>
-            </div>
-            <div class="review-content">
-                <div class="review-rating">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="review-text">
-                    The cultural tour was incredible! Dumaguete's heritage felt
-                    so alive through their expert guides. A truly immersive experience!
-                </p>
-                <div class="review-author">
-                    <img src="{{ asset('Images/user2.jpg') }}" alt="Kenji" />
-                    <div class="review-author-info">
-                        <span class="name">Kenji Yamamoto</span>
-                        <span class="location"><i class="fas fa-map-marker-alt"></i> Tokyo, Japan</span>
-                        <span class="post-date">1 week ago</span>
-                    </div>
+        <div class="review-actions">
+            <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>234</span></button>
+            <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>18</span></button>
+            <button class="action-btn share-btn" data-card-id="1"><i class="far fa-share-square"></i> <span>Share</span></button>
+            <div class="action-spacer"></div>
+            <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
+        </div>
+        <div class="review-comments">
+            <div class="comment-item">
+                <img src="{{ asset('Images/user2.jpg') }}" alt="Kenji" class="comment-avatar" />
+                <div class="comment-body">
+                    <span class="comment-name">Kenji Y.</span>
+                    <p class="comment-text">Couldn't agree more! The staff made us feel so welcome 🏠❤️</p>
+                    <span class="comment-time">2 days ago</span>
                 </div>
             </div>
-            <div class="review-actions">
-                <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>189</span></button>
-                <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>24</span></button>
-                <button class="action-btn share-btn"><i class="far fa-share-square"></i> <span>Share</span></button>
-                <div class="action-spacer"></div>
-                <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
+            <div class="comment-item">
+                <img src="{{ asset('Images/user3.jpg') }}" alt="Aiden" class="comment-avatar" />
+                <div class="comment-body">
+                    <span class="comment-name">Aiden M.</span>
+                    <p class="comment-text">That sunset view from the room is incredible!</p>
+                    <span class="comment-time">1 day ago</span>
+                </div>
             </div>
-            <div class="review-comments">
-                <div class="comment-item">
-                    <img src="{{ asset('Images/user1.jpg') }}" alt="Maria" class="comment-avatar" />
-                    <div class="comment-body">
-                        <span class="comment-name">Maria S.</span>
-                        <p class="comment-text">Adding this to my bucket list! Which tour guide did you have?</p>
-                        <span class="comment-time">5 days ago</span>
-                    </div>
-                </div>
-                <div class="comment-input-wrap">
-                    <input type="text" placeholder="Write a comment… (sign in required)" readonly />
-                    <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
-                </div>
+            <div class="comment-input-wrap">
+                <input type="text" placeholder="Write a comment… (sign in required)" readonly />
+                <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
-
-        {# ── Card 3: Food ── #}
-        <div class="review-card" data-category="food">
-            <div class="review-image-wrapper"
-                 data-lightbox="{{ asset('Images/review3.jpg') }}"
-                 data-caption="Gourmet Silvanas tasting — Aiden Mitchell">
-                <img src="{{ asset('Images/review3.jpg') }}" class="review-image" alt="Relaxation" />
-                <div class="review-overlay">
-                    <div class="expand-icon"><i class="fas fa-expand"></i></div>
-                </div>
-                <span class="review-category">Food</span>
-            </div>
-            <div class="review-content">
-                <div class="review-rating">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                </div>
-                <p class="review-text">
-                    I chose their Relaxation package and everything—from gourmet
-                    meals to wellness activities—was perfectly tailored to my needs.
-                </p>
-                <div class="review-author">
-                    <img src="{{ asset('Images/user3.jpg') }}" alt="Aiden" />
-                    <div class="review-author-info">
-                        <span class="name">Aiden Mitchell</span>
-                        <span class="location"><i class="fas fa-map-marker-alt"></i> Vancouver, Canada</span>
-                        <span class="post-date">2 weeks ago</span>
-                    </div>
-                </div>
-            </div>
-            <div class="review-actions">
-                <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>412</span></button>
-                <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>56</span></button>
-                <button class="action-btn share-btn"><i class="far fa-share-square"></i> <span>Share</span></button>
-                <div class="action-spacer"></div>
-                <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
-            </div>
-            <div class="review-comments">
-                <div class="comment-item">
-                    <img src="{{ asset('Images/user2.jpg') }}" alt="Kenji" class="comment-avatar" />
-                    <div class="comment-body">
-                        <span class="comment-name">Kenji Y.</span>
-                        <p class="comment-text">The food recommendations were so accurate! Silvanas are life-changing 🤤</p>
-                        <span class="comment-time">1 week ago</span>
-                    </div>
-                </div>
-                <div class="comment-item">
-                    <img src="{{ asset('Images/user1.jpg') }}" alt="Maria" class="comment-avatar" />
-                    <div class="comment-body">
-                        <span class="comment-name">Maria S.</span>
-                        <p class="comment-text">Your photos are stunning! What camera do you use?</p>
-                        <span class="comment-time">4 days ago</span>
-                    </div>
-                </div>
-                <div class="comment-input-wrap">
-                    <input type="text" placeholder="Write a comment… (sign in required)" readonly />
-                    <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </div>
-
     </div>
+
+    {# ── Card 2: Adventure ── #}
+    <div class="review-card" data-category="adventure" data-card-id="2">
+        <div class="review-image-wrapper"
+             data-lightbox="{{ asset('Images/review2.jpg') }}"
+             data-caption="Heritage walk through old Dumaguete — Kenji Yamamoto">
+            <img src="{{ asset('Images/review2.jpg') }}" class="review-image" alt="Cultural Tour" />
+            <div class="review-overlay">
+                <div class="expand-icon"><i class="fas fa-expand"></i></div>
+            </div>
+            <span class="review-category">Adventure</span>
+        </div>
+        <div class="review-content">
+            <div class="review-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p class="review-text">
+                The cultural tour was incredible! Dumaguete's heritage felt
+                so alive through their expert guides. A truly immersive experience!
+            </p>
+            <div class="review-author">
+                <img src="{{ asset('Images/user2.jpg') }}" alt="Kenji" />
+                <div class="review-author-info">
+                    <span class="name">Kenji Yamamoto</span>
+                    <span class="location"><i class="fas fa-map-marker-alt"></i> Tokyo, Japan</span>
+                    <span class="post-date">1 week ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="review-actions">
+            <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>189</span></button>
+            <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>24</span></button>
+            <button class="action-btn share-btn" data-card-id="2"><i class="far fa-share-square"></i> <span>Share</span></button>
+            <div class="action-spacer"></div>
+            <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
+        </div>
+        <div class="review-comments">
+            <div class="comment-item">
+                <img src="{{ asset('Images/user1.jpg') }}" alt="Maria" class="comment-avatar" />
+                <div class="comment-body">
+                    <span class="comment-name">Maria S.</span>
+                    <p class="comment-text">Adding this to my bucket list! Which tour guide did you have?</p>
+                    <span class="comment-time">5 days ago</span>
+                </div>
+            </div>
+            <div class="comment-input-wrap">
+                <input type="text" placeholder="Write a comment… (sign in required)" readonly />
+                <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    {# ── Card 3: Food ── #}
+    <div class="review-card" data-category="food" data-card-id="3">
+        <div class="review-image-wrapper"
+             data-lightbox="{{ asset('Images/review3.jpg') }}"
+             data-caption="Gourmet Silvanas tasting — Aiden Mitchell">
+            <img src="{{ asset('Images/review3.jpg') }}" class="review-image" alt="Relaxation" />
+            <div class="review-overlay">
+                <div class="expand-icon"><i class="fas fa-expand"></i></div>
+            </div>
+            <span class="review-category">Food</span>
+        </div>
+        <div class="review-content">
+            <div class="review-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+            </div>
+            <p class="review-text">
+                I chose their Relaxation package and everything—from gourmet
+                meals to wellness activities—was perfectly tailored to my needs.
+            </p>
+            <div class="review-author">
+                <img src="{{ asset('Images/user3.jpg') }}" alt="Aiden" />
+                <div class="review-author-info">
+                    <span class="name">Aiden Mitchell</span>
+                    <span class="location"><i class="fas fa-map-marker-alt"></i> Vancouver, Canada</span>
+                    <span class="post-date">2 weeks ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="review-actions">
+            <button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>412</span></button>
+            <button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>56</span></button>
+            <button class="action-btn share-btn" data-card-id="3"><i class="far fa-share-square"></i> <span>Share</span></button>
+            <div class="action-spacer"></div>
+            <button class="action-btn bookmark-btn" data-requires-auth="true"><i class="far fa-bookmark"></i></button>
+        </div>
+        <div class="review-comments">
+            <div class="comment-item">
+                <img src="{{ asset('Images/user2.jpg') }}" alt="Kenji" class="comment-avatar" />
+                <div class="comment-body">
+                    <span class="comment-name">Kenji Y.</span>
+                    <p class="comment-text">The food recommendations were so accurate! Silvanas are life-changing 🤤</p>
+                    <span class="comment-time">1 week ago</span>
+                </div>
+            </div>
+            <div class="comment-item">
+                <img src="{{ asset('Images/user1.jpg') }}" alt="Maria" class="comment-avatar" />
+                <div class="comment-body">
+                    <span class="comment-name">Maria S.</span>
+                    <p class="comment-text">Your photos are stunning! What camera do you use?</p>
+                    <span class="comment-time">4 days ago</span>
+                </div>
+            </div>
+            <div class="comment-input-wrap">
+                <input type="text" placeholder="Write a comment… (sign in required)" readonly />
+                <button class="send-btn" data-requires-auth="true"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+</div>
 
     <!-- Share Your Story CTA -->
     <div class="sharewall-cta">

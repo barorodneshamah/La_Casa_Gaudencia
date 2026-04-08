@@ -9,22 +9,19 @@ document.addEventListener('DOMContentLoaded', function () {
        SHARE WALL INTERACTIONS
     ══════════════════════════════════════ */
 
-    /* ── helper: bubble card to top of feed ── */
     function bubbleCardToTop(card) {
         var feed = document.getElementById('reviewFeed');
         if (!feed || feed.firstChild === card) return;
         feed.insertBefore(card, feed.firstChild);
         card.classList.remove('bubbling');
-        void card.offsetWidth; /* force reflow */
+        void card.offsetWidth;
         card.classList.add('bubbling');
         setTimeout(function () { card.classList.remove('bubbling'); }, 550);
     }
 
-    /* Like buttons */
     document.querySelectorAll('.like-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
-            /* requires auth — redirect */
             if (this.getAttribute('data-requires-auth') === 'true') {
                 window.location.href = '{{ path("app_login") }}';
                 return;
@@ -44,11 +41,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* Comment toggle */
     document.querySelectorAll('.comment-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
-            /* requires auth — redirect */
             if (this.getAttribute('data-requires-auth') === 'true') {
                 window.location.href = '{{ path("app_login") }}';
                 return;
@@ -64,41 +59,81 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* Share button */
-    document.querySelectorAll('.share-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            var self = this;
-            self.classList.add('shared');
-            var span       = self.querySelector('span');
+    // FIXED: Share button - no bubbling, unique URL per card, redirects to login
+document.querySelectorAll('.share-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        var clickedBtn = this;
+        var clickedSpan = clickedBtn.querySelector('span');
+        var card = clickedBtn.closest('.review-card');
+        
+        var authorEl = card.querySelector('.review-author-info .name');
+        var authorName = authorEl ? authorEl.textContent.trim() : 'Guest';
+        var category = card.getAttribute('data-category') || 'story';
+        
+        // Share URL redirects to login page
+        var shareUrl = window.location.origin + '{{ path("app_login") }}' + '?ref=sharewall&story=' + category + '-' + authorName.replace(/\s+/g, '-').toLowerCase();
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl)
+                .then(function() {
+                    clickedBtn.classList.add('shared');
+                    clickedSpan.textContent = 'Copied!';
+                    
+                    setTimeout(function() {
+                        clickedBtn.classList.remove('shared');
+                        clickedSpan.textContent = 'Share';
+                    }, 2000);
+                })
+                .catch(function() {
+                    doFallbackCopy(shareUrl, clickedBtn, clickedSpan);
+                });
+        } else {
+            doFallbackCopy(shareUrl, clickedBtn, clickedSpan);
+        }
+    });
+});
+    // Fallback copy helper
+    function doFallbackCopy(text, btn, span) {
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            btn.classList.add('shared');
             span.textContent = 'Copied!';
-            bubbleCardToTop(self.closest('.review-card'));
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(window.location.href).catch(function () {});
-            }
-            setTimeout(function () {
-                self.classList.remove('shared');
+            setTimeout(function() {
+                btn.classList.remove('shared');
                 span.textContent = 'Share';
             }, 2000);
-        });
-    });
+        } catch (err) {
+            alert('Copy this link:\n' + text);
+        }
+        
+        document.body.removeChild(textArea);
+    }
 
-    /* Bookmark button */
     document.querySelectorAll('.bookmark-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
-            /* requires auth — redirect */
             if (this.getAttribute('data-requires-auth') === 'true') {
                 window.location.href = '{{ path("app_login") }}';
                 return;
             }
             this.classList.toggle('bookmarked');
-            var icon      = this.querySelector('i');
+            var icon = this.querySelector('i');
             icon.className = this.classList.contains('bookmarked') ? 'fas fa-bookmark' : 'far fa-bookmark';
         });
     });
 
-    /* Comment send buttons — redirect to login */
     document.querySelectorAll('.send-btn[data-requires-auth="true"]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -106,14 +141,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* Comment input fields — click redirects to login */
     document.querySelectorAll('.comment-input-wrap input[readonly]').forEach(function (input) {
         input.addEventListener('click', function () {
             window.location.href = '{{ path("app_login") }}';
         });
     });
 
-    /* Filter tabs */
     var filterTabs  = document.querySelectorAll('.filter-tab');
     var reviewCards = document.querySelectorAll('.review-card[data-category]');
 
@@ -125,11 +158,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             reviewCards.forEach(function (card) {
                 if (filter === 'all' || card.getAttribute('data-category') === filter) {
-                    card.style.display   = '';
-                    card.style.opacity   = '0';
+                    card.style.display = '';
+                    card.style.opacity = '0';
                     card.style.transform = 'translateY(20px)';
                     setTimeout(function () {
-                        card.style.opacity   = '1';
+                        card.style.opacity = '1';
                         card.style.transform = 'translateY(0)';
                     }, 100);
                 } else {
@@ -139,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* Image Lightbox */
     var lightbox        = document.getElementById('lightbox');
     var lightboxImage   = document.getElementById('lightboxImage');
     var lightboxCaption = document.getElementById('lightboxCaption');
@@ -148,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (lightbox && lightboxImage && lightboxCaption) {
         document.querySelectorAll('.review-image-wrapper[data-lightbox]').forEach(function (wrapper) {
             wrapper.addEventListener('click', function () {
-                lightboxImage.src          = this.getAttribute('data-lightbox');
+                lightboxImage.src = this.getAttribute('data-lightbox');
                 lightboxCaption.textContent = this.getAttribute('data-caption') || '';
                 lightbox.classList.add('show');
                 document.body.style.overflow = 'hidden';
@@ -165,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.target === this) closeLightbox();
         });
 
-        /* Escape key for lightbox */
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && lightbox.classList.contains('show')) {
                 closeLightbox();
@@ -173,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* Animated stat counters */
     var statNumbers  = document.querySelectorAll('.stat-number[data-count]');
     var statsCounted = false;
 
@@ -208,16 +238,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ══════════════════════════════════════
-       SERVICE MODALS - AJAX Data Loading
+       SERVICE MODALS - DATABASE DATA WITH IMAGES
     ══════════════════════════════════════ */
     var serviceModals = document.querySelectorAll('.service-modal');
     var serviceModalCloseBtns = document.querySelectorAll('.service-modal-close');
+    
     let loadedData = {
         accommodations: false,
         tours: false,
         dining: false,
-        planning: true,    /* static content, no AJAX needed */
-        sharewall: true    /* static content, no AJAX needed */
+        planning: true,
+        sharewall: true
     };
 
     function openServiceModal(type) {
@@ -228,19 +259,17 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
 
-        // Load data if not already loaded
         if (!loadedData[type] && (type === 'accommodations' || type === 'tours' || type === 'dining')) {
             loadModalData(type, modal);
             loadedData[type] = true;
         }
 
-        // Animate modal content
         setTimeout(function() {
             modal.querySelectorAll('.sample-service-card').forEach(function(card, i) {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(30px)';
                 setTimeout(function() {
-                    card.style.transition = 'opacity 0.5s ease ' + (i * 0.08) + 's, transform 0.5s cubic-bezier(.34,1.56,.64,1) ' + (i * 0.08) + 's';
+                    card.style.transition = 'opacity 0.5s ease ' + (i * 0.1) + 's, transform 0.5s cubic-bezier(.34,1.56,.64,1) ' + (i * 0.1) + 's';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
                 }, 50);
@@ -270,213 +299,216 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const grid = document.getElementById(gridId);
-        const showingCount = modal.querySelector('[data-showing-count]');
-        if (!grid) return;
+        if (!grid) {
+            console.error('Grid not found:', gridId);
+            return;
+        }
+
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">' +
+            '<i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary-color); margin-bottom: 20px;"></i>' +
+            '<p style="color: var(--text-light); font-size: 16px;">Loading...</p>' +
+        '</div>';
 
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data && data.data.length > 0) {
-                    // Update showing count
-                    if (showingCount) {
-                        showingCount.innerHTML = `Showing <strong>${data.showing}</strong> of <strong>${data.total}</strong> items. <span style="color: var(--primary-color);">Sign in to see all!</span>`;
-                    }
-
-                    // Generate cards
-                    grid.innerHTML = data.data.map(item => generateCardHTML(item, type)).join('');
-                    
-                    // Attach event listeners
+            .then(function(response) {
+                var contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(function(text) {
+                        console.error('Non-JSON response:', text.substring(0, 200));
+                        throw new Error('Server error. Please try again.');
+                    });
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('API Response for ' + type + ':', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                var items = [];
+                if (data.success && Array.isArray(data.data)) {
+                    items = data.data;
+                } else if (Array.isArray(data)) {
+                    items = data;
+                } else if (data.data && Array.isArray(data.data)) {
+                    items = data.data;
+                }
+                
+                if (items.length > 0) {
+                    grid.innerHTML = items.map(function(item) { return generateCardHTML(item, type); }).join('');
                     attachCardEventListeners(grid);
                     
-                    // Show teaser message
-                    showTeaserMessage(modal, data.total, data.showing);
+                    grid.querySelectorAll('.sample-service-card').forEach(function(card, i) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(function() {
+                            card.style.transition = 'all 0.4s ease';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, i * 100);
+                    });
                 } else {
-                    grid.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                            <i class="fas fa-info-circle fa-3x" style="color: var(--accent-gold); margin-bottom: 20px;"></i>
-                            <h3 style="color: var(--primary-color); margin-bottom: 10px;">Coming Soon!</h3>
-                            <p style="color: var(--text-light); font-size: 16px;">We're preparing amazing options for you. Check back soon or sign in to get notified!</p>
-                            <a href="{{ path('app_register') }}" class="notice-btn" style="margin-top: 20px; display: inline-block;">
-                                <i class="fas fa-bell"></i> Get Notified
-                            </a>
-                        </div>
-                    `;
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">' +
+                        '<i class="fas fa-box-open fa-3x" style="color: var(--accent-gold); margin-bottom: 20px;"></i>' +
+                        '<h3 style="color: var(--primary-color); margin-bottom: 10px;">No Items Available</h3>' +
+                        '<p style="color: var(--text-light); font-size: 16px;">Check back soon for new offerings!</p>' +
+                    '</div>';
                 }
             })
-            .catch(err => {
-                console.error('Error loading data:', err);
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--text-dark); margin-bottom: 10px;">Oops! Something went wrong</h3>
-                        <p style="color: var(--text-light); font-size: 16px; margin-bottom: 20px;">We couldn't load the data. Please try again.</p>
-                        <button onclick="location.reload()" class="notice-btn">
-                            <i class="fas fa-redo"></i> Retry
-                        </button>
-                    </div>
-                `;
+            .catch(function(err) {
+                console.error('Fetch error:', err);
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">' +
+                    '<i class="fas fa-exclamation-triangle fa-3x" style="color: #e74c3c; margin-bottom: 20px;"></i>' +
+                    '<h3 style="color: var(--text-dark); margin-bottom: 10px;">Error Loading Data</h3>' +
+                    '<p style="color: var(--text-light); font-size: 14px;">' + err.message + '</p>' +
+                '</div>';
             });
     }
 
     function generateCardHTML(item, type) {
-        const rating = item.rating || 4.5;
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = (rating % 1) >= 0.5;
+        var rating = item.rating || 4.5;
+        var fullStars = Math.floor(rating);
+        var hasHalfStar = (rating % 1) >= 0.5;
         
-        let starsHTML = '';
-        for (let i = 0; i < fullStars; i++) {
+        var starsHTML = '';
+        for (var i = 0; i < fullStars; i++) {
             starsHTML += '<i class="fas fa-star"></i>';
         }
         if (hasHalfStar) {
             starsHTML += '<i class="fas fa-star-half-alt"></i>';
         }
-        for (let i = fullStars + (hasHalfStar ? 1 : 0); i < 5; i++) {
+        for (var i = fullStars + (hasHalfStar ? 1 : 0); i < 5; i++) {
             starsHTML += '<i class="far fa-star"></i>';
         }
 
-        let badgeHTML = '';
-        let categoryAttr = '';
-        
-        if (type === 'accommodations') {
-            badgeHTML = item.available <= 2 ? '<span class="card-badge popular">Almost Full!</span>' : '';
-            categoryAttr = `data-room-category="${item.category || 'deluxe'}"`;
-        } else if (type === 'tours') {
-            badgeHTML = item.reviews > 100 ? '<span class="card-badge popular">Best Seller</span>' : '';
-            categoryAttr = `data-tour-category="${item.category || 'cultural'}"`;
-        } else if (type === 'dining') {
-            badgeHTML = item.isVegetarian ? '<span class="card-badge" style="background: #27ae60;">Vegetarian</span>' : '';
-            categoryAttr = `data-food-category="${item.category ? item.category.toLowerCase() : 'filipino'}"`;
+        var badgeHTML = '';
+        if (type === 'accommodations' && item.available && item.available <= 2) {
+            badgeHTML = '<span class="card-badge" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">Almost Full!</span>';
+        } else if (type === 'tours' && item.reviews > 100) {
+            badgeHTML = '<span class="card-badge" style="background: linear-gradient(135deg, #f39c12, #e67e22);">Popular</span>';
+        } else if (type === 'dining' && item.category) {
+            badgeHTML = '<span class="card-badge" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">' + item.category + '</span>';
         }
 
-        let availabilityHTML = '';
-        if (type === 'accommodations' && item.available !== undefined) {
-            const statusClass = item.available > 3 ? 'available' : 'limited';
-            const statusText = item.available > 3 ? `${item.available} rooms available` : `Only ${item.available} left!`;
-            availabilityHTML = `
-                <div class="card-availability">
-                    <i class="fas fa-calendar-check"></i>
-                    <span class="availability-status ${statusClass}">${statusText}</span>
-                </div>
-            `;
-        }
-
-        let featuresHTML = '';
+        var featuresHTML = '';
         if (type === 'accommodations' && item.amenities && item.amenities.length) {
-            featuresHTML = `
-                <div class="card-features">
-                    ${item.amenities.slice(0, 4).map(amenity => 
-                        `<span class="feature-tag"><i class="fas fa-check"></i> ${amenity}</span>`
-                    ).join('')}
-                </div>
-            `;
+            featuresHTML = '<div class="card-features">' +
+                item.amenities.slice(0, 4).map(function(a) {
+                    return '<span class="feature-tag"><i class="fas fa-check"></i> ' + a + '</span>';
+                }).join('') +
+            '</div>';
         } else if (type === 'tours' && item.inclusions && item.inclusions.length) {
-            featuresHTML = `
-                <div class="card-features">
-                    ${item.inclusions.slice(0, 3).map(inc => 
-                        `<span class="feature-tag"><i class="fas fa-check"></i> ${inc}</span>`
-                    ).join('')}
-                    <span class="feature-tag"><i class="fas fa-clock"></i> ${item.duration || 'Full Day'}</span>
-                </div>
-            `;
+            featuresHTML = '<div class="card-features">' +
+                item.inclusions.slice(0, 2).map(function(inc) {
+                    return '<span class="feature-tag"><i class="fas fa-check"></i> ' + inc + '</span>';
+                }).join('') +
+                '<span class="feature-tag"><i class="fas fa-clock"></i> ' + (item.duration || 'Full Day') + '</span>' +
+            '</div>';
         } else if (type === 'dining') {
-            let dietTags = [];
-            if (item.isVegetarian) dietTags.push('<span class="feature-tag"><i class="fas fa-leaf"></i> Vegetarian</span>');
-            if (item.isSpicy) dietTags.push('<span class="feature-tag"><i class="fas fa-pepper-hot"></i> Spicy</span>');
-            featuresHTML = `
-                <div class="card-features">
-                    <span class="feature-tag"><i class="fas fa-utensils"></i> ${item.category || 'Filipino'}</span>
-                    ${dietTags.join('')}
-                </div>
-            `;
+            featuresHTML = '<div class="card-features">' +
+                '<span class="feature-tag"><i class="fas fa-utensils"></i> ' + (item.category || 'Filipino') + '</span>' +
+                (item.availableStock ? '<span class="feature-tag"><i class="fas fa-box"></i> ' + item.availableStock + ' in stock</span>' : '') +
+            '</div>';
         }
 
-        let scheduleHTML = '';
-        if (type === 'tours' && item.schedule) {
-            scheduleHTML = `
-                <div class="tour-schedule">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>${item.schedule}</span>
-                </div>
-            `;
+        var extraInfo = '';
+        if (type === 'accommodations' && item.available) {
+            var statusColor = item.available > 3 ? '#27ae60' : '#e74c3c';
+            extraInfo = '<div class="card-availability" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 13px;">' +
+                '<i class="fas fa-calendar-check" style="color: ' + statusColor + ';"></i>' +
+                '<span style="color: ' + statusColor + '; font-weight: 600;">' +
+                    (item.available > 3 ? item.available + ' rooms available' : 'Only ' + item.available + ' left!') +
+                '</span>' +
+            '</div>';
+        } else if (type === 'tours') {
+            extraInfo = '<div class="tour-info" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; font-size: 13px; color: var(--text-light);">' +
+                (item.location ? '<span><i class="fas fa-map-marker-alt" style="color: var(--primary-color); margin-right: 5px;"></i>' + item.location + '</span>' : '') +
+                (item.schedule ? '<span><i class="fas fa-clock" style="color: var(--accent-gold); margin-right: 5px;"></i>' + item.schedule + '</span>' : '') +
+            '</div>';
         }
 
-        const unitLabel = type === 'accommodations' ? '/night' : type === 'tours' ? '/person' : '/meal';
-
-        return `
-            <div class="sample-service-card" ${categoryAttr}>
-                <div class="card-image-wrapper">
-                    <img src="{{ asset('') }}${item.image}" alt="${item.name}" class="card-image" onerror="this.src='{{ asset('Images/placeholder.jpg') }}'"/>
-                    ${badgeHTML}
-                    <div class="card-hover-overlay">
-                        <button class="quick-view-btn" data-item='${JSON.stringify(item).replace(/'/g, "&apos;")}'>
-                            <i class="fas fa-search-plus"></i> Quick View
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h4>${item.name}</h4>
-                    <div class="card-rating">
-                        ${starsHTML}
-                        <span>${rating.toFixed(1)} (${item.reviews || 0} reviews)</span>
-                    </div>
-                    <p>${item.description}</p>
-                    ${featuresHTML}
-                    ${availabilityHTML}
-                    ${scheduleHTML}
-                    <div class="card-footer">
-                        <div class="card-price">
-                            <span class="price-label">From</span>
-                            <span class="price-value">₱${item.price.toLocaleString()} <span class="price-unit">${unitLabel}</span></span>
-                        </div>
-                        <a href="{{ path('app_login') }}" class="card-book-btn">
-                            <i class="fas fa-lock"></i> Sign In to Book
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function showTeaserMessage(modal, total, showing) {
-        const notice = modal.querySelector('.service-modal-notice');
-        if (notice && total > showing) {
-            const diff = total - showing;
-            const noticeText = notice.querySelector('.notice-text p');
-            if (noticeText) {
-                noticeText.innerHTML = `You're viewing ${showing} of ${total} available options. <strong>Sign in to unlock ${diff} more exclusive choices and member-only discounts!</strong>`;
+        var unitLabel = type === 'accommodations' ? '/night' : type === 'tours' ? '/person' : '/serving';
+        
+        var imageSrc = item.image || '';
+        if (!imageSrc || imageSrc === '') {
+            if (type === 'accommodations') {
+                imageSrc = '/Images/room1.jpg';
+            } else if (type === 'tours') {
+                imageSrc = '/Images/tour1.jpg';
+            } else if (type === 'dining') {
+                imageSrc = '/Images/food1.jpg';
+            } else {
+                imageSrc = '/Images/placeholder.jpg';
             }
         }
+
+        var safeName = (item.name || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        var safeDesc = (item.description || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        var formattedPrice = Number(item.price || 0).toLocaleString();
+
+        return '<div class="sample-service-card">' +
+            '<div class="card-image-wrapper">' +
+                '<img ' +
+                    'src="' + imageSrc + '" ' +
+                    'alt="' + safeName + '" ' +
+                    'class="card-image" ' +
+                    'loading="lazy" ' +
+                    'onerror="this.onerror=null; this.src=\'/Images/placeholder.jpg\';" ' +
+                '/>' +
+                badgeHTML +
+                '<div class="card-hover-overlay">' +
+                    '<button ' +
+                        'class="quick-view-btn" ' +
+                        'data-name="' + safeName + '" ' +
+                        'data-price="' + (item.price || 0) + '" ' +
+                        'data-desc="' + safeDesc + '" ' +
+                        'data-image="' + imageSrc + '"' +
+                    '>' +
+                        '<i class="fas fa-search-plus"></i> Quick View' +
+                    '</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="card-body">' +
+                '<h4>' + (item.name || 'Item') + '</h4>' +
+                '<div class="card-rating">' +
+                    starsHTML +
+                    '<span>' + rating.toFixed(1) + ' (' + (item.reviews || 0) + ' reviews)</span>' +
+                '</div>' +
+                '<p>' + (item.description || 'No description available.') + '</p>' +
+                featuresHTML +
+                extraInfo +
+                '<div class="card-footer">' +
+                    '<div class="card-price">' +
+                        '<span class="price-label">From</span>' +
+                        '<span class="price-value">₱' + formattedPrice + ' <span class="price-unit">' + unitLabel + '</span></span>' +
+                    '</div>' +
+                    '<a href="{{ path('app_login') }}" class="card-book-btn">' +
+                        '<i class="fas fa-lock"></i> Sign In to Book' +
+                    '</a>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
     }
 
     function attachCardEventListeners(grid) {
-        // Quick view buttons
-        grid.querySelectorAll('.quick-view-btn').forEach(btn => {
+        grid.querySelectorAll('.quick-view-btn').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const itemData = JSON.parse(this.getAttribute('data-item'));
-                showQuickViewAlert(itemData);
+                var name = this.getAttribute('data-name');
+                var price = this.getAttribute('data-price');
+                var desc = this.getAttribute('data-desc');
+                alert(name + '\n\nPrice: ₱' + Number(price).toLocaleString() + '\n\n' + desc + '\n\n✨ Sign in to see full details and book!');
             });
         });
 
-        // Book buttons - all redirect to login
-        grid.querySelectorAll('.card-book-btn').forEach(btn => {
+        grid.querySelectorAll('.card-book-btn').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Optional: Store intended booking in session
-                localStorage.setItem('intendedBooking', JSON.stringify({
-                    type: this.closest('.sample-service-card').getAttribute('data-room-category') || 
-                          this.closest('.sample-service-card').getAttribute('data-tour-category') || 
-                          this.closest('.sample-service-card').getAttribute('data-food-category'),
-                    itemName: this.closest('.sample-service-card').querySelector('h4').textContent
-                }));
                 window.location.href = '{{ path("app_login") }}';
             });
         });
-    }
-
-    function showQuickViewAlert(item) {
-        alert(`${item.name}\n\nPrice: ₱${item.price.toLocaleString()}\n\n${item.description}\n\n✨ Sign in to see full details, photos, and book instantly!`);
-        // In production, replace with a nice modal
     }
 
     function closeServiceModal() {
@@ -484,41 +516,15 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.style.overflow = '';
     }
 
-    // Event listeners for view buttons - using event delegation for reliability
     document.addEventListener('click', function(e) {
         var btn = e.target.closest('[data-service-view]');
         if (btn) {
             e.stopPropagation();
             e.preventDefault();
-            console.log('Button clicked via delegation, service type:', btn.getAttribute('data-service-view'));
             var serviceType = btn.getAttribute('data-service-view');
-            
-            try {
-                openServiceModal(serviceType);
-            } catch (error) {
-                console.error('Error opening modal:', error);
-            }
+            openServiceModal(serviceType);
         }
     });
-
-    // Also try direct attachment as backup
-    setTimeout(function() {
-        document.querySelectorAll('[data-service-view]').forEach(function (btn) {
-            console.log('Backup: Attaching event listener to button:', btn);
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                console.log('Backup: Button clicked, service type:', this.getAttribute('data-service-view'));
-                var serviceType = this.getAttribute('data-service-view');
-                
-                try {
-                    openServiceModal(serviceType);
-                } catch (error) {
-                    console.error('Backup: Error opening modal:', error);
-                }
-            });
-        });
-    }, 1000);
 
     serviceModalCloseBtns.forEach(function (btn) {
         btn.addEventListener('click', closeServiceModal);
@@ -535,59 +541,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     /* ══════════════════════════════════════
-       SERVICE MODAL FILTERS
-    ══════════════════════════════════════ */
-    function setupFilters(tabsSelector, cardsSelector, categoryAttr) {
-        const tabs = document.querySelectorAll(tabsSelector);
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                tabs.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                
-                const filter = this.getAttribute(categoryAttr);
-                const cards = document.querySelectorAll(cardsSelector);
-                let delay = 0;
-
-                cards.forEach(card => {
-                    const cardCategory = card.getAttribute(categoryAttr.replace('data-', 'data-').replace('-filter', '-category'));
-                    const match = filter === 'all' || cardCategory === filter;
-                    
-                    if (match) {
-                        card.style.display = '';
-                        card.style.opacity = '0';
-                        card.style.transform = 'translateY(20px)';
-                        setTimeout(() => {
-                            card.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(.34,1.56,.64,1)';
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0)';
-                        }, delay);
-                        delay += 60;
-                    } else {
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.95)';
-                        setTimeout(() => card.style.display = 'none', 250);
-                    }
-                });
-            });
-        });
-    }
-
-    // Setup filters for each modal
-    setTimeout(() => {
-        setupFilters('[data-room-filter]', '[data-room-category]', 'data-room-filter');
-        setupFilters('[data-tour-filter]', '[data-tour-category]', 'data-tour-filter');
-        setupFilters('[data-food-filter]', '[data-food-category]', 'data-food-filter');
-    }, 1000);
-
-    /* ══════════════════════════════════════
-       SERVICE CARD ANIMATIONS
+       SERVICE CARD ANIMATIONS 
     ══════════════════════════════════════ */
     var cardObserver = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0) scale(1)';
+                entry.target.style.transform = 'translateY(0)';
                 cardObserver.unobserve(entry.target);
             }
         });
@@ -595,33 +555,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('.service-card').forEach(function (card, i) {
         card.style.opacity = '0';
-        card.style.transform = 'translateY(40px) scale(.97)';
-        card.style.transition =
-            'opacity .6s cubic-bezier(.22,1,.36,1) ' + (i * 0.1) + 's,' +
-            'transform .6s cubic-bezier(.34,1.56,.64,1) ' + (i * 0.1) + 's,' +
-            'box-shadow .45s cubic-bezier(.34,1.56,.64,1),' +
-            'border-color .4s ease';
+        card.style.transform = 'translateY(40px)';
+        card.style.transition = 'opacity 0.6s ease ' + (i * 0.1) + 's, transform 0.6s ease ' + (i * 0.1) + 's, box-shadow 0.4s ease';
         cardObserver.observe(card);
-    });
-
-    /* ══════════════════════════════════════
-       SERVICE CARD MAGNETIC TILT EFFECT
-    ══════════════════════════════════════ */
-    document.querySelectorAll('.service-card').forEach(function (card) {
-        card.addEventListener('mousemove', function (e) {
-            const rect = this.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const dx = (e.clientX - cx) / (rect.width / 2);
-            const dy = (e.clientY - cy) / (rect.height / 2);
-            const tiltX = dy * -5;
-            const tiltY = dx * 5;
-            this.style.transform = `translateY(-12px) scale(1.015) perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-        });
-        
-        card.addEventListener('mouseleave', function () {
-            this.style.transform = '';
-        });
     });
 
     /* ══════════════════════════════════════
@@ -642,7 +578,6 @@ document.addEventListener('DOMContentLoaded', function () {
             menuToggle.classList.toggle('active');
         });
 
-        /* Close mobile menu when a link is clicked */
         document.querySelectorAll('.navbar ul li a').forEach(function (link) {
             link.addEventListener('click', function () {
                 navMenu.classList.remove('active');
@@ -658,7 +593,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var sections = document.querySelectorAll('section[id]');
 
     if (navLinks.length > 0 && sections.length > 0 && navbar) {
-        /* Helper: clear all active states */
         var clearActive = function () {
             navLinks.forEach(function (l) {
                 l.classList.remove('nav-active');
@@ -666,7 +600,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         };
 
-        /* Helper: mark a link active by matching href fragment */
         var setActive = function (id) {
             clearActive();
             navLinks.forEach(function (link) {
@@ -677,25 +610,21 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         };
 
-        /* On scroll — highlight the section currently in view */
         window.addEventListener('scroll', function () {
-            var scrollY  = window.pageYOffset;
-            var current  = '';
+            var scrollY = window.pageYOffset;
+            var current = '';
 
             sections.forEach(function (section) {
-                var top    = section.offsetTop - navbar.offsetHeight - 20;
+                var top = section.offsetTop - navbar.offsetHeight - 20;
                 var bottom = top + section.offsetHeight;
                 if (scrollY >= top && scrollY < bottom) {
                     current = section.getAttribute('id');
                 }
             });
 
-            if (current) {
-                setActive(current);
-            }
+            if (current) setActive(current);
         });
 
-        /* On click — immediately highlight the clicked link */
         navLinks.forEach(function (link) {
             link.addEventListener('click', function () {
                 clearActive();
@@ -703,7 +632,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        /* On page load — highlight based on current hash */
         var initialHash = window.location.hash ? window.location.hash.replace('#', '') : 'home';
         setActive(initialHash);
     }
@@ -719,12 +647,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 var target = document.querySelector(href);
                 if (target && navbar) {
                     window.scrollTo({
-                        top:      target.offsetTop - navbar.offsetHeight,
+                        top: target.offsetTop - navbar.offsetHeight,
                         behavior: 'smooth'
                     });
                 } else if (target) {
                     window.scrollTo({
-                        top:      target.offsetTop,
+                        top: target.offsetTop,
                         behavior: 'smooth'
                     });
                 }
@@ -739,18 +667,16 @@ document.addEventListener('DOMContentLoaded', function () {
         entries.forEach(function (entry, index) {
             if (entry.isIntersecting) {
                 setTimeout(function () {
-                    entry.target.style.opacity   = '1';
+                    entry.target.style.opacity = '1';
                     entry.target.style.transform = 'translateY(0)';
                 }, index * 100);
             }
         });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    document.querySelectorAll(
-        '.about-card, .review-card, .perk-item, .contact-item, .stat-item, .about-cta-inner'
-    ).forEach(function (el, index) {
-        el.style.opacity    = '0';
-        el.style.transform  = 'translateY(30px)';
+    document.querySelectorAll('.about-card, .review-card, .perk-item, .contact-item, .stat-item, .about-cta-inner').forEach(function (el, index) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
         el.style.transition = 'opacity 0.6s ease ' + (index * 0.1) + 's, transform 0.6s ease ' + (index * 0.1) + 's';
         observer.observe(el);
     });
@@ -777,12 +703,12 @@ document.addEventListener('DOMContentLoaded', function () {
             var about = document.querySelector('#about');
             if (about && navbar) {
                 window.scrollTo({
-                    top:      about.offsetTop - navbar.offsetHeight,
+                    top: about.offsetTop - navbar.offsetHeight,
                     behavior: 'smooth'
                 });
             } else if (about) {
                 window.scrollTo({
-                    top:      about.offsetTop,
+                    top: about.offsetTop,
                     behavior: 'smooth'
                 });
             }
@@ -792,102 +718,69 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ══════════════════════════════════════
        RIPPLE EFFECT
     ══════════════════════════════════════ */
-    var rippleStyle         = document.createElement('style');
+    var rippleStyle = document.createElement('style');
     rippleStyle.textContent = '@keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }';
     document.head.appendChild(rippleStyle);
 
     function attachRipple(selector) {
         document.addEventListener('click', function(e) {
-            const btn = e.target.closest(selector);
+            var btn = e.target.closest(selector);
             if (!btn) return;
             
-            const ripple = document.createElement('span');
-            const rect = btn.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
+            var ripple = document.createElement('span');
+            var rect = btn.getBoundingClientRect();
+            var size = Math.max(rect.width, rect.height);
             
-            ripple.style.cssText = `
-                position: absolute;
-                width: ${size}px;
-                height: ${size}px;
-                left: ${e.clientX - rect.left - size / 2}px;
-                top: ${e.clientY - rect.top - size / 2}px;
-                background: rgba(255,255,255,0.4);
-                border-radius: 50%;
-                transform: scale(0);
-                animation: rippleEffect 0.6s ease-out;
-                pointer-events: none;
-                z-index: 99;
-            `;
+            ripple.style.cssText = 
+                'position: absolute;' +
+                'width: ' + size + 'px;' +
+                'height: ' + size + 'px;' +
+                'left: ' + (e.clientX - rect.left - size / 2) + 'px;' +
+                'top: ' + (e.clientY - rect.top - size / 2) + 'px;' +
+                'background: rgba(255,255,255,0.4);' +
+                'border-radius: 50%;' +
+                'transform: scale(0);' +
+                'animation: rippleEffect 0.6s ease-out;' +
+                'pointer-events: none;' +
+                'z-index: 99;';
             
             btn.style.position = 'relative';
             btn.style.overflow = 'hidden';
             btn.appendChild(ripple);
             
-            setTimeout(() => ripple.remove(), 650);
+            setTimeout(function() { ripple.remove(); }, 650);
         });
     }
 
     attachRipple('.service-cta-btn, .card-book-btn, .notice-btn, .view-all-btn, .btn, .btn-create-account, .signin-btn');
 
     /* ══════════════════════════════════════
-       ENHANCED SERVICE CARD 3D TILT
-    ═══════════════════════════════════════ */
-    document.querySelectorAll('.service-card').forEach(card => {
-        card.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (y - centerY) / 10;
-            const rotateY = (centerX - x) / 10;
-            
-            this.style.transform = `
-                perspective(1000px) 
-                rotateX(${rotateX}deg) 
-                rotateY(${rotateY}deg) 
-                translateY(-12px) 
-                scale3d(1.02, 1.02, 1.02)
-            `;
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = '';
-        });
-    });
-
-    /* ══════════════════════════════════════
        PRICE COUNTER ANIMATION
-    ═══════════════════════════════════════ */
+    ══════════════════════════════════════ */
     function animatePrice(element) {
-        const targetText = element.textContent.replace(/,/g, '');
+        var targetText = element.textContent.replace(/[₱,]/g, '').trim();
+        if (isNaN(parseInt(targetText)) || targetText.toLowerCase() === 'free') return;
         
-        // Skip if it's "Free"
-        if (isNaN(parseInt(targetText))) return;
+        var target = parseInt(targetText);
+        var duration = 1500;
+        var step = target / (duration / 16);
+        var current = 0;
         
-        const target = parseInt(targetText);
-        const duration = 1500;
-        const step = target / (duration / 16);
-        let current = 0;
-        
-        const timer = setInterval(() => {
+        var timer = setInterval(function() {
             current += step;
             if (current >= target) {
-                element.textContent = target.toLocaleString();
+                element.textContent = '₱' + target.toLocaleString();
                 clearInterval(timer);
             } else {
-                element.textContent = Math.floor(current).toLocaleString();
+                element.textContent = '₱' + Math.floor(current).toLocaleString();
             }
         }, 16);
     }
 
-    // Trigger price animation when cards become visible
-    const priceObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+    var priceObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
             if (entry.isIntersecting) {
-                const priceElement = entry.target.querySelector('.price-amount');
+                var priceElement = entry.target.querySelector('.price-amount');
                 if (priceElement && !priceElement.classList.contains('animated')) {
                     priceElement.classList.add('animated');
                     animatePrice(priceElement);
@@ -897,50 +790,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }, { threshold: 0.5 });
 
-    document.querySelectorAll('.service-card').forEach(card => {
+    document.querySelectorAll('.service-card').forEach(function(card) {
         priceObserver.observe(card);
     });
 
     /* ══════════════════════════════════════
-       MAGNETIC CURSOR EFFECT (Optional)
-    ═══════════════════════════════════════ */
-    document.querySelectorAll('.modern-btn').forEach(btn => {
-        btn.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            
-            this.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) translateY(-3px) scale(1.03)`;
-        });
-        
-        btn.addEventListener('mouseleave', function() {
-            this.style.transform = '';
-        });
-    });
-
-    /* ══════════════════════════════════════
        SCROLL REVEAL FOR SERVICE CARDS
-    ═══════════════════════════════════════ */
-    const serviceObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
+    ══════════════════════════════════════ */
+    var serviceObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry, index) {
             if (entry.isIntersecting) {
-                setTimeout(() => {
+                setTimeout(function() {
                     entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0) scale(1)';
+                    entry.target.style.transform = 'translateY(0)';
                 }, index * 100);
                 serviceObserver.unobserve(entry.target);
             }
         });
     }, { threshold: 0.1, rootMargin: '-50px' });
 
-    document.querySelectorAll('.service-card').forEach((card, i) => {
+    document.querySelectorAll('.service-card').forEach(function(card, i) {
         card.style.opacity = '0';
-        card.style.transform = 'translateY(40px) scale(0.97)';
-        card.style.transition = `
-            opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.1}s,
-            transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 0.1}s,
-            box-shadow 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)
-        `;
+        card.style.transform = 'translateY(40px)';
+        card.style.transition = 'opacity 0.6s ease ' + (i * 0.1) + 's, transform 0.6s ease ' + (i * 0.1) + 's, box-shadow 0.4s ease';
         serviceObserver.observe(card);
     });
 });

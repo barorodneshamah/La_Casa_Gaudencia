@@ -675,7 +675,7 @@ footer::after{content:"";position:absolute;top:-100px;right:-100px;width:400px;h
     overflow: hidden;
     box-shadow: 0 4px 24px rgba(0,0,0,.08);
     border: 1px solid rgba(194,74,22,.1);
-    transition: all .45s cubic-bezier(.34, 1.56, .64, 1);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -727,7 +727,7 @@ footer::after{content:"";position:absolute;top:-100px;right:-100px;width:400px;h
 }
 
 .service-card:hover {
-    transform: translateY(-12px) scale(1.02);
+    transform: translateY(-12px);
     box-shadow: 0 28px 60px rgba(194,74,22,.22), 
                 0 0 0 1px rgba(212,168,83,.3);
     border-color: transparent;
@@ -2290,9 +2290,7 @@ footer::after{content:"";position:absolute;top:-100px;right:-100px;width:400px;h
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   NEW: SERVICE MODAL — DISPLAY FIX
-   (The original used display:none / .show = display:block which
-    causes the modal to not center. Override with flex centering.)
+   SERVICE MODAL 
 ═══════════════════════════════════════════════════════════════ */
 
 .service-modal {
@@ -2306,7 +2304,6 @@ footer::after{content:"";position:absolute;top:-100px;right:-100px;width:400px;h
     z-index: 10000;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    /* use flex so content is truly centered */
     align-items: center;
     justify-content: center;
     padding: 20px;

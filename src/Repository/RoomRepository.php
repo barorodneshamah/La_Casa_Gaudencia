@@ -13,44 +13,16 @@ class RoomRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, 'App\Entity\Room');
+        parent::__construct($registry, Room::class);
     }
 
-    //    /**
-    //     * @return Room[] Returns an array of Room objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Room
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
     /**
-     * Find minimum room price for active rooms
+     * Find minimum room price
      */
     public function findMinPrice(): ?float
     {
-        $qb = $this->createQueryBuilder('r');
-        
-        $result = $qb->select('MIN(r.pricePerNight) as minPrice')
-            ->where('r.status = :status')
-            ->setParameter('status', 'Available')
+        $result = $this->createQueryBuilder('r')
+            ->select('MIN(r.pricePerNight) as minPrice')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -58,28 +30,31 @@ class RoomRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find available rooms for landing page (limit to tease)
+     * Find random rooms for landing page
      */
-    public function findForLandingPage(int $limit = 4): array
+    public function findForLandingPage(int $limit = 3): array
     {
-        return $this->createQueryBuilder('r')
-            ->where('r.status = :status')
-            ->setParameter('status', 'Available')
-            ->orderBy('r.pricePerNight', 'ASC')
-            ->setMaxResults($limit)
+        // Get all rooms first
+        $allRooms = $this->createQueryBuilder('r')
             ->getQuery()
             ->getResult();
+        
+        // Shuffle and return limited
+        if (count($allRooms) > 0) {
+            shuffle($allRooms);
+            return array_slice($allRooms, 0, $limit);
+        }
+        
+        return [];
     }
 
     /**
-     * Count total active rooms
+     * Count total rooms
      */
     public function countActiveRooms(): int
     {
         return (int) $this->createQueryBuilder('r')
             ->select('COUNT(r.id)')
-            ->where('r.status = :status')
-            ->setParameter('status', 'Available')
             ->getQuery()
             ->getSingleScalarResult();
     }

@@ -16,41 +16,13 @@ class FoodRepository extends ServiceEntityRepository
         parent::__construct($registry, Food::class);
     }
 
-    //    /**
-    //     * @return Food[] Returns an array of Food objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Food
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
     /**
-     * Find minimum food price for active items
+     * Find minimum food price
      */
     public function findMinPrice(): ?float
     {
-        $qb = $this->createQueryBuilder('f');
-        
-        $result = $qb->select('MIN(f.price) as minPrice')
-            ->where('f.status = :status')
-            ->setParameter('status', 'Available')
+        $result = $this->createQueryBuilder('f')
+            ->select('MIN(f.price) as minPrice')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -58,28 +30,31 @@ class FoodRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find available food items for landing page
+     * Find random food items for landing page
      */
-    public function findForLandingPage(int $limit = 4): array
+    public function findForLandingPage(int $limit = 3): array
     {
-        return $this->createQueryBuilder('f')
-            ->where('f.status = :status')
-            ->setParameter('status', 'Available')
-            ->orderBy('f.price', 'ASC')
-            ->setMaxResults($limit)
+        // Get all food items first
+        $allFood = $this->createQueryBuilder('f')
             ->getQuery()
             ->getResult();
+        
+        // Shuffle and return limited
+        if (count($allFood) > 0) {
+            shuffle($allFood);
+            return array_slice($allFood, 0, $limit);
+        }
+        
+        return [];
     }
 
     /**
-     * Count total active food items
+     * Count total food items
      */
     public function countActiveFoodItems(): int
     {
         return (int) $this->createQueryBuilder('f')
             ->select('COUNT(f.id)')
-            ->where('f.status = :status')
-            ->setParameter('status', 'Available')
             ->getQuery()
             ->getSingleScalarResult();
     }

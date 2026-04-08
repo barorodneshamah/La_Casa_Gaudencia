@@ -10,65 +10,64 @@ use Symfony\Component\Mime\Address;
 
 class EmailVerificationService
 {
-public function __construct(
-private EntityManagerInterface $entityManager,
-private MailerInterface $mailer
-) {}
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private MailerInterface $mailer
+    ) {}
 
-/**
-* Generate a unique verification token
-*/
-public function generateVerificationToken(): string
-{
-return bin2hex(random_bytes(32));
+    /**
+     * Generate a unique verification token
+     */
+    public function generateVerificationToken(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
 
-}
+    /**
+     * Send verification email to user
+     */
+    public function sendVerificationEmail(User $user, string $verificationUrl): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address('barorodneshamah@gmail.com', 'La Casa Gaudencia'))
+            ->to(new Address($user->getEmail()))
+            ->subject('Please verify your email address')
+            ->htmlTemplate('emails/verification.html.twig')
+            ->context([
+                'user' => $user,
+                'verificationUrl' => $verificationUrl,
+            ]);
 
-/**
-* Send verification email to user
-*/
-public function sendVerificationEmail(User $user, string $verificationUrl): void
-{
-$email = (new TemplatedEmail())
-->from(new Address('barorodneshamah@gmail.com', 'La Casa Gaudencia')) 
-->to(new Address($user->getEmail()))
-->subject('Please verify your email address')
-->htmlTemplate('emails/verification.html.twig')
-->context([
-'user' => $user,
-'verificationUrl' => $verificationUrl,
-]);
+        $this->mailer->send($email);
+    }
 
-$this->mailer->send($email);
-}
+    /**
+     * Verify a token and mark user as verified
+     */
+    public function verifyToken(string $token): ?User
+    {
+        $user = $this->entityManager
+            ->getRepository(User::class)
+            ->findOneBy(['verificationToken' => $token]);
 
-/**
-* Verify a token and mark user as verified
-*/
-public function verifyToken(string $token): ?User
-{
-$user = $this->entityManager
-->getRepository(User::class)
-->findOneBy(['verificationToken' => $token]);
+        if (!$user) {
+            return null;
+        }
 
-if (!$user) {
-return null;
-}
+        // Mark user as verified
+        $user->setIsVerified(true);
+        $user->setVerificationToken(null); // Clear the token
 
-// Mark user as verified
-$user->setIsVerified(true);
-$user->setVerificationToken(null); // Clear the token
+        $this->entityManager->flush();
 
-$this->entityManager->flush();
+        return $user;
+    }
 
-return $user;
-}
-
-/**
-* Check if a user needs verification
-*/
-public function needsVerification(User $user): bool
-{
-return !$user->isVerified();
-}
+    /**
+     * Check if a user needs verification
+     */
+    public function needsVerification(User $user): bool
+    {
+        return !$user->isVerified();
+    }
 }
