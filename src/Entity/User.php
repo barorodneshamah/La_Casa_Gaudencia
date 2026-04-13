@@ -2,11 +2,20 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\ApiProperty;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -15,6 +24,33 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['user:read']]
+        ),
+        new Get(
+            security: "is_granted('ROLE_ADMIN') or object == user",
+            normalizationContext: ['groups' => ['user:read', 'user:detail']]
+        ),
+        new Post(
+            security: "is_granted('PUBLIC_ACCESS')",
+            denormalizationContext: ['groups' => ['user:write']],
+            validationContext: ['groups' => ['user:create']]
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN') or object == user",
+            denormalizationContext: ['groups' => ['user:write']],
+            validationContext: ['groups' => ['user:update']]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        )
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
 
@@ -31,33 +67,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['user:read', 'user:write'])]
+    #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
+    #[Assert\Length(min: 3, max: 180, groups: ['user:create', 'user:update'])]
     private ?string $username = null;
 
     #[ORM\Column]
+    #[Groups(['user:read', 'user:detail'])]
     private array $roles = [];
 
     #[ORM\Column]
+    #[Groups(['user:write'])]
+    #[Assert\NotBlank(groups: ['user:create'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['user:read', 'user:write'])]
+    #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
+    #[Assert\Email(groups: ['user:create', 'user:update'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
+    #[Assert\Length(max: 255, groups: ['user:create', 'user:update'])]
     private ?string $fullName = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['user:read', 'user:detail'])]
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user:detail'])]
     private ?string $verificationToken = null;
 
     public function getId(): ?int

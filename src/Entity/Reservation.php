@@ -3,13 +3,34 @@
 namespace App\Entity;
 
 use App\Repository\ReservationRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_GUEST')",
+            normalizationContext: ['groups' => ['reservation:read']]
+        ),
+        new Get(
+            security: "is_granted('ROLE_GUEST') or object.guest == user",
+            normalizationContext: ['groups' => ['reservation:read', 'reservation:detail']]
+        ),
+        new Post(
+            security: "is_granted('ROLE_GUEST')",
+            denormalizationContext: ['groups' => ['reservation:write']]
+        )
+    ]
+)]
 class Reservation
 {
     public const SERVICE_ROOM = 'room';
@@ -29,53 +50,69 @@ class Reservation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['reservation:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
+    #[Groups(['reservation:read'])]
     private ?string $reservationCode = null;
 
     // ====== ADD THIS PROPERTY ======
     #[ORM\Column(length: 20)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?string $serviceType = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['reservation:read', 'reservation:detail'])]
     private ?User $guest = null;
 
     #[ORM\ManyToOne(targetEntity: Room::class)]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?Room $room = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?\DateTimeInterface $checkInDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?\DateTimeInterface $checkOutDate = null;
 
     #[ORM\ManyToOne(targetEntity: Tour::class)]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?Tour $tour = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?int $tourParticipants = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?\DateTimeInterface $tourDate = null;
 
     #[ORM\ManyToOne(targetEntity: Package::class)]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?Package $package = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?array $foodItems = [];
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?int $numberOfGuests = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?string $specialRequests = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['reservation:read', 'reservation:write'])]
     private ?string $contactPhone = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
+    #[Groups(['reservation:read'])]
     private ?string $totalAmount = '0.00';
 
     #[ORM\Column(length: 20)]

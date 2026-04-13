@@ -3,60 +3,85 @@
 namespace App\Entity;
 
 use App\Repository\PackageRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PackageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['package:read']]),
+        new Get(normalizationContext: ['groups' => ['package:read', 'package:detail']])
+    ]
+)]
 class Package
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['package:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['package:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['package:read', 'package:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[Groups(['package:read', 'package:detail'])]
     private ?string $originalPrice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['package:read'])]
     private ?string $packagePrice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    #[Groups(['package:read'])]
     private ?string $discountPercentage = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['package:read', 'package:detail'])]
     private ?\DateTimeInterface $validFrom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['package:read', 'package:detail'])]
     private ?\DateTimeInterface $validUntil = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['package:read', 'package:detail'])]
     private ?int $maxRedemptions = null;
 
     #[ORM\Column]
+    #[Groups(['package:read', 'package:detail'])]
     private int $currentRedemptions = 0;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['package:read'])]
     private ?string $status = 'Active';
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['package:read'])]
     private ?string $packageType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['package:read'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['package:read', 'package:detail'])]
     private ?array $galleryImages = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['package:detail'])]
     private ?string $termsAndConditions = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

@@ -3,45 +3,65 @@
 namespace App\Entity;
 
 use App\Repository\RoomRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['room:read']]),
+        new Get(normalizationContext: ['groups' => ['room:read', 'room:detail']])
+    ]
+)]
 class Room
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['room:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 40)]
+    #[Groups(['room:read'])]
     private ?string $roomNumber = null;
 
     #[ORM\Column(length: 60)]
+    #[Groups(['room:read'])]
     private ?string $roomType = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['room:read'])]
     private ?string $pricePerNight = null;
 
     #[ORM\Column(type: Types::INTEGER)]
+    #[Groups(['room:read'])]
     private ?int $capacity = null;
 
     #[ORM\Column(length: 4000, nullable: true)]
+    #[Groups(['room:read', 'room:detail'])]
     private ?string $features = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['room:read', 'room:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 30)]
+    #[Groups(['room:read'])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['room:read'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['room:read', 'room:detail'])]
     private ?array $galleryImages = null;
 
     /** @var array<string,mixed> */

@@ -3,48 +3,69 @@
 namespace App\Entity;
 
 use App\Repository\TourRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TourRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['tour:read']]),
+        new Get(normalizationContext: ['groups' => ['tour:read', 'tour:detail']])
+    ]
+)]
 class Tour
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tour:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['tour:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['tour:read', 'tour:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['tour:read'])]
     private ?string $location = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['tour:read'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 160)]
+    #[Groups(['tour:read'])]
     private ?string $duration = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tour:read', 'tour:detail'])]
     private ?\DateTime $scheduleDate = null;
 
     #[ORM\Column]
+    #[Groups(['tour:read'])]
     private ?int $availableSlots = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['tour:read'])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['tour:read'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['tour:read', 'tour:detail'])]
     private ?array $galleryImages = null;
 
     /**

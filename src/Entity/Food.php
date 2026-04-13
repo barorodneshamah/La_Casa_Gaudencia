@@ -3,42 +3,61 @@
 namespace App\Entity;
 
 use App\Repository\FoodRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FoodRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['food:read']]),
+        new Get(normalizationContext: ['groups' => ['food:read', 'food:detail']])
+    ]
+)]
 class Food
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['food:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['food:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['food:read', 'food:detail'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['food:read'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['food:read'])]
     private ?string $category = null;
 
     #[ORM\Column]
+    #[Groups(['food:read', 'food:detail'])]
     private ?int $availableStock = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['food:read'])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['food:read'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['food:read', 'food:detail'])]
     private ?array $galleryImages = [];
 
     /**

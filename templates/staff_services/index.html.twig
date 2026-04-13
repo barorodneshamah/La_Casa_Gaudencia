@@ -18,6 +18,12 @@
         --brand-text-muted: #888888;
         --font-heading: 'Playfair Display', serif;
         --font-body: 'Roboto', sans-serif;
+
+        --radius-lg: 18px;
+        --radius-md: 12px;
+        --shadow-sm: 0 6px 18px rgba(0,0,0,.06);
+        --shadow-md: 0 12px 35px rgba(0,0,0,.10);
+        --ease-out: cubic-bezier(.2,.8,.2,1);
     }
 
     * {
@@ -27,10 +33,21 @@
     }
 
     body {
-        background-color: #f7f5edff;
         font-family: 'Roboto', sans-serif;
         color: #2f2f2f;
+
+        background-image:
+            linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+            url('{{ asset("images/ground.jpeg") }}');
+
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
     }
+
+    /* ensure content renders above overlay */
+    .sidebar-accent, .sidebar, .topbar, .main-content { position: relative; z-index: 1; }
 
     /* ===== ACCENT BAR ===== */
     .sidebar-accent {
@@ -41,7 +58,6 @@
         height: 100vh;
         background-color: #c24a16;
         border-radius: 0 6px 6px 0;
-        box-shadow: 2px 0 8px rgba(0,0,0,0.15);
         z-index: 30;
     }
 
@@ -72,14 +88,12 @@
         width: 75px;
         height: 75px;
         margin-bottom: 8px;
-        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
     }
 
     .brand h1 {
         font-family: 'Playfair Display', serif;
         color: #c24a16;
         font-size: 22px;
-        letter-spacing: .5px;
         margin: 0;
         font-weight: 600;
     }
@@ -87,7 +101,6 @@
     .brand small {
         color: #777;
         font-size: 12px;
-        letter-spacing: .75px;
         font-weight: 500;
     }
 
@@ -117,6 +130,7 @@
         color: #2f2f2f;
         text-decoration: none;
         transition: all .25s ease;
+        position: relative;
     }
 
     .sidebar ul li svg {
@@ -134,13 +148,14 @@
         margin-left: -12px;
         border-radius: 0 30px 30px 0;
         padding-left: 48px;
-        box-shadow: 0 4px 12px rgba(194,74,22,0.25);
     }
 
     .sidebar ul li a:hover svg,
     .sidebar ul li.active a svg {
         fill: white !important;
     }
+
+    .sidebar ul li.active a::before{ content: none !important; }
 
     /* ===== LOGOUT SECTION ===== */
     .sidebar-logout {
@@ -166,25 +181,38 @@
         font-size: 15px;
         font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+        box-shadow: 0 10px 24px rgba(194, 74, 22, .22);
         border: none;
         cursor: pointer;
     }
 
     .logout-btn:hover {
-        background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+        box-shadow: 0 16px 34px rgba(194, 74, 22, .28);
     }
 
     .logout-btn i {
         font-size: 16px;
     }
 
+    /* ===== MOBILE OVERLAY (for sidebar) ===== */
+    .mobile-overlay{
+        position:fixed;
+        inset:0;
+        background: rgba(0,0,0,.35);
+        opacity:0;
+        visibility:hidden;
+        transition: all .3s var(--ease-out);
+        z-index: 15;
+    }
+    .mobile-overlay.show{
+        opacity:1;
+        visibility:visible;
+    }
+
     /* ===== TOPBAR ===== */
     .topbar {
         margin-left: 268px;
-        background: #c24a16;
         height: 70px;
         display: flex;
         align-items: center;
@@ -194,20 +222,42 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+
+        background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+        background-size: 200% 200%;
+        animation: topbarShift 10s var(--ease-out) infinite;
+    }
+    @keyframes topbarShift{
+        0%{ background-position: 0% 50%; }
+        50%{ background-position: 100% 50%; }
+        100%{ background-position: 0% 50%; }
     }
 
     .topbar-left {
         font-family: 'Playfair Display', serif;
         font-size: 24px;
         font-weight: 600;
-        letter-spacing: .7px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .topbar-right {
         display: flex;
         align-items: center;
     }
+
+    .menu-btn{
+        display:none;
+        border:none;
+        background: rgba(255,255,255,.15);
+        color:#fff;
+        width:42px;
+        height:42px;
+        border-radius: 12px;
+        cursor:pointer;
+    }
+    .menu-btn:hover{ background: rgba(255,255,255,.25); }
 
     .datetime-display {
         text-align: right;
@@ -273,18 +323,18 @@
     .service-card {
         background: white;
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow-sm);
         overflow: hidden;
         display: flex;
         flex-direction: row;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.4s var(--ease-out);
         border: 1px solid rgba(0,0,0,0.04);
         position: relative;
     }
 
     .service-card:hover {
         transform: translateY(-8px);
-        box-shadow: 0 20px 50px rgba(194, 74, 22, 0.15);
+        box-shadow: var(--shadow-md);
     }
 
     /* ===== CARD IMAGE SECTION ===== */
@@ -572,49 +622,6 @@
         transform: translateX(4px);
     }
 
-    /* ===== CARD RIBBON (Optional) ===== */
-    .card-ribbon {
-        position: absolute;
-        top: 20px;
-        right: -35px;
-        background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
-        color: white;
-        padding: 8px 40px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transform: rotate(45deg);
-        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    }
-
-    /* ===== SINGLE COLUMN CARD (Full Width) ===== */
-    .service-card.full-width {
-        grid-column: span 2;
-    }
-
-    .service-card.full-width .card-image {
-        width: 40%;
-    }
-
-    .service-card.full-width .card-content {
-        width: 60%;
-    }
-
-    /* ===== VERTICAL CARD VARIANT ===== */
-    .service-card.vertical {
-        flex-direction: column;
-    }
-
-    .service-card.vertical .card-image {
-        width: 100%;
-        min-height: 200px;
-    }
-
-    .service-card.vertical .card-content {
-        width: 100%;
-    }
-
     /* ===== PACKAGE HIGHLIGHT BORDER ===== */
     .service-card.package-card {
         border: 2px solid rgba(123, 31, 162, 0.15);
@@ -625,14 +632,61 @@
         border-color: rgba(123, 31, 162, 0.3);
     }
 
+    /* ===== ENHANCED SHINE SWEEP (cards) ===== */
+    .service-card::after{
+        content:"";
+        position:absolute;
+        inset:-40% -60%;
+        background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.35) 45%, transparent 60%);
+        transform: translateX(-35%) rotate(8deg);
+        opacity: 0;
+        transition: opacity .25s var(--ease-out);
+        pointer-events:none;
+    }
+    .service-card:hover::after{
+        opacity: 1;
+        animation: shine 1.05s var(--ease-out) both;
+    }
+    @keyframes shine{
+        from{ transform: translateX(-45%) rotate(8deg); }
+        to{ transform: translateX(45%) rotate(8deg); }
+    }
+
+    /* ===== REVEAL ON SCROLL ===== */
+    .reveal{
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity .55s var(--ease-out), transform .55s var(--ease-out);
+        transition-delay: var(--d, 0ms);
+        will-change: transform, opacity;
+    }
+    .reveal.in-view{
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ===== ACCESSIBLE FOCUS ===== */
+    :focus-visible{
+        outline: 3px solid rgba(194, 74, 22, .35);
+        outline-offset: 3px;
+        border-radius: 10px;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        margin-top: 24px;
+        padding: 20px;
+        background: #fff3e0;
+        border-left: 4px solid #c24a16;
+        border-radius: 8px;
+        color: #666;
+        font-size: 14px;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1400px) {
         .service-card-grid {
             grid-template-columns: 1fr;
-        }
-
-        .service-card.full-width {
-            grid-column: span 1;
         }
     }
 
@@ -641,14 +695,12 @@
             flex-direction: column;
         }
 
-        .service-card .card-image,
-        .service-card.full-width .card-image {
+        .service-card .card-image {
             width: 100%;
             min-height: 220px;
         }
 
-        .service-card .card-content,
-        .service-card.full-width .card-content {
+        .service-card .card-content {
             width: 100%;
         }
 
@@ -665,39 +717,45 @@
         }
     }
 
+    /* Mobile: off-canvas sidebar */
     @media (max-width: 768px) {
-        .sidebar {
-            display: none;
-        }
+        .menu-btn{ display:inline-flex; align-items:center; justify-content:center; }
 
-        .sidebar-accent {
-            display: none;
-        }
+        .topbar { margin-left: 0; }
+        .main-content { margin-left: 0; padding: 20px; }
 
-        .main-content,
-        .topbar {
-            margin-left: 0;
-        }
+        .sidebar-accent { display: block; transform: translateX(-120%); transition: transform .35s var(--ease-out); }
+        .sidebar { display: flex; transform: translateX(-120%); transition: transform .35s var(--ease-out); }
 
-        .main-content {
-            padding: 20px;
-        }
+        .sidebar.open{ transform: translateX(0); }
+        .sidebar-accent.open{ transform: translateX(0); }
 
         .card-actions {
             flex-direction: column;
+        }
+    }
+
+    /* ===== REDUCED MOTION ===== */
+    @media (prefers-reduced-motion: reduce){
+        *,.reveal, .topbar{
+            animation: none !important;
+            transition: none !important;
+            scroll-behavior: auto !important;
         }
     }
 </style>
 {% endblock %}
 
 {% block body %}
+{% set currentRoute = app.request.attributes.get('_route') %}
+
 <!-- ACCENT BAR -->
 <div class="sidebar-accent"></div>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
     <div class="brand">
-        <img src="/Images/WEB.png" alt="Logo">
+        <img src="{{ asset('Images/WEB.png') }}" alt="Logo">
         <h1>La Casa Gaudencia</h1>
         <small>Staff Panel</small>
     </div>
@@ -706,7 +764,7 @@
     <div class="sidebar-separator"></div>
 
     <ul>
-        <li>
+        <li class="{{ currentRoute == 'app_staff_dashboard' ? 'active' : '' }}">
             <a href="{{ path('app_staff_dashboard') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
@@ -715,7 +773,7 @@
             </a>
         </li>
 
-        <li>
+        <li class="{{ currentRoute == 'staff_services' ? 'active' : '' }}">
             <a href="{{ path('staff_services') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
@@ -724,7 +782,7 @@
             </a>
         </li>
 
-        <li>
+        <li class="{{ currentRoute == 'reservation_index' ? 'active' : '' }}">
             <a href="{{ path('reservation_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
@@ -733,16 +791,16 @@
             </a>
         </li>
 
-        <li>
+        <li class="{{ currentRoute == 'app_payment_dashboard' ? 'active' : '' }}">
             <a href="{{ path('app_payment_dashboard') }}">
                 <svg viewBox="0 0 24 24">
-                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
-                 </svg>
+                    <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
+                </svg>
                 Payments
             </a>
         </li>
 
-        <li>
+        <li class="{{ currentRoute == 'app_contact_message_index' ? 'active' : '' }}">
             <a href="{{ path('app_contact_message_index') }}">
                 <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
                 Messages
@@ -758,9 +816,17 @@
     </div>
 </div>
 
+<!-- MOBILE OVERLAY (for sidebar) -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
 <!-- TOPBAR -->
 <div class="topbar">
-    <div class="topbar-left">Staff Service Management</div>
+    <div class="topbar-left">
+        <button class="menu-btn" type="button" aria-label="Open menu" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span>Staff Service Management</span>
+    </div>
     <div class="topbar-right">
         <div class="datetime-display">
             <div class="time" id="currentTime">00:00 AM</div>
@@ -797,24 +863,19 @@
     {% set totalFoods = foodsList|length %}
     {% set availableFoods = foodsList|filter(f => f.status|lower == 'available')|length %}
     {% set outOfStockFoods = foodsList|filter(f => f.status|lower == 'out of stock' or f.availableStock == 0)|length %}
-    {% set totalStock = 0 %}
-    {% for food in foodsList %}
-        {% set totalStock = totalStock + food.availableStock %}
-    {% endfor %}
 
     {# Packages Data #}
     {% set packagesList = packages|default([]) %}
     {% set totalPackages = packagesList|length %}
     {% set activePackages = packagesList|filter(p => p.status|lower == 'active')|length %}
     {% set featuredPackages = packagesList|filter(p => p.isFeatured == true)|length %}
-    {% set expiredPackages = packagesList|filter(p => p.status|lower == 'expired' or p.status|lower == 'inactive')|length %}
 
     <!-- SERVICE CARDS GRID -->
     <div class="service-card-grid">
         <!-- ROOM SERVICE CARD -->
         <div class="service-card">
             <div class="card-image">
-                <img src="/Images/H1.jpg" alt="Room Services">
+                <img src="{{ asset('Images/H1.jpg') }}" alt="Room Services">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge">
                     <i class="fas fa-star"></i>
@@ -869,7 +930,7 @@
         <!-- TOUR SERVICE CARD -->
         <div class="service-card">
             <div class="card-image">
-                <img src="/Images/Hotel.jpg" alt="Tour Services">
+                <img src="{{ asset('Images/Hotel.jpg') }}" alt="Tour Services">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge">
                     <i class="fas fa-star"></i>
@@ -924,7 +985,7 @@
         <!-- FOOD SERVICE CARD -->
         <div class="service-card">
             <div class="card-image">
-                <img src="/Images/culinary.jpg" alt="Food Services">
+                <img src="{{ asset('Images/culinary.jpg') }}" alt="Food Services">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge">
                     <i class="fas fa-star"></i>
@@ -979,7 +1040,7 @@
         <!-- PACKAGE SERVICE CARD -->
         <div class="service-card package-card">
             <div class="card-image">
-                <img src="/Images/Hall.jpg" alt="Package Deals">
+                <img src="{{ asset('Images/Hall.jpg') }}" alt="Package Deals">
                 <div class="card-image-overlay"></div>
                 <span class="card-category-badge promo-badge">
                     <i class="fas fa-gift"></i>
@@ -1033,7 +1094,7 @@
     </div>
 
     {% if totalRooms == 0 and totalTours == 0 and totalFoods == 0 and totalPackages == 0 %}
-        <div style="margin-top: 24px; padding: 20px; background: #fff3e0; border-left: 4px solid #c24a16; border-radius: 8px; color:#666; font-size: 14px;">
+        <div class="empty-state">
             <strong>Getting Started:</strong> No services found yet. Start by adding rooms, tours, or food items to begin managing your property. Then create packages to bundle them together!
         </div>
     {% endif %}
@@ -1065,6 +1126,61 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        // close mobile sidebar after clicking a link
+        document.querySelectorAll('.sidebar a').forEach(a => {
+            a.addEventListener('click', () => closeSidebar());
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+
+        initReveal();
     });
+
+    function toggleSidebar(){
+        const sidebar = document.querySelector('.sidebar');
+        const accent = document.querySelector('.sidebar-accent');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.toggle('open');
+        accent.classList.toggle('open');
+        overlay.classList.toggle('show');
+    }
+
+    function closeSidebar(){
+        const sidebar = document.querySelector('.sidebar');
+        const accent = document.querySelector('.sidebar-accent');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.remove('open');
+        accent.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
+    function initReveal() {
+        const targets = document.querySelectorAll(
+            '.page-header, .service-card'
+        );
+
+        targets.forEach((el, i) => {
+            el.classList.add('reveal');
+            el.style.setProperty('--d', `${Math.min(i * 55, 420)}ms`);
+        });
+
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        targets.forEach(el => io.observe(el));
+    }
 </script>
 {% endblock %}

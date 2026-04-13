@@ -3,11 +3,32 @@
 namespace App\Entity;
 
 use App\Repository\PaymentRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[ORM\Table(name: 'payments')]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['payment:read']]
+        ),
+        new Get(
+            security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['payment:read', 'payment:detail']]
+        ),
+        new Post(
+            security: "is_granted('ROLE_GUEST')",
+            denormalizationContext: ['groups' => ['payment:write']]
+        )
+    ]
+)]
 class Payment
 {
     // Payment Status Constants
@@ -29,51 +50,66 @@ class Payment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['payment:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
+    #[Groups(['payment:read'])]
     private ?string $transactionReference = null;
 
     #[ORM\ManyToOne(targetEntity: Reservation::class, inversedBy: 'payments')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['payment:read', 'payment:write', 'payment:detail'])]
     private ?Reservation $reservation = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['payment:read', 'payment:detail'])]
     private ?User $paidBy = null;
 
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?string $amount = null;
 
     #[ORM\Column(length: 30)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?string $paymentMethod = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['payment:read'])]
     private ?string $status = self::STATUS_PENDING;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['payment:write', 'payment:detail'])]
     private ?string $proofOfPayment = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?string $referenceNumber = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?string $guestNotes = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['payment:detail'])]
     private ?string $adminNotes = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['payment:detail'])]
     private ?User $approvedBy = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['payment:detail'])]
     private ?\DateTimeInterface $approvedAt = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['payment:detail'])]
     private ?string $rejectionReason = null;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['payment:read'])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]

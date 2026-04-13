@@ -15,6 +15,12 @@
     --brand-text-muted: #888888;
     --font-heading: 'Playfair Display', serif;
     --font-body: 'Roboto', sans-serif;
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-sm: 0 6px 18px rgba(0,0,0,.06);
+    --shadow-md: 0 12px 35px rgba(0,0,0,.10);
+    --ease-out: cubic-bezier(.2,.8,.2,1);
 }
 
 * {
@@ -24,10 +30,21 @@
 }
 
 body {
-    background-color: #f7f5edff;
     font-family: 'Roboto', sans-serif;
     color: #2f2f2f;
+
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
 }
+
+/* ensure content renders above overlay */
+.sidebar-accent, .sidebar, .topbar, .main-content { position: relative; z-index: 1; }
 
 /* ===== ACCENT BAR ===== */
 .sidebar-accent {
@@ -38,7 +55,6 @@ body {
     height: 100vh;
     background-color: #c24a16;
     border-radius: 0 6px 6px 0;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
     z-index: 30;
 }
 
@@ -69,14 +85,12 @@ body {
     width: 75px;
     height: 75px;
     margin-bottom: 8px;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
 }
 
 .brand h1 {
     font-family: 'Playfair Display', serif;
     color: #c24a16;
     font-size: 22px;
-    letter-spacing: .5px;
     margin: 0;
     font-weight: 600;
 }
@@ -84,7 +98,6 @@ body {
 .brand small {
     color: #777;
     font-size: 12px;
-    letter-spacing: .75px;
     font-weight: 500;
 }
 
@@ -113,6 +126,7 @@ body {
     color: #2f2f2f;
     text-decoration: none;
     transition: all .25s ease;
+    position: relative;
 }
 
 .sidebar ul li svg {
@@ -129,13 +143,14 @@ body {
     margin-left: -12px;
     border-radius: 0 30px 30px 0;
     padding-left: 48px;
-    box-shadow: 0 4px 12px rgba(194,74,22,0.25);
 }
 
 .sidebar ul li a:hover svg,
 .sidebar ul li.active a svg {
     fill: white !important;
 }
+
+.sidebar ul li.active a::before{ content: none !important; }
 
 /* ===== LOGOUT SECTION ===== */
 .sidebar-logout {
@@ -161,25 +176,38 @@ body {
     font-size: 15px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    box-shadow: 0 10px 24px rgba(194, 74, 22, .22);
     border: none;
     cursor: pointer;
 }
 
 .logout-btn:hover {
-    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+    box-shadow: 0 16px 34px rgba(194, 74, 22, .28);
 }
 
 .logout-btn i {
     font-size: 16px;
 }
 
+/* ===== MOBILE OVERLAY ===== */
+.mobile-overlay{
+    position:fixed;
+    inset:0;
+    background: rgba(0,0,0,.35);
+    opacity:0;
+    visibility:hidden;
+    transition: all .3s var(--ease-out);
+    z-index: 15;
+}
+.mobile-overlay.show{
+    opacity:1;
+    visibility:visible;
+}
+
 /* ===== TOPBAR ===== */
 .topbar {
     margin-left: 268px;
-    background: #c24a16;
     height: 70px;
     display: flex;
     align-items: center;
@@ -189,20 +217,42 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+
+    background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s var(--ease-out) infinite;
+}
+@keyframes topbarShift{
+    0%{ background-position: 0% 50%; }
+    50%{ background-position: 100% 50%; }
+    100%{ background-position: 0% 50%; }
 }
 
 .topbar-left {
     font-family: 'Playfair Display', serif;
     font-size: 24px;
     font-weight: 600;
-    letter-spacing: .7px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .topbar-right {
     display: flex;
     align-items: center;
 }
+
+.menu-btn{
+    display:none;
+    border:none;
+    background: rgba(255,255,255,.15);
+    color:#fff;
+    width:42px;
+    height:42px;
+    border-radius: 12px;
+    cursor:pointer;
+}
+.menu-btn:hover{ background: rgba(255,255,255,.25); }
 
 .datetime-display {
     text-align: right;
@@ -305,6 +355,7 @@ body {
 .btn-hollow:hover { 
     background: #c24a16; 
     color: #fff; 
+    transform: translateY(-2px);
 }
 
 .btn-solid { 
@@ -315,6 +366,7 @@ body {
 
 .btn-solid:hover { 
     transform: translateY(-2px); 
+    box-shadow: 0 10px 24px rgba(194,74,22,.35);
 }
 
 .btn-export {
@@ -325,15 +377,37 @@ body {
 
 .btn-export:hover {
     transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(46,125,50,.35);
 }
 
 /* Card wrapper */
 .log-card { 
     background: #fff; 
-    border-radius: 16px; 
-    box-shadow: 0 8px 24px rgba(0,0,0,.08); 
+    border-radius: var(--radius-lg); 
+    box-shadow: var(--shadow-sm); 
     border: 1px solid rgba(0,0,0,.05); 
-    overflow: hidden; 
+    overflow: hidden;
+    position: relative;
+}
+
+/* Card shine effect */
+.log-card::after{
+    content:"";
+    position:absolute;
+    inset:-40% -60%;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.35) 45%, transparent 60%);
+    transform: translateX(-35%) rotate(8deg);
+    opacity: 0;
+    transition: opacity .25s var(--ease-out);
+    pointer-events:none;
+}
+.log-card:hover::after{
+    opacity: 1;
+    animation: shine 1.05s var(--ease-out) both;
+}
+@keyframes shine{
+    from{ transform: translateX(-45%) rotate(8deg); }
+    to{ transform: translateX(45%) rotate(8deg); }
 }
 
 /* Top summary strip */
@@ -503,7 +577,13 @@ body {
     display: flex; 
     align-items: center; 
     gap: 12px; 
-    box-shadow: 0 4px 12px rgba(0,0,0,.04); 
+    box-shadow: 0 4px 12px rgba(0,0,0,.04);
+    transition: all 0.3s ease;
+}
+
+.quick-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
 }
 
 .quick-tile i { 
@@ -543,7 +623,13 @@ body {
     padding: 16px 18px; 
     display: flex; 
     justify-content: space-between; 
-    align-items: center; 
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    background: #fafafa;
+    border-color: #c24a16;
 }
 
 .detail-label { 
@@ -612,7 +698,7 @@ body {
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid #eee;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-sm);
 }
 
 .data-card-header {
@@ -668,6 +754,14 @@ body {
     gap: 14px;
     padding: 12px 0;
     border-bottom: 1px solid #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: #fafafa;
+    padding-left: 10px;
+    margin-left: -10px;
+    border-radius: 8px;
 }
 
 .activity-item:last-child {
@@ -748,6 +842,12 @@ body {
     display: flex;
     align-items: center;
     gap: 18px;
+    transition: all 0.3s ease;
+}
+
+.entity-card:hover {
+    border-color: #c24a16;
+    box-shadow: 0 6px 20px rgba(194,74,22,.15);
 }
 
 .entity-icon {
@@ -840,21 +940,34 @@ body {
     font-size: 14px;
 }
 
+/* ===== REVEAL ON SCROLL ===== */
+.reveal{
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .55s var(--ease-out), transform .55s var(--ease-out);
+    transition-delay: var(--d, 0ms);
+    will-change: transform, opacity;
+}
+.reveal.in-view{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== ACCESSIBLE FOCUS ===== */
+:focus-visible{
+    outline: 3px solid rgba(194, 74, 22, .35);
+    outline-offset: 3px;
+    border-radius: 10px;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
-    .sidebar {
-        width: 220px;
-    }
-    .main-content,
-    .topbar {
-        margin-left: 228px;
+    .details-grid { 
+        grid-template-columns: 1fr; 
     }
 }
 
 @media (max-width: 900px) {
-    .details-grid { 
-        grid-template-columns: 1fr; 
-    }
     .log-hero { 
         flex-direction: column; 
         align-items: flex-start; 
@@ -871,15 +984,19 @@ body {
     }
 }
 
+/* Mobile: off-canvas sidebar */
 @media (max-width: 768px) {
-    .sidebar,
-    .sidebar-accent {
-        display: none;
-    }
-    .main-content,
-    .topbar {
-        margin-left: 0;
-    }
+    .menu-btn{ display:inline-flex; align-items:center; justify-content:center; }
+
+    .topbar { margin-left: 0; }
+    .main-content { margin-left: 0; padding: 20px; }
+
+    .sidebar-accent { display: block; transform: translateX(-120%); transition: transform .35s var(--ease-out); }
+    .sidebar { display: flex; transform: translateX(-120%); transition: transform .35s var(--ease-out); }
+
+    .sidebar.open{ transform: translateX(0); }
+    .sidebar-accent.open{ transform: translateX(0); }
+
     .page-header {
         flex-direction: column;
         align-items: flex-start;
@@ -888,10 +1005,20 @@ body {
         width: 100%;
     }
 }
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce){
+    *,.reveal, .topbar{
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
 </style>
 {% endblock %}
 
 {% block body %}
+{% set currentRoute = app.request.attributes.get('_route') %}
 
 <!-- ACCENT BAR -->
 <div class="sidebar-accent"></div>
@@ -899,7 +1026,7 @@ body {
 <!-- SIDEBAR -->
 <div class="sidebar">
     <div class="brand">
-        <img src="/Images/WEB.png" alt="Logo">
+        <img src="{{ asset('Images/WEB.png') }}" alt="Logo">
         <h1>La Casa Gaudencia</h1>
         <small>Admin Panel</small>
     </div>
@@ -907,7 +1034,7 @@ body {
     <div class="sidebar-separator"></div>
 
     <ul>
-        <li>
+        <li class="{{ currentRoute == 'app_admin_dashboard' ? 'active' : '' }}">
             <a href="{{ path('app_admin_dashboard') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
@@ -915,7 +1042,7 @@ body {
                 Dashboard
             </a>
         </li>
-        <li>
+        <li class="{{ currentRoute == 'app_user_index' ? 'active' : '' }}">
             <a href="{{ path('app_user_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
@@ -923,7 +1050,7 @@ body {
                 User Management
             </a>
         </li>
-        <li>
+        <li class="{{ currentRoute == 'app_admin_services' ? 'active' : '' }}">
             <a href="{{ path('app_admin_services') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/>
@@ -931,7 +1058,7 @@ body {
                 Services
             </a>
         </li>
-        <li>
+        <li class="{{ currentRoute == 'reservation_index' ? 'active' : '' }}">
             <a href="{{ path('reservation_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/>
@@ -939,7 +1066,7 @@ body {
                 Reservations
             </a>
         </li>
-        <li>
+        <li class="{{ currentRoute == 'app_payment_dashboard' ? 'active' : '' }}">
             <a href="{{ path('app_payment_dashboard') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/>
@@ -947,13 +1074,13 @@ body {
                 Payments
             </a>
         </li>
-        <li>
+        <li class="{{ currentRoute == 'app_contact_message_index' ? 'active' : '' }}">
             <a href="{{ path('app_contact_message_index') }}">
                 <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
                 Messages
             </a>
         </li>
-        <li class="active">
+        <li class="{{ currentRoute starts with 'app_activity_log' ? 'active' : '' }}">
             <a href="{{ path('app_activity_log_index') }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
@@ -972,9 +1099,17 @@ body {
     </div>
 </div>
 
+<!-- MOBILE OVERLAY -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
 <!-- TOPBAR -->
 <div class="topbar">
-    <div class="topbar-left">Activity Log Details</div>
+    <div class="topbar-left">
+        <button class="menu-btn" type="button" aria-label="Open menu" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span>Activity Log Details</span>
+    </div>
     <div class="topbar-right">
         <div class="datetime-display">
             <div class="time" id="currentTime">00:00 AM</div>
@@ -1348,6 +1483,61 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
+
+    // close mobile sidebar after clicking a link
+    document.querySelectorAll('.sidebar a').forEach(a => {
+        a.addEventListener('click', () => closeSidebar());
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
+    initReveal();
 });
+
+function toggleSidebar(){
+    const sidebar = document.querySelector('.sidebar');
+    const accent = document.querySelector('.sidebar-accent');
+    const overlay = document.getElementById('mobileOverlay');
+
+    sidebar.classList.toggle('open');
+    accent.classList.toggle('open');
+    overlay.classList.toggle('show');
+}
+
+function closeSidebar(){
+    const sidebar = document.querySelector('.sidebar');
+    const accent = document.querySelector('.sidebar-accent');
+    const overlay = document.getElementById('mobileOverlay');
+
+    sidebar.classList.remove('open');
+    accent.classList.remove('open');
+    overlay.classList.remove('show');
+}
+
+function initReveal() {
+    const targets = document.querySelectorAll(
+        '.page-header, .log-card, .section-heading, .detail-item, .quick-tile, .activity-item'
+    );
+
+    targets.forEach((el, i) => {
+        el.classList.add('reveal');
+        el.style.setProperty('--d', `${Math.min(i * 35, 420)}ms`);
+    });
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    targets.forEach(el => io.observe(el));
+}
 </script>
 {% endblock %}

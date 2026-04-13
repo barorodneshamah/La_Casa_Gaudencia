@@ -29,4 +29,9 @@ services:
     App\Controller\TourController:
         arguments:
             $tourImagesDirectory: '%tour_images_directory%'
+
+    # API Platform Data Persisters
+    App\DataPersister\UserDataPersister:
+        tags:
+            - { name: 'api_platform.state_processor', priority: 1 }
             

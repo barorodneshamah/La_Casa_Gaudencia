@@ -67,7 +67,7 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
         } elseif (in_array('ROLE_STAFF', $roles, true)) {
             $url = $this->urlGenerator->generate('app_staff_dashboard');
         } else {
-            $url = $this->urlGenerator->generate('app_landing');
+            $url = $this->urlGenerator->generate('app_home');
         }
 
         $response = new RedirectResponse($url);
