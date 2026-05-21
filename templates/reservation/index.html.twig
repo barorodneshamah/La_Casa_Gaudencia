@@ -26,9 +26,17 @@
 
 /* ===== GLOBAL ===== */
 body {
-    background-color: #f7f5edff;
     font-family: 'Roboto', sans-serif;
     color: #2f2f2f;
+
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 /* ===== ACCENT BAR ===== */
@@ -176,9 +184,14 @@ body {
 }
 
 /* ===== TOPBAR ===== */
+@keyframes topbarShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .topbar {
     margin-left: 268px;
-    background: #c24a16;
     height: 70px;
     display: flex;
     align-items: center;
@@ -188,7 +201,10 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+
+    background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .topbar-left {
@@ -201,6 +217,7 @@ body {
 .topbar-right {
     display: flex;
     align-items: center;
+    gap: 20px;
 }
 
 .datetime-display {
@@ -220,6 +237,50 @@ body {
     font-size: 10px;
     color: rgba(255, 255, 255, 0.8);
     margin-top: 1px;
+}
+
+/* ===== MENU BUTTON ===== */
+.menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 5px;
+}
+
+.menu-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.menu-btn span {
+    width: 20px;
+    height: 2px;
+    background: white;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+/* ===== MOBILE OVERLAY ===== */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+}
+
+.mobile-overlay.active {
+    display: block;
 }
 
 /* ===== MAIN CONTENT ===== */
@@ -628,6 +689,11 @@ table.dataTable tbody td {
     color: #c2185b;
 }
 
+.type-badge.spa {
+    background: #fbe9e7;
+    color: #c24a16;
+}
+
 /* ===== PRICE COLUMN ===== */
 .price-cell {
     font-weight: 700;
@@ -1031,10 +1097,9 @@ table.dataTable tbody td {
                         <!-- GUEST -->
                         <td>
                             <div class="guest-cell">
-                                <span class="email">{{ reservation.guestEmail ?? reservation['guestEmail'] ?? 'N/A' }}</span>
-                                {% set phone = reservation.guestPhone ?? reservation['guestPhone'] ?? null %}
-                                {% if phone %}
-                                <span class="phone"><i class="fas fa-phone"></i> {{ phone }}</span>
+                                <span class="email">{{ reservation.guest ? reservation.guest.email : 'N/A' }}</span>
+                                {% if reservation.contactPhone %}
+                                <span class="phone"><i class="fas fa-phone"></i> {{ reservation.contactPhone }}</span>
                                 {% endif %}
                             </div>
                         </td>
@@ -1054,13 +1119,15 @@ table.dataTable tbody td {
                                 {% if (reservation.foodItems is defined and reservation.foodItems is not empty) or (reservation['hasFood'] is defined and reservation['hasFood']) %}
                                     <span class="type-badge food"><i class="fas fa-utensils"></i> Food</span>
                                 {% endif %}
+                                {% if (reservation.spa is defined and reservation.spa) or (reservation['hasSpa'] is defined and reservation['hasSpa']) %}
+                                    <span class="type-badge spa"><i class="fas fa-spa"></i> Spa</span>
+                                {% endif %}
                             </div>
                         </td>
 
                         <!-- TOTAL PRICE -->
                         <td>
-                            {% set price = reservation.totalPrice ?? reservation['totalPrice'] ?? 0 %}
-                            <div class="price-cell">₱{{ price|number_format(2, '.', ',') }}</div>
+                            <div class="price-cell">₱{{ (reservation.totalAmount ?? 0)|number_format(2, '.', ',') }}</div>
                         </td>
 
                         <!-- PAYMENT STATUS -->
@@ -1181,5 +1248,50 @@ $(document).ready(function() {
         }
     });
 });
+</script>
+
+{# ── Mercure real-time reservation updates ──────────────────────────────── #}
+<script>
+(function () {
+    const hubUrl = new URL('{{ mercure('/topic/reservations')|e('js') }}');
+    const es = new EventSource(hubUrl);
+
+    es.onmessage = function (event) {
+        try {
+            const data = JSON.parse(event.data);
+            showRealtimeToast(data);
+            // Give the user 3 seconds to read the toast, then refresh the list
+            setTimeout(function () { location.reload(); }, 3000);
+        } catch (e) { /* ignore malformed payloads */ }
+    };
+
+    es.onerror = function () {
+        // Mercure hub unreachable — silently disable real-time
+        es.close();
+    };
+
+    function showRealtimeToast(data) {
+        const action = data.status === 'PENDING' ? 'New booking' : 'Booking updated';
+        const code   = data.reservationCode ? ' #' + data.reservationCode : '';
+        const msg    = action + code + ' — status: ' + (data.status || '?');
+
+        const toast = document.createElement('div');
+        toast.style.cssText = [
+            'position:fixed', 'top:20px', 'right:20px', 'z-index:9999',
+            'background:#2e7d32', 'color:#fff', 'padding:14px 20px',
+            'border-radius:10px', 'font-family:Roboto,sans-serif',
+            'font-size:14px', 'box-shadow:0 4px 20px rgba(0,0,0,0.2)',
+            'max-width:320px', 'line-height:1.4',
+            'animation:slideIn .3s ease'
+        ].join(';');
+        toast.textContent = '🔔 ' + msg;
+
+        const style = document.createElement('style');
+        style.textContent = '@keyframes slideIn{from{transform:translateX(110%)}to{transform:translateX(0)}}';
+        document.head.appendChild(style);
+        document.body.appendChild(toast);
+        setTimeout(function () { toast.remove(); }, 3500);
+    }
+})();
 </script>
 {% endblock %}

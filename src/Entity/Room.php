@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['room:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['room:read', 'package:detail']]),
         new Get(normalizationContext: ['groups' => ['room:read', 'room:detail']])
     ]
 )]
@@ -25,23 +25,23 @@ class Room
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 40)]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?string $roomNumber = null;
 
     #[ORM\Column(length: 60)]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?string $roomType = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?string $pricePerNight = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?int $capacity = null;
 
     #[ORM\Column(length: 4000, nullable: true)]
@@ -53,11 +53,11 @@ class Room
     private ?string $description = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['room:read'])]
+    #[Groups(['room:read', 'package:detail'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]

@@ -53,7 +53,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     public const ROLE_GUEST = 'ROLE_GUEST';
     public const ROLE_STAFF = 'ROLE_STAFF';
     public const ROLE_ADMIN = 'ROLE_ADMIN';
@@ -111,6 +110,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['user:detail'])]
     private ?string $verificationToken = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
+    #[Groups(['user:detail'])]
+    private ?string $googleId = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user:detail'])]
+    private ?string $fcmToken = null;
+
+    // ── Getters/Setters ───────────────────────────────────────────
 
     public function getId(): ?int
     {
@@ -220,6 +229,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->verificationToken = $token;
         return $this;
     }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): static
+    {
+        $this->fcmToken = $fcmToken;
+        return $this;
+    }
+
+    // ── Lifecycle callbacks ───────────────────────────────────────
 
     #[ORM\PrePersist]
     public function onPrePersist(): void

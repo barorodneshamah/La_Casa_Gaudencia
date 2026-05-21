@@ -24,9 +24,17 @@
 }
 
 body {
-    background-color: #f7f5edff;
     font-family: 'Roboto', sans-serif;
     color: #2f2f2f;
+
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 /* ===== ACCENT BAR ===== */
@@ -173,9 +181,14 @@ body {
 }
 
 /* ===== TOPBAR ===== */
+@keyframes topbarShift{
+  0%{ background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
+  100%{ background-position: 0% 50%; }
+}
+
 .topbar {
     margin-left: 268px;
-    background: #c24a16;
     height: 70px;
     display: flex;
     align-items: center;
@@ -185,7 +198,10 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+
+    background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .topbar-left {
@@ -198,6 +214,35 @@ body {
 .topbar-right {
     display: flex;
     align-items: center;
+    gap: 20px;
+}
+
+.bell-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .25s;
+}
+.bell-btn:hover { background: rgba(255,255,255,0.28); color: white; }
+.bell-badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    min-width: 17px; height: 17px;
+    background: #ef4444;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800; color: #fff;
+    padding: 0 3px;
 }
 
 .datetime-display {
@@ -217,6 +262,50 @@ body {
     font-size: 10px;
     color: rgba(255, 255, 255, 0.8);
     margin-top: 1px;
+}
+
+/* ===== MENU BUTTON ===== */
+.menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 5px;
+}
+
+.menu-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.menu-btn span {
+    width: 20px;
+    height: 2px;
+    background: white;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+/* ===== MOBILE OVERLAY ===== */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+}
+
+.mobile-overlay.active {
+    display: block;
 }
 
 /* ===== MAIN CONTENT ===== */
@@ -691,69 +780,36 @@ body {
     color: #c24a16;
 }
 
-/* ===== STATUS OPTIONS ===== */
-.status-options {
+/* ===== STATUS DISPLAY ===== */
+.status-display {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
 }
 
-.status-option {
+.status-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed #eee;
 }
 
-.status-option:hover {
-    background: rgba(194, 74, 22, 0.05);
+.status-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
-.status-option.selected {
-    border-color: #c24a16;
-    background: rgba(194, 74, 22, 0.05);
-}
-
-.status-option input {
-    display: none;
-}
-
-.status-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.status-dot.unread {
-    background: #ef6c00;
-}
-
-.status-dot.read {
-    background: #2e7d32;
-}
-
-.status-dot.replied {
-    background: #1565c0;
-}
-
-.status-dot.archived {
-    background: #6a1b9a;
-}
-
-.status-option span {
-    font-size: 14px;
+.status-row-label {
+    font-size: 13px;
+    color: #888;
     font-weight: 500;
 }
 
-.btn-save {
+.btn-archive {
     width: 100%;
-    margin-top: 15px;
-    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    margin-top: 6px;
+    background: linear-gradient(135deg, #6a1b9a 0%, #8e24aa 100%);
     color: white;
     border: none;
     padding: 14px;
@@ -761,14 +817,18 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(194, 74, 22, 0.3);
+    box-shadow: 0 4px 15px rgba(106, 27, 154, 0.25);
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.btn-save:hover {
-    background: linear-gradient(135deg, #a53f13 0%, #c24a16 100%);
+.btn-archive:hover {
+    background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(194, 74, 22, 0.4);
+    box-shadow: 0 6px 20px rgba(106, 27, 154, 0.4);
 }
 
 /* ===== NOTES ===== */
@@ -1012,6 +1072,10 @@ body {
             <div class="time" id="currentTime">00:00 AM</div>
             <div class="date" id="currentDate">Loading...</div>
         </div>
+        <a href="{{ path('app_contact_message_index') }}" class="bell-btn" id="bellBtn" title="Messages">
+            <i class="fas fa-bell"></i>
+            <span class="bell-badge" id="bellBadge" style="display:none"></span>
+        </a>
     </div>
 </div>
 
@@ -1114,7 +1178,7 @@ body {
                                 <span class="reply-author">
                                     <i class="fas fa-user-shield"></i>
                                     {% if reply.repliedBy is not null %}
-                                        {{ reply.repliedBy.firstName ?? reply.repliedBy.email }}
+                                        {{ reply.repliedBy.fullName ?? reply.repliedBy.username ?? reply.repliedBy.email }}
                                     {% else %}
                                         Staff
                                     {% endif %}
@@ -1164,36 +1228,39 @@ body {
         <!-- RIGHT SIDEBAR -->
         <div class="sidebar-panel">
 
-            <!-- Update Status -->
+            <!-- Status (automatic) -->
             <div class="side-card">
-                <h3><i class="fas fa-tasks"></i> Update Status</h3>
-                <form method="post" action="{{ path('app_contact_message_status', {id: message.id}) }}">
-                    <div class="status-options">
-                        <label class="status-option {{ message.status == 'unread' ? 'selected' : '' }}">
-                            <input type="radio" name="status" value="unread" {{ message.status == 'unread' ? 'checked' : '' }}>
-                            <span class="status-dot unread"></span>
-                            <span>Unread</span>
-                        </label>
-                        <label class="status-option {{ message.status == 'read' ? 'selected' : '' }}">
-                            <input type="radio" name="status" value="read" {{ message.status == 'read' ? 'checked' : '' }}>
-                            <span class="status-dot read"></span>
-                            <span>Read</span>
-                        </label>
-                        <label class="status-option {{ message.status == 'replied' ? 'selected' : '' }}">
-                            <input type="radio" name="status" value="replied" {{ message.status == 'replied' ? 'checked' : '' }}>
-                            <span class="status-dot replied"></span>
-                            <span>Replied</span>
-                        </label>
-                        <label class="status-option {{ message.status == 'archived' ? 'selected' : '' }}">
-                            <input type="radio" name="status" value="archived" {{ message.status == 'archived' ? 'checked' : '' }}>
-                            <span class="status-dot archived"></span>
-                            <span>Archived</span>
-                        </label>
+                <h3><i class="fas fa-info-circle"></i> Status</h3>
+                <div class="status-display">
+                    <div class="status-row">
+                        <span class="status-row-label">Current Status</span>
+                        <span class="status-badge status-{{ message.status }}">{{ message.status }}</span>
                     </div>
-                    <button type="submit" class="btn-save">
-                        <i class="fas fa-check"></i> Save Status
-                    </button>
-                </form>
+                    <div class="status-row">
+                        <span class="status-row-label">Received</span>
+                        <span style="font-size:13px;font-weight:500">{{ message.createdAt|date('M d, Y h:i A') }}</span>
+                    </div>
+                    {% if message.readAt %}
+                    <div class="status-row">
+                        <span class="status-row-label">Read at</span>
+                        <span style="font-size:13px;font-weight:500">{{ message.readAt|date('M d, Y h:i A') }}</span>
+                    </div>
+                    {% endif %}
+                    {% if message.userSeenAt %}
+                    <div class="status-row">
+                        <span class="status-row-label">Seen by customer</span>
+                        <span style="font-size:13px;font-weight:500">{{ message.userSeenAt|date('M d, Y h:i A') }}</span>
+                    </div>
+                    {% endif %}
+                    {% if message.status != 'archived' %}
+                    <form method="post" action="{{ path('app_contact_message_status', {id: message.id}) }}">
+                        <input type="hidden" name="status" value="archived">
+                        <button type="submit" class="btn-archive">
+                            <i class="fas fa-archive"></i> Archive
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- Notes -->
@@ -1264,13 +1331,25 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
-    // Status Radio Selection
-    document.querySelectorAll('.status-option input').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
-            this.closest('.status-option').classList.add('selected');
-        });
-    });
+    // Notification bell polling
+    function refreshBell() {
+        fetch('/dashboard/api/unread-count', { credentials: 'same-origin' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (!data) return;
+                const badge = document.getElementById('bellBadge');
+                if (!badge) return;
+                if (data.count > 0) {
+                    badge.textContent = data.count > 9 ? '9+' : data.count;
+                    badge.style.display = '';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(() => {});
+    }
+    refreshBell();
+    setInterval(refreshBell, 30000);
 });
 </script>
 {% endblock %}

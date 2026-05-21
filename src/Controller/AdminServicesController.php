@@ -6,6 +6,7 @@ use App\Repository\RoomRepository;
 use App\Repository\TourRepository;
 use App\Repository\FoodRepository;
 use App\Repository\PackageRepository;
+use App\Repository\SpaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,22 +17,19 @@ final class AdminServicesController extends AbstractController
 {
     #[Route('/admin/services', name: 'app_admin_services')]
     public function index(
-        RoomRepository $roomRepository, 
+        RoomRepository $roomRepository,
         TourRepository $tourRepository,
-        FoodRepository $foodRepository, 
-        PackageRepository $packageRepository
+        FoodRepository $foodRepository,
+        PackageRepository $packageRepository,
+        SpaRepository $spaRepository
     ): Response
     {
-        $rooms = $roomRepository->findAll();
-        $tours = $tourRepository->findAll();
-        $foods = $foodRepository->findAll();
-        $package = $packageRepository->findAll();
-
         return $this->render('admin_services/index.html.twig', [
-            'rooms' => $rooms,
-            'tours' => $tours,
-            'foods' => $foods,
-            'packages' => $package,
+            'rooms'    => $roomRepository->findAll(),
+            'tours'    => $tourRepository->findAll(),
+            'foods'    => $foodRepository->findAll(),
+            'packages' => $packageRepository->findAll(),
+            'spas'     => $spaRepository->findAll(),
         ]);
     }
 }

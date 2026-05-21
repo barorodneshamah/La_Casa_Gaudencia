@@ -25,9 +25,17 @@
 }
 
 body {
-    background-color: #f7f5edff;
     font-family: 'Roboto', sans-serif;
     color: #2f2f2f;
+
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 /* ===== ACCENT BAR ===== */
@@ -178,9 +186,14 @@ body {
 }
 
 /* ===== TOPBAR ===== */
+@keyframes topbarShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .topbar {
     margin-left: 268px;
-    background: #c24a16;
     height: 70px;
     display: flex;
     align-items: center;
@@ -190,7 +203,10 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+
+    background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .topbar-left {
@@ -203,6 +219,7 @@ body {
 .topbar-right {
     display: flex;
     align-items: center;
+    gap: 20px;
 }
 
 .datetime-display {
@@ -222,6 +239,50 @@ body {
     font-size: 10px;
     color: rgba(255, 255, 255, 0.8);
     margin-top: 1px;
+}
+
+/* ===== MENU BUTTON ===== */
+.menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 5px;
+}
+
+.menu-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.menu-btn span {
+    width: 20px;
+    height: 2px;
+    background: white;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+/* ===== MOBILE OVERLAY ===== */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 15;
+}
+
+.mobile-overlay.active {
+    display: block;
 }
 
 /* ===== MAIN CONTENT ===== */
@@ -1503,7 +1564,7 @@ body {
                 <div class="payment-card {% if hoursAgo > 24 %}urgent{% endif %}"
                      data-service="{{ reservation.serviceType }}"
                      data-method="{{ payment.paymentMethod }}"
-                     data-search="{{ payment.transactionReference|lower }} {{ guest.firstName|lower }} {{ guest.lastName|lower }} {{ guest.email|lower }}">
+                     data-search="{{ payment.transactionReference|lower }} {{ (guest.fullName ?? guest.username)|lower }} {{ guest.email|lower }}">
                     
                     <!-- Card Header -->
                     <div class="payment-card-header">
@@ -1541,10 +1602,10 @@ body {
                                 <span class="label">Guest</span>
                                 <div class="guest-info">
                                     <div class="guest-avatar">
-                                        {{ guest.firstName|slice(0, 1)|upper }}{{ guest.lastName|slice(0, 1)|upper }}
+                                        {{ (guest.fullName ?? guest.username)|slice(0, 1)|upper }}
                                     </div>
                                     <div class="guest-details">
-                                        <span class="name">{{ guest.firstName }} {{ guest.lastName }}</span>
+                                        <span class="name">{{ guest.fullName ?? guest.username }}</span>
                                         <span class="email">{{ guest.email }}</span>
                                     </div>
                                 </div>
@@ -1592,7 +1653,7 @@ body {
                             <!-- Reservation -->
                             <div class="info-item">
                                 <span class="label">Reservation</span>
-                                <span class="value">{{ reservation.referenceNumber }}</span>
+                                <span class="value">{{ reservation.reservationCode }}</span>
                             </div>
 
                             <!-- Total -->
@@ -1630,9 +1691,9 @@ body {
                     <!-- Card Footer -->
                     <div class="payment-card-footer">
                         <div class="reservation-info">
-                            {% if reservation.serviceType == 'ROOM' %}
-                                <span><i class="fas fa-calendar-alt"></i> {{ reservation.checkIn|date('M d') }} - {{ reservation.checkOut|date('M d, Y') }}</span>
-                            {% elseif reservation.serviceType == 'TOUR' %}
+                            {% if reservation.serviceType == 'room' and reservation.checkInDate %}
+                                <span><i class="fas fa-calendar-alt"></i> {{ reservation.checkInDate|date('M d') }}{% if reservation.checkOutDate %} - {{ reservation.checkOutDate|date('M d, Y') }}{% endif %}</span>
+                            {% elseif reservation.serviceType == 'tour' and reservation.tourDate %}
                                 <span><i class="fas fa-calendar-alt"></i> {{ reservation.tourDate|date('M d, Y') }}</span>
                             {% else %}
                                 <span><i class="fas fa-calendar-alt"></i> {{ reservation.createdAt|date('M d, Y') }}</span>
@@ -1891,5 +1952,39 @@ document.addEventListener('keydown', function(e) {
         });
     }
 });
+
+// Real-time payment notifications via Mercure
+(function () {
+    fetch('/api/mercure/token')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data) return;
+            const url = new URL(data.hubUrl);
+            url.searchParams.append('topic', '/topic/payments');
+            const es = new EventSource(url.toString(), { headers: { Authorization: 'Bearer ' + data.token } });
+            es.onmessage = function (e) {
+                try {
+                    const payment = JSON.parse(e.data);
+                    if (payment.status === 'PENDING') {
+                        showPaymentToast(payment);
+                    }
+                } catch {}
+            };
+        })
+        .catch(() => {});
+
+    function showPaymentToast(payment) {
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:#c24a16;color:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:320px;font-family:Roboto,sans-serif;';
+        toast.innerHTML = '<strong>New Payment Submitted</strong><br>Transaction: ' + (payment.transactionRef || payment.id) + '<br>Amount: ₱' + Number(payment.amount).toLocaleString();
+        const btn = document.createElement('button');
+        btn.textContent = 'View';
+        btn.style.cssText = 'margin-top:8px;background:#fff;color:#c24a16;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:600;';
+        btn.onclick = () => location.reload();
+        toast.appendChild(btn);
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 12000);
+    }
+})();
 </script>
 {% endblock %}

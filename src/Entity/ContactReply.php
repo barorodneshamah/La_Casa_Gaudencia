@@ -3,9 +3,23 @@
 namespace App\Entity;
 
 use App\Repository\ContactReplyRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new Post(),
+        new Get(),
+        new GetCollection(),
+    ],
+    normalizationContext: ['groups' => ['reply:read']],
+    denormalizationContext: ['groups' => ['reply:write']]
+)]
 #[ORM\Entity(repositoryClass: ContactReplyRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class ContactReply
@@ -13,20 +27,25 @@ class ContactReply
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['reply:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: ContactMessage::class, inversedBy: 'replies')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Groups(['reply:read', 'reply:write'])]
     private ?ContactMessage $contactMessage = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['reply:read', 'reply:write'])]
     private ?User $repliedBy = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['reply:read', 'reply:write'])]
     private ?string $replyMessage = null;
 
     #[ORM\Column]
+    #[Groups(['reply:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\PrePersist]

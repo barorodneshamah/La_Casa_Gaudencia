@@ -7,9 +7,11 @@ use App\Repository\TourRepository;
 use App\Repository\RoomRepository;
 use App\Repository\FoodRepository;
 use App\Repository\PackageRepository;
+use App\Repository\SpaRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\UserRepository;
 use App\Repository\ActivityLogRepository;
+use App\Repository\ContactMessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,9 +30,11 @@ final class AdminDashboardController extends AbstractController
         RoomRepository $roomRepository,
         FoodRepository $foodRepository,
         PackageRepository $packageRepository,
+        SpaRepository $spaRepository,
         PaymentRepository $paymentRepository,
         UserRepository $userRepository,
-        ActivityLogRepository $activityLogRepository
+        ActivityLogRepository $activityLogRepository,
+        ContactMessageRepository $contactMessageRepository
     ): Response {
         
         /** @var User $user */
@@ -101,7 +105,11 @@ final class AdminDashboardController extends AbstractController
         $totalRooms = $roomRepository->count([]);
         $totalFoods = $foodRepository->count([]);
         $totalPackages = $packageRepository->count([]);
-        $totalRecords = $totalTours + $totalRooms + $totalFoods + $totalPackages;
+        $totalSpas = $spaRepository->count([]);
+        $totalRecords = $totalTours + $totalRooms + $totalFoods + $totalPackages + $totalSpas;
+
+        // Unread messages (for notification bell)
+        $unreadMessages = $contactMessageRepository->countUnread();
 
         // Recent Activities (last 10)
         $recentActivities = $activityLogRepository->findBy(
@@ -124,11 +132,11 @@ final class AdminDashboardController extends AbstractController
             'total_rooms' => $totalRooms,
             'total_foods' => $totalFoods,
             'total_packages' => $totalPackages,
+            'total_spas' => $totalSpas,
             'total_sales' => $totalSales,
             'today_sales' => $todaySales,
             'monthly_sales' => $monthlySales,
             'total_transactions' => $totalTransactions,
-            // New data
             'total_users' => $totalUsers,
             'total_staff' => $totalStaff,
             'total_admins' => $totalAdmins,
@@ -136,6 +144,7 @@ final class AdminDashboardController extends AbstractController
             'total_records' => $totalRecords,
             'recent_activities' => $recentActivities,
             'today_activities' => $todayActivities,
+            'unread_messages' => $unreadMessages,
         ]);
     }
 

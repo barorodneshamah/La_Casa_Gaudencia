@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\PaymentRepository;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -16,11 +18,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') or is_granted('ROLE_GUEST')",
             normalizationContext: ['groups' => ['payment:read']]
         ),
         new Get(
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') or (is_granted('ROLE_GUEST') and object.paidBy == user)",
             normalizationContext: ['groups' => ['payment:read', 'payment:detail']]
         ),
         new Post(
@@ -64,19 +66,30 @@ class Payment
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['payment:read', 'payment:detail'])]
+    #[Groups(['payment:read', 'payment:write', 'payment:detail'])]
     private ?User $paidBy = null;
 
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
     #[Groups(['payment:read', 'payment:write'])]
+    #[Assert\NotBlank]
+    #[Assert\GreaterThan(0)]
     private ?string $amount = null;
 
     #[ORM\Column(length: 30)]
     #[Groups(['payment:read', 'payment:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: [
+        self::METHOD_CASH, self::METHOD_CREDIT_CARD, self::METHOD_DEBIT_CARD,
+        self::METHOD_GCASH, self::METHOD_MAYA, self::METHOD_PAYPAL, self::METHOD_BANK_TRANSFER,
+    ])]
     private ?string $paymentMethod = null;
 
     #[ORM\Column(length: 20)]
     #[Groups(['payment:read'])]
+    #[Assert\Choice(choices: [
+        self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED,
+        self::STATUS_REFUNDED, self::STATUS_CANCELLED,
+    ])]
     private ?string $status = self::STATUS_PENDING;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -126,6 +139,18 @@ class Payment
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTime();
+    }
+
+    #[Assert\Callback]
+    public function validateReferenceNumber(ExecutionContextInterface $context): void
+    {
+        if ($this->paymentMethod !== self::METHOD_CASH
+            && (empty($this->referenceNumber) || $this->referenceNumber === 'N/A')
+        ) {
+            $context->buildViolation('A reference/transaction number is required for cashless payments.')
+                ->atPath('referenceNumber')
+                ->addViolation();
+        }
     }
 
     private function generateTransactionReference(): string

@@ -21,9 +21,17 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background-color: #f7f5edff;
     font-family: 'Roboto', sans-serif;
     color: #2f2f2f;
+
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 /* ===== SIDEBAR ===== */
@@ -114,9 +122,14 @@ body {
 .logout-btn:hover { transform: translateY(-2px); }
 
 /* ===== TOPBAR ===== */
+@keyframes topbarShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .topbar {
     margin-left: 268px;
-    background: var(--brand-primary);
     height: 70px;
     display: flex;
     align-items: center;
@@ -126,6 +139,10 @@ body {
     position: sticky;
     top: 0;
     z-index: 10;
+
+    background: linear-gradient(120deg, var(--brand-primary) 0%, #e85d04 45%, var(--brand-primary) 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .topbar-left { 
@@ -139,6 +156,15 @@ body {
     font-weight: 600; 
 }
 .topbar-right { display: flex; align-items: center; gap: 20px; }
+
+/* ===== MENU BUTTON ===== */
+.menu-btn { display: none; flex-direction: column; justify-content: center; align-items: center; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; gap: 5px; }
+.menu-btn:hover { background: rgba(255,255,255,0.3); }
+.menu-btn span { width: 20px; height: 2px; background: white; display: block; transition: all 0.3s ease; }
+
+/* ===== MOBILE OVERLAY ===== */
+.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 15; }
+.mobile-overlay.active { display: block; }
 
 .back-btn {
     display: flex;
@@ -457,6 +483,10 @@ body {
 .status-badge.refunded {
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
     color: #0369a1;
+}
+.status-badge.paid {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #047857;
 }
 
 .action-btns { display: flex; gap: 8px; }
@@ -829,15 +859,15 @@ body {
                     </td>
                     <td>
                         <div class="guest-info">
-                            <span class="guest-name">{{ payment.paidBy.firstName }} {{ payment.paidBy.lastName }}</span>
+                            <span class="guest-name">{{ payment.paidBy.fullName ?? payment.paidBy.username }}</span>
                             <span class="guest-email">{{ payment.paidBy.email }}</span>
                         </div>
                     </td>
                     <td>
                         <div class="reservation-info">
-                            <span class="reservation-ref">{{ payment.reservation.referenceNumber }}</span>
+                            <span class="reservation-ref">{{ payment.reservation.reservationCode }}</span>
                             <span class="reservation-date">
-                                {{ payment.reservation.checkIn|date('M d, Y') }}
+                                {{ payment.reservation.checkInDate ? payment.reservation.checkInDate|date('M d, Y') : payment.reservation.createdAt|date('M d, Y') }}
                             </span>
                         </div>
                     </td>
@@ -879,18 +909,25 @@ body {
                         </span>
                     </td>
                     <td>
-                        <span class="status-badge {{ payment.status|lower }}">
-                            {% if payment.status == 'PENDING' %}
-                                <i class="fas fa-clock"></i>
-                            {% elseif payment.status == 'APPROVED' %}
-                                <i class="fas fa-check-circle"></i>
-                            {% elseif payment.status == 'REJECTED' %}
-                                <i class="fas fa-times-circle"></i>
-                            {% elseif payment.status == 'REFUNDED' %}
-                                <i class="fas fa-undo"></i>
-                            {% endif %}
-                            {{ payment.status|capitalize }}
+                        {% if payment.status == 'APPROVED' %}
+                        <span class="status-badge paid">
+                            <i class="fas fa-check-circle"></i> Paid
                         </span>
+                        {% elseif payment.status == 'PENDING' %}
+                        <span class="status-badge pending">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
+                        {% elseif payment.status == 'REJECTED' %}
+                        <span class="status-badge rejected">
+                            <i class="fas fa-times-circle"></i> Rejected
+                        </span>
+                        {% elseif payment.status == 'REFUNDED' %}
+                        <span class="status-badge refunded">
+                            <i class="fas fa-undo"></i> Refunded
+                        </span>
+                        {% else %}
+                        <span class="status-badge">{{ payment.status|capitalize }}</span>
+                        {% endif %}
                     </td>
                     <td>
                         {{ payment.createdAt|date('M d, Y') }}<br>

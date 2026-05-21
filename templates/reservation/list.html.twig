@@ -2,8 +2,456 @@
 
 {% block title %}{{ serviceLabel }}{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-primary-light: #e85d04;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-sm: 0 6px 18px rgba(0,0,0,.06);
+    --shadow-md: 0 12px 35px rgba(0,0,0,.10);
+    --ease-out: cubic-bezier(.2,.8,.2,1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* ensure content renders above overlay */
+.sidebar-accent, .sidebar, .topbar, .modal-overlay, .toast, .main-content { position: relative; z-index: 1; }
+
+/* ===== SIDEBAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    z-index: 30;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    width: 260px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+}
+
+.brand { text-align: center; margin-bottom: 30px; }
+.brand img { width: 75px; height: 75px; margin-bottom: 8px; }
+.brand h1 { font-family: 'Playfair Display', serif; color: #c24a16; font-size: 22px; margin: 0; }
+.brand small { color: #777; font-size: 12px; }
+
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 10px 0 15px 0;
+}
+
+.sidebar ul { list-style: none; width: 100%; padding: 0; }
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+    position: relative;
+}
+.sidebar ul li svg { width: 20px; height: 20px; fill: #888; transition: .25s; }
+.sidebar ul li a:hover, .sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+}
+.sidebar ul li a:hover svg, .sidebar ul li.active a svg { fill: white !important; }
+
+.sidebar ul li.active a::before{ content: none !important; }
+
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 24px rgba(194, 74, 22, .22);
+}
+.logout-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(194, 74, 22, .28); }
+
+/* ===== TOPBAR ===== */
+.topbar {
+    margin-left: 268px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s var(--ease-out) infinite;
+}
+
+@keyframes topbarShift{
+  0%{ background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
+  100%{ background-position: 0% 50%; }
+}
+
+.topbar-left {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.topbar-right { display: flex; align-items: center; gap: 20px; }
+
+.menu-btn{
+  display:none;
+  border:none;
+  background: rgba(255,255,255,.15);
+  color:#fff;
+  width:42px;
+  height:42px;
+  border-radius: 12px;
+  cursor:pointer;
+}
+.menu-btn:hover{ background: rgba(255,255,255,.25); }
+
+.datetime-display {
+    text-align: right;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+.datetime-display .time { font-size: 14px; font-weight: 600; }
+.datetime-display .date { font-size: 10px; color: rgba(255,255,255,0.8); }
+
+/* ===== PROFILE BUTTON ===== */
+.profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+.profile-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #c24a16;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+.profile-info { text-align: left; }
+.profile-name { font-size: 14px; font-weight: 600; }
+.profile-role { font-size: 11px; color: rgba(255,255,255,0.75); }
+
+/* ===== MOBILE OVERLAY (for sidebar) ===== */
+.mobile-overlay{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.35);
+  opacity:0;
+  visibility:hidden;
+  transition: all .3s var(--ease-out);
+  z-index: 15;
+}
+.mobile-overlay.show{
+  opacity:1;
+  visibility:visible;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 268px;
+    margin-top: 20px;
+    padding: 35px;
+    min-height: calc(100vh - 90px);
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.show { transform: translateX(0); }
+    .topbar { margin-left: 0; }
+    .main-content { margin-left: 0; }
+    .menu-btn { display: flex; }
+}
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="container py-4">
+
+<!-- ACCENT BAR -->
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                Staff Panel
+            {% endif %}
+        </small>
+    </div>
+
+    <!-- BAR LINE -->
+    <div class="sidebar-separator"></div>
+
+    <ul>
+    {# ================= ADMIN MENUS ================= #}
+    {% if is_granted('ROLE_ADMIN') %}
+
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('app_user_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                User Management
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('food_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>
+                </svg>
+                Food Management
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('room_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 14c1.66 0 3-1.34 3-3S8.66 8 7 8s-3 1.34-3 3 1.34 3 3 3zm12-7h-7.58l3.29-3.29L16 2.41 13.41 5H21v2zM7 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6 3H4v1.58l9 9V9c0-1.1-.9-2-2-2h-1.58l-5-5H6V3zm12 0v10c0 1.1-.9 2-2 2h-3.58l-1.41-1.41L10.41 15H17c1.66 0 3-1.34 3-3V3h2z"/>
+                </svg>
+                Room Management
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('tour_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Tour Management
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('package_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4zM4 9h2v2H4V9zm0 4h2v2H4v-2zm0 4h2v2H4v-2zm4 0h2v2H8v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm2-4h-2v-2h2v2zm0-4h-2V7h2v2zm-4-3h2v2h-2V6zm-4 3h2v2h-2V9zm0 4h2v2h-2v-2z"/>
+                </svg>
+                Package Management
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('contact_message_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                Messages
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('payment_dashboard_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                </svg>
+                Payments
+            </a>
+        </li>
+
+    {# ================= STAFF MENUS ================= #}
+    {% else %}
+
+        <li>
+            <a href="{{ path('app_staff_dashboard') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+        </li>
+
+        <li class="active">
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+                </svg>
+                Reservations
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ path('staff_services_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Services
+            </a>
+        </li>
+
+    {% endif %}
+
+    </ul>
+
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <i class="fas fa-calendar-check"></i>
+        {{ serviceLabel }}
+    </div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time">{{ "now"|date("H:i") }}</div>
+            <div class="date">{{ "now"|date("M d, Y") }}</div>
+        </div>
+        <button class="profile-btn" onclick="toggleProfileMenu()">
+            <div class="profile-avatar">{{ app.user.firstName|slice(0,1) }}{{ app.user.lastName|slice(0,1) }}</div>
+            <div class="profile-info">
+                <div class="profile-name">{{ app.user.firstName }} {{ app.user.lastName }}</div>
+                <div class="profile-role">
+                    {% if 'ROLE_ADMIN' in app.user.roles %}
+                        Administrator
+                    {% elseif 'ROLE_STAFF' in app.user.roles %}
+                        Staff
+                    {% endif %}
+                </div>
+            </div>
+        </button>
+    </div>
+</div>
+
+<!-- MOBILE OVERLAY -->
+<div class="mobile-overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+<div class="container-fluid">
     {# Header #}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -131,4 +579,49 @@
         Showing {{ reservations|length }} reservation(s)
     </div>
 </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ===== DATE TIME =====
+    function updateDateTime() {
+        const now = new Date();
+        const timeEls = document.querySelectorAll('.time');
+        const dateEls = document.querySelectorAll('.date');
+        
+        timeEls.forEach(el => {
+            el.textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+        });
+        
+        dateEls.forEach(el => {
+            el.textContent = now.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        });
+    }
+    
+    // Initial call
+    updateDateTime();
+    
+    // Update every minute
+    setInterval(updateDateTime, 60000);
+});
+
+// ===== MENU TOGGLE =====
+function toggleProfileMenu() {
+    // Simple implementation - could be expanded
+    console.log('Profile menu toggle');
+}
+</script>
 {% endblock %}

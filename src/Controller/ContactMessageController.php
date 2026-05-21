@@ -6,8 +6,11 @@ use App\Entity\ContactMessage;
 use App\Entity\ContactReply;
 use App\Form\ContactMessageType;
 use App\Repository\ContactMessageRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -25,6 +28,10 @@ class ContactMessageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($contactMessage->getSubject() === 'Other') {
+                $custom = trim((string) $form->get('otherSubject')->getData());
+                $contactMessage->setSubject($custom ?: 'Other');
+            }
             $contactMessage->setIpAddress($request->getClientIp());
             $em->persist($contactMessage);
             $em->flush();
@@ -79,7 +86,9 @@ class ContactMessageController extends AbstractController
         ContactMessage $message,
         Request $request,
         EntityManagerInterface $em,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        NotificationService $notificationService,
+        UserRepository $userRepository
     ): Response {
         $replyText = trim($request->request->get('reply_message', ''));
 
@@ -100,10 +109,29 @@ class ContactMessageController extends AbstractController
         $em->persist($reply);
         $em->flush();
 
+        // Push notification — send once per reply chain, collapse duplicates on device
+        if ($message->getPushSentAt() === null) {
+            $user = $userRepository->findOneBy(['email' => $message->getEmail()]);
+            if ($user && $user->getFcmToken()) {
+                try {
+                    $notificationService->sendToDevice(
+                        $user->getFcmToken(),
+                        'Reply to your message',
+                        "Re: {$message->getSubject()}",
+                        ['type' => 'contact_reply', 'messageId' => (string) $message->getId()],
+                        'contact_reply_' . $message->getId()
+                    );
+                    $message->markPushSent();
+                    $em->flush();
+                } catch (\Throwable) {
+                }
+            }
+        }
+
         // Send email to the original sender
         try {
             $email = (new Email())
-                ->from('barorodneshamah.com')
+                ->from('barorodneshamah@gmail.com')
                 ->to($message->getEmail())
                 ->subject('Re: ' . $message->getSubject())
                 ->text(
@@ -113,7 +141,7 @@ class ContactMessageController extends AbstractController
                 );
             $mailer->send($email);
             $this->addFlash('success', 'Reply sent and saved successfully.');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->addFlash('success', 'Reply saved to database. Note: email delivery failed — check your mailer configuration.');
         }
 
@@ -146,6 +174,12 @@ class ContactMessageController extends AbstractController
 
         $this->addFlash('success', 'Notes saved successfully.');
         return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
+    }
+
+    #[Route('/dashboard/api/unread-count', name: 'app_contact_unread_count', methods: ['GET'])]
+    public function unreadCount(ContactMessageRepository $repo): JsonResponse
+    {
+        return new JsonResponse(['count' => $repo->countUnread()]);
     }
 
     #[Route('/dashboard/messages/{id}/delete', name: 'app_contact_message_delete', methods: ['POST'])]
@@ -195,5 +229,25 @@ class ContactMessageController extends AbstractController
         $em->flush();
         $this->addFlash('success', 'Bulk action completed successfully.');
         return $this->redirectToRoute('app_contact_message_index');
+    }
+
+    // ── Mobile API ────────────────────────────────────────────────
+
+    #[Route('/api/contact-messages/{id}/seen', name: 'api_contact_message_seen', methods: ['POST'])]
+    public function markSeenByUser(
+        ContactMessage $message,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+
+        if (!$user || $user->getEmail() !== $message->getEmail()) {
+            return $this->json(['message' => 'Forbidden'], 403);
+        }
+
+        $message->markSeenByUser();
+        $em->flush();
+
+        return $this->json(['success' => true, 'userSeenAt' => $message->getUserSeenAt()?->format(\DateTimeInterface::ATOM)]);
     }
 }

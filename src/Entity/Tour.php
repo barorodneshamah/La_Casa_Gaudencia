@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['tour:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['tour:read', 'package:detail']]),
         new Get(normalizationContext: ['groups' => ['tour:read', 'tour:detail']])
     ]
 )]
@@ -25,11 +25,11 @@ class Tour
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -37,15 +37,15 @@ class Tour
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?string $location = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 160)]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?string $duration = null;
 
     #[ORM\Column(nullable: true)]
@@ -53,15 +53,15 @@ class Tour
     private ?\DateTime $scheduleDate = null;
 
     #[ORM\Column]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?int $availableSlots = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['tour:read'])]
+    #[Groups(['tour:read', 'package:detail'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]

@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['food:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['food:read', 'package:detail']]),
         new Get(normalizationContext: ['groups' => ['food:read', 'food:detail']])
     ]
 )]
@@ -25,11 +25,11 @@ class Food
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['food:read'])]
+    #[Groups(['food:read', 'package:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['food:read'])]
+    #[Groups(['food:read', 'package:detail'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -37,11 +37,11 @@ class Food
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['food:read'])]
+    #[Groups(['food:read', 'package:detail'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['food:read'])]
+    #[Groups(['food:read', 'package:detail'])]
     private ?string $category = null;
 
     #[ORM\Column]
@@ -49,11 +49,11 @@ class Food
     private ?int $availableStock = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['food:read'])]
+    #[Groups(['food:read', 'package:detail'])]
     private ?string $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['food:read'])]
+    #[Groups(['food:read', 'package:detail'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]

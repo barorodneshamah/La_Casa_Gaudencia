@@ -61,6 +61,18 @@
             "./migrations/.gitignore"
         ]
     },
+    "google/apiclient": {
+        "version": "2.19",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.10",
+            "ref": "07a97ec434d43b7903c78069a04c92adb6442e52"
+        },
+        "files": [
+            "./config/packages/google_apiclient.yaml"
+        ]
+    },
     "knpuniversity/oauth2-client-bundle": {
         "version": "2.20",
         "recipe": {
@@ -126,6 +138,15 @@
             "./config/packages/asset_mapper.yaml",
             "./importmap.php"
         ]
+    },
+    "symfony/brevo-mailer": {
+        "version": "7.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.4",
+            "ref": "7c1038ceb733175f610a913a885a7c8b552b703a"
+        }
     },
     "symfony/console": {
         "version": "7.3",
@@ -216,6 +237,18 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.4",
+            "ref": "b141b8c8f13bc8c31d718a5488039b712c0d3592"
+        },
+        "files": [
+            "./config/packages/mercure.yaml"
+        ]
     },
     "symfony/messenger": {
         "version": "7.3",

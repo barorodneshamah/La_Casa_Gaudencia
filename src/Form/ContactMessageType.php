@@ -49,10 +49,17 @@ class ContactMessageType extends AbstractType
                     'General Question' => 'General Question',
                     'Feedback' => 'Feedback',
                     'Partnership' => 'Partnership',
+                    'Other' => 'Other',
                 ],
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Please select a subject'])
                 ]
+            ])
+            ->add('otherSubject', TextType::class, [
+                'label'    => 'Please specify',
+                'required' => false,
+                'mapped'   => false,
+                'attr'     => ['placeholder' => 'Describe your inquiry...', 'maxlength' => 255],
             ])
             ->add('message', TextareaType::class, [
                 'label' => 'Your Message',

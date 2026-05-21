@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la c:/Users/ACER/ | grep -i projects)",
+      "Read(//c/Users/ACER/**)",
+      "Bash(php bin/console doctrine:migrations:diff --no-interaction)",
+      "Bash(php bin/console doctrine:migrations:execute --up \"DoctrineMigrations\\\\\\\\Version20260521170206\" --no-interaction)",
+      "Bash(php bin/console doctrine:migrations:migrate --no-interaction)",
+      "Bash(php bin/console lint:container)",
+      "Bash(php composer.phar show)",
+      "Bash(composer show *)",
+      "Bash(findstr /i \"brevo mailer sendinblue\")",
+      "Bash(composer require *)"
+    ]
+  }
+}

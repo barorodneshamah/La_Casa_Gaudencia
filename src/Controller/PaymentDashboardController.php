@@ -6,12 +6,12 @@ use App\Entity\Payment;
 use App\Entity\Reservation;
 use App\Repository\PaymentRepository;
 use App\Repository\ReservationRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/payments')]
 class PaymentDashboardController extends AbstractController
@@ -128,24 +128,32 @@ class PaymentDashboardController extends AbstractController
     public function approve(
         Request $request,
         Payment $payment,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        NotificationService $notificationService
     ): Response {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_STAFF')) {
+            throw $this->createAccessDeniedException('Only admin and staff can approve payments.');
+        }
         if ($this->isCsrfTokenValid('approve'.$payment->getId(), $request->request->get('_token'))) {
             $payment->setStatus(Payment::STATUS_APPROVED);
             $payment->setApprovedBy($this->getUser());
             $payment->setApprovedAt(new \DateTime());
             $payment->setAdminNotes($request->request->get('admin_notes'));
 
-            // Update reservation payment status
             $reservation = $payment->getReservation();
             $reservation->updatePaymentStatus();
 
-            // If fully paid, confirm reservation
             if ($reservation->getPaymentStatus() === Reservation::PAYMENT_PAID) {
                 $reservation->setStatus(Reservation::STATUS_CONFIRMED);
             }
 
             $entityManager->flush();
+
+            $this->pushToGuest($payment, $notificationService,
+                'Payment Approved',
+                "Your payment of ₱{$payment->getAmount()} has been approved.",
+                'payment_approved'
+            );
 
             $this->addFlash('success', 'Payment approved successfully!');
         }
@@ -157,8 +165,12 @@ class PaymentDashboardController extends AbstractController
     public function reject(
         Request $request,
         Payment $payment,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        NotificationService $notificationService
     ): Response {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_STAFF')) {
+            throw $this->createAccessDeniedException('Only admin and staff can reject payments.');
+        }
         if ($this->isCsrfTokenValid('reject'.$payment->getId(), $request->request->get('_token'))) {
             $payment->setStatus(Payment::STATUS_REJECTED);
             $payment->setApprovedBy($this->getUser());
@@ -168,10 +180,33 @@ class PaymentDashboardController extends AbstractController
 
             $entityManager->flush();
 
+            $this->pushToGuest($payment, $notificationService,
+                'Payment Rejected',
+                "Your payment of ₱{$payment->getAmount()} was rejected. Please contact us for details.",
+                'payment_rejected'
+            );
+
             $this->addFlash('success', 'Payment rejected.');
         }
 
         return $this->redirectToRoute('app_payment_show', ['id' => $payment->getId()]);
+    }
+
+    private function pushToGuest(Payment $payment, NotificationService $notificationService, string $title, string $body, string $type): void
+    {
+        try {
+            $guest = $payment->getPaidBy();
+            if ($guest && $guest->getFcmToken()) {
+                $notificationService->sendToDevice(
+                    $guest->getFcmToken(),
+                    $title,
+                    $body,
+                    ['type' => $type, 'paymentId' => (string) $payment->getId(), 'transactionRef' => $payment->getTransactionReference()],
+                    'payment_' . $payment->getId()
+                );
+            }
+        } catch (\Throwable) {
+        }
     }
 
     #[Route('/payment/{id}/refund', name: 'app_payment_refund', methods: ['POST'])]
@@ -180,6 +215,9 @@ class PaymentDashboardController extends AbstractController
         Payment $payment,
         EntityManagerInterface $entityManager
     ): Response {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_STAFF')) {
+            throw $this->createAccessDeniedException('Only admin and staff can refund payments.');
+        }
         if ($this->isCsrfTokenValid('refund'.$payment->getId(), $request->request->get('_token'))) {
             $payment->setStatus(Payment::STATUS_REFUNDED);
             $payment->setAdminNotes($request->request->get('admin_notes'));

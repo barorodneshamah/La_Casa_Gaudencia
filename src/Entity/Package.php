@@ -4,8 +4,11 @@ namespace App\Entity;
 
 use App\Repository\PackageRepository;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -17,7 +20,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['package:read']]),
-        new Get(normalizationContext: ['groups' => ['package:read', 'package:detail']])
+        new Get(normalizationContext: ['groups' => ['package:read', 'package:detail']]),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            denormalizationContext: ['groups' => ['package:write']]
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            denormalizationContext: ['groups' => ['package:write']]
+        ),
+        new Delete(security: "is_granted('ROLE_ADMIN')"),
     ]
 )]
 class Package
@@ -29,11 +41,11 @@ class Package
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['package:read'])]
+    #[Groups(['package:read', 'package:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['package:read', 'package:detail'])]
+    #[Groups(['package:read', 'package:detail', 'package:write'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
@@ -41,7 +53,7 @@ class Package
     private ?string $originalPrice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['package:read'])]
+    #[Groups(['package:read', 'package:write'])]
     private ?string $packagePrice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
@@ -49,15 +61,15 @@ class Package
     private ?string $discountPercentage = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['package:read', 'package:detail'])]
+    #[Groups(['package:read', 'package:detail', 'package:write'])]
     private ?\DateTimeInterface $validFrom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['package:read', 'package:detail'])]
+    #[Groups(['package:read', 'package:detail', 'package:write'])]
     private ?\DateTimeInterface $validUntil = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['package:read', 'package:detail'])]
+    #[Groups(['package:read', 'package:detail', 'package:write'])]
     private ?int $maxRedemptions = null;
 
     #[ORM\Column]
@@ -65,23 +77,23 @@ class Package
     private int $currentRedemptions = 0;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['package:read'])]
+    #[Groups(['package:read', 'package:write'])]
     private ?string $status = 'Active';
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups(['package:read'])]
+    #[Groups(['package:read', 'package:write'])]
     private ?string $packageType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['package:read'])]
+    #[Groups(['package:read', 'package:write'])]
     private ?string $mainImage = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    #[Groups(['package:read', 'package:detail'])]
+    #[Groups(['package:read', 'package:detail', 'package:write'])]
     private ?array $galleryImages = [];
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['package:detail'])]
+    #[Groups(['package:detail', 'package:write'])]
     private ?string $termsAndConditions = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -104,14 +116,17 @@ class Package
 
     #[ORM\ManyToMany(targetEntity: Tour::class)]
     #[ORM\JoinTable(name: 'package_tours')]
+    #[Groups(['package:detail'])]
     private Collection $tours;
 
     #[ORM\ManyToMany(targetEntity: Food::class)]
     #[ORM\JoinTable(name: 'package_foods')]
+    #[Groups(['package:detail'])]
     private Collection $foods;
 
     #[ORM\ManyToMany(targetEntity: Room::class)]
     #[ORM\JoinTable(name: 'package_rooms')]
+    #[Groups(['package:detail'])]
     private Collection $rooms;
 
     #[ORM\Column]
@@ -615,7 +630,7 @@ class Package
         return $gallery[0] ?? null;
     }
 
-    public function getItemConfig(string $type, $id): array
+    public function getItemConfig(string $type, int|string $id): array
     {
         $configs = $this->itemConfig ?? [];
         $key = (string) $id;

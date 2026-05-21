@@ -8,6 +8,9 @@ parameters:
     tour_images_directory: '%kernel.project_dir%/public/uploads/tours'
     food_images_directory: '%kernel.project_dir%/public/uploads/foods'
     package_images_directory: '%kernel.project_dir%/public/uploads/packages'
+    spa_images_directory: '%kernel.project_dir%/public/uploads/spas'
+    google_client_id: '%env(GOOGLE_CLIENT_ID)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -30,8 +33,15 @@ services:
         arguments:
             $tourImagesDirectory: '%tour_images_directory%'
 
+    App\Controller\SpaController:
+        arguments:
+            $spaImagesDirectory: '%spa_images_directory%'
+
     # API Platform Data Persisters
     App\DataPersister\UserDataPersister:
         tags:
             - { name: 'api_platform.state_processor', priority: 1 }
-            
+
+    App\Service\NotificationService:
+        arguments:
+            $firebaseCredentialsPath: '%kernel.project_dir%/config/firebase-credentials.json'

@@ -12,13 +12,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: "is_granted('ROLE_GUEST')",
+            security: "is_granted('ROLE_GUEST') or is_granted('ROLE_STAFF') or is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['reservation:read']]
         ),
         new Get(
@@ -37,6 +38,7 @@ class Reservation
     public const SERVICE_TOUR = 'tour';
     public const SERVICE_PACKAGE = 'package';
     public const SERVICE_FOOD = 'food';
+    public const SERVICE_SPA = 'spa';
 
     public const STATUS_PENDING = 'PENDING';
     public const STATUS_CONFIRMED = 'CONFIRMED';
@@ -57,14 +59,15 @@ class Reservation
     #[Groups(['reservation:read'])]
     private ?string $reservationCode = null;
 
-    // ====== ADD THIS PROPERTY ======
     #[ORM\Column(length: 20)]
     #[Groups(['reservation:read', 'reservation:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: [self::SERVICE_ROOM, self::SERVICE_TOUR, self::SERVICE_PACKAGE, self::SERVICE_FOOD, self::SERVICE_SPA])]
     private ?string $serviceType = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['reservation:read', 'reservation:detail'])]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?User $guest = null;
 
     #[ORM\ManyToOne(targetEntity: Room::class)]
@@ -85,6 +88,7 @@ class Reservation
 
     #[ORM\Column(nullable: true)]
     #[Groups(['reservation:read', 'reservation:write'])]
+    #[Assert\Positive]
     private ?int $tourParticipants = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -95,12 +99,17 @@ class Reservation
     #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?Package $package = null;
 
+    #[ORM\ManyToOne(targetEntity: Spa::class)]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
+    private ?Spa $spa = null;
+
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups(['reservation:read', 'reservation:write', 'reservation:detail'])]
     private ?array $foodItems = [];
 
     #[ORM\Column(nullable: true)]
     #[Groups(['reservation:read', 'reservation:write'])]
+    #[Assert\Positive]
     private ?int $numberOfGuests = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -116,9 +125,13 @@ class Reservation
     private ?string $totalAmount = '0.00';
 
     #[ORM\Column(length: 20)]
+    #[Groups(['reservation:read'])]
+    #[Assert\Choice(choices: [self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_CANCELLED, self::STATUS_COMPLETED])]
     private ?string $status = self::STATUS_PENDING;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['reservation:read'])]
+    #[Assert\Choice(choices: [self::PAYMENT_UNPAID, self::PAYMENT_PARTIAL, self::PAYMENT_PAID])]
     private ?string $paymentStatus = self::PAYMENT_UNPAID;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -131,6 +144,7 @@ class Reservation
     private ?string $adminNotes = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['reservation:read'])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -149,6 +163,29 @@ class Reservation
     {
         $this->createdAt = new \DateTime();
         $this->reservationCode = 'RES-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+        $this->calculateTotalAmount();
+    }
+
+    private function calculateTotalAmount(): void
+    {
+        $total = 0.0;
+
+        if ($this->room) {
+            $nights = max(1, $this->getNights());
+            $total += (float) $this->room->getPricePerNight() * $nights;
+        }
+
+        if ($this->tour) {
+            $total += (float) $this->tour->getPrice() * max(1, $this->tourParticipants ?? 1);
+        }
+
+        if ($this->package) {
+            $total += (float) $this->package->getPackagePrice();
+        }
+
+        if ($total > 0) {
+            $this->totalAmount = number_format($total, 2, '.', '');
+        }
     }
 
     #[ORM\PreUpdate]
@@ -197,6 +234,9 @@ class Reservation
 
     public function getPackage(): ?Package { return $this->package; }
     public function setPackage(?Package $package): self { $this->package = $package; return $this; }
+
+    public function getSpa(): ?Spa { return $this->spa; }
+    public function setSpa(?Spa $spa): self { $this->spa = $spa; return $this; }
 
     public function getFoodItems(): ?array { return $this->foodItems; }
     public function setFoodItems(?array $items): self { $this->foodItems = $items; return $this; }

@@ -1,0 +1,380 @@
+{# templates/payment_dashboard/show.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Payment #{{ payment.transactionReference }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-primary-light: #e85d04;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+    background-image: linear-gradient(rgba(255,252,236,0.78), rgba(242,236,208,0.78)), url('{{ asset("images/ground.jpeg") }}');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* ── Sidebar ── */
+.sidebar-accent { position: fixed; top: 0; left: 0; width: 8px; height: 100vh; background-color: #c24a16; border-radius: 0 6px 6px 0; z-index: 30; }
+.sidebar { position: fixed; top: 0; left: 8px; width: 260px; height: 100vh; background: white; box-shadow: 0 8px 28px rgba(0,0,0,.08); display: flex; flex-direction: column; align-items: center; padding-top: 28px; border-radius: 0 12px 12px 0; z-index: 20; }
+.brand { text-align: center; margin-bottom: 30px; }
+.brand img { width: 75px; height: 75px; margin-bottom: 8px; }
+.brand h1 { font-family: 'Playfair Display', serif; color: #c24a16; font-size: 22px; margin: 0; }
+.brand small { color: #777; font-size: 12px; }
+.sidebar-separator { width: 75%; height: 1.5px; background: linear-gradient(to right, transparent, #d1d1d1, transparent); margin: 10px 0 15px 0; }
+.sidebar ul { list-style: none; width: 100%; padding: 0; }
+.sidebar ul li a { display: flex; gap: 14px; align-items: center; padding: 14px 35px; font-size: 15px; font-weight: 500; color: #2f2f2f; text-decoration: none; transition: all .25s ease; }
+.sidebar ul li svg { width: 20px; height: 20px; fill: #888; transition: .25s; }
+.sidebar ul li a:hover, .sidebar ul li.active a { background-color: #c24a16; color: white; margin-left: -12px; border-radius: 0 30px 30px 0; padding-left: 48px; }
+.sidebar ul li a:hover svg, .sidebar ul li.active a svg { fill: white !important; }
+.sidebar-logout { width: 100%; padding: 20px 30px; margin-top: auto; display: flex; justify-content: center; border-top: 1px solid #eee; }
+.logout-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 80%; padding: 14px 24px; background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%); color: white; text-decoration: none; border-radius: 12px; font-size: 15px; font-weight: 600; transition: all 0.3s ease; }
+.logout-btn:hover { transform: translateY(-2px); }
+
+/* ── Topbar ── */
+@keyframes topbarShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.topbar { margin-left: 268px; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 35px; color: white; position: sticky; top: 0; z-index: 10; background: linear-gradient(120deg, var(--brand-primary) 0%, #e85d04 45%, var(--brand-primary) 100%); background-size: 200% 200%; animation: topbarShift 10s cubic-bezier(.2,.8,.2,1) infinite; }
+.topbar-left { display: flex; align-items: center; gap: 20px; }
+.topbar-left .page-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 20px; }
+.back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: rgba(255,255,255,.15); color: white; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: 500; transition: all 0.3s; }
+.back-btn:hover { background: rgba(255,255,255,.25); color: white; }
+.datetime-display { text-align: right; padding: 6px 14px; background: rgba(255,255,255,.15); border-radius: 8px; }
+.datetime-display .time { font-size: 14px; font-weight: 600; }
+.datetime-display .date { font-size: 10px; color: rgba(255,255,255,.8); }
+
+/* ── Main content ── */
+.main-content { margin-left: 268px; padding: 32px; min-height: calc(100vh - 70px); }
+
+/* ── Cards ── */
+.detail-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.05); padding: 32px; margin-bottom: 24px; }
+.detail-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: #2f2f2f; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f0ebe3; display: flex; align-items: center; gap: 10px; }
+.detail-card h3 i { color: #c24a16; }
+
+.info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.info-item label { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 6px; }
+.info-item span { font-size: 15px; color: #2f2f2f; font-weight: 500; }
+
+.amount-big { font-size: 36px; font-weight: 700; color: #c24a16; font-family: 'Playfair Display', serif; }
+
+/* ── Badges ── */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.badge-approved, .badge-paid { background: #e8f5e9; color: #2e7d32; }
+.badge-pending   { background: #fff8e1; color: #f57f17; }
+.badge-rejected  { background: #fce4ec; color: #c62828; }
+.badge-refunded  { background: #e3f2fd; color: #1565c0; }
+.badge-cancelled { background: #f5f5f5; color: #757575; }
+
+/* ── Action buttons ── */
+.action-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all .25s; }
+.btn-approve { background: linear-gradient(135deg, #2e7d32, #388e3c); color: white; }
+.btn-approve:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46,125,50,.3); }
+.btn-reject  { background: linear-gradient(135deg, #c62828, #d32f2f); color: white; }
+.btn-reject:hover  { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(198,40,40,.3); }
+.btn-refund  { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; }
+.btn-refund:hover  { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(21,101,192,.3); }
+.btn-secondary { background: #f5f5f5; color: #555; }
+.btn-secondary:hover { background: #e0e0e0; }
+
+/* ── Modal ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: white; border-radius: 16px; padding: 32px; width: 460px; max-width: 95vw; }
+.modal-box h4 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 18px; }
+.modal-box label { font-size: 13px; font-weight: 600; color: #555; display: block; margin-bottom: 6px; margin-top: 14px; }
+.modal-box textarea, .modal-box input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; }
+.modal-box textarea:focus, .modal-box input:focus { outline: none; border-color: #c24a16; }
+.modal-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end; }
+
+/* ── Alerts ── */
+.flash { padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; font-weight: 500; }
+.flash-success { background: #e8f5e9; color: #2e7d32; border-left: 4px solid #2e7d32; }
+.flash-error   { background: #fce4ec; color: #c62828; border-left: 4px solid #c62828; }
+
+@media (max-width: 768px) {
+    .sidebar, .sidebar-accent { display: none; }
+    .topbar, .main-content { margin-left: 0; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/Images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if 'ROLE_ADMIN' in app.user.roles %}Admin Panel
+            {% elseif 'ROLE_STAFF' in app.user.roles %}Staff Panel{% endif %}
+        </small>
+    </div>
+    <div class="sidebar-separator"></div>
+    <ul>
+        {% if is_granted('ROLE_ADMIN') %}
+            <li><a href="{{ path('app_admin_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
+            <li><a href="{{ path('app_user_index') }}"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/></svg>User Management</a></li>
+            <li><a href="{{ path('app_admin_services') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>Services</a></li>
+            <li><a href="{{ path('reservation_index') }}"><svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>Reservations</a></li>
+            <li class="active"><a href="{{ path('app_payment_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>Payments</a></li>
+            <li><a href="{{ path('app_activity_log_index') }}"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>Activity Logs</a></li>
+        {% elseif is_granted('ROLE_STAFF') %}
+            <li><a href="{{ path('app_staff_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
+            <li><a href="{{ path('staff_services') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>Services</a></li>
+            <li><a href="{{ path('reservation_index') }}"><svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>Reservations</a></li>
+            <li class="active"><a href="{{ path('app_payment_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>Payments</a></li>
+            <li><a href="{{ path('app_contact_message_index') }}"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>Messages</a></li>
+        {% endif %}
+    </ul>
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">Log Out</a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="{{ path('app_payment_dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Payments
+        </a>
+        <span class="page-title">Payment Detail</span>
+    </div>
+    <div class="topbar-right">
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    {% for label, messages in app.flashes(['success', 'error', 'warning']) %}
+        {% for msg in messages %}
+            <div class="flash flash-{{ label == 'error' ? 'error' : 'success' }}">
+                <i class="fas fa-{{ label == 'error' or label == 'warning' ? 'exclamation-circle' : 'check-circle' }}"></i>
+                {{ msg }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- Amount + Status -->
+    <div class="detail-card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+        <div>
+            <div style="font-size:13px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">Amount Paid</div>
+            <div class="amount-big">₱{{ payment.amount|number_format(2, '.', ',') }}</div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:13px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;">Status</div>
+            {% set s = payment.status %}
+            <span class="badge badge-{{ s|lower == 'approved' ? 'approved' : s|lower }}">
+                <i class="fas fa-{{ s == 'APPROVED' ? 'check-circle' : (s == 'PENDING' ? 'clock' : (s == 'REJECTED' ? 'times-circle' : (s == 'REFUNDED' ? 'undo' : 'ban'))) }}"></i>
+                {{ s == 'APPROVED' ? 'Paid' : s|title }}
+            </span>
+            <div style="margin-top:8px; font-size:12px; color:#999;">Ref: {{ payment.transactionReference }}</div>
+        </div>
+    </div>
+
+    <!-- Payment details -->
+    <div class="detail-card">
+        <h3><i class="fas fa-receipt"></i> Payment Information</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Guest</label>
+                <span>{{ payment.paidBy ? (payment.paidBy.fullName ?? payment.paidBy.username) : '—' }}</span>
+            </div>
+            <div class="info-item">
+                <label>Email</label>
+                <span>{{ payment.paidBy ? payment.paidBy.email : '—' }}</span>
+            </div>
+            <div class="info-item">
+                <label>Payment Method</label>
+                <span>{{ payment.paymentMethodLabel }}</span>
+            </div>
+            <div class="info-item">
+                <label>Reference / Receipt No.</label>
+                <span>{{ payment.referenceNumber ?: '—' }}</span>
+            </div>
+            <div class="info-item">
+                <label>Date Recorded</label>
+                <span>{{ payment.createdAt ? payment.createdAt|date('M d, Y h:i A') : '—' }}</span>
+            </div>
+            {% if payment.approvedBy %}
+            <div class="info-item">
+                <label>Processed By</label>
+                <span>{{ payment.approvedBy.fullName ?? payment.approvedBy.username }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if payment.adminNotes %}
+        <div style="margin-top:20px;">
+            <label style="font-size:12px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:6px;">Admin Notes</label>
+            <div style="background:#fafafa; border-radius:8px; padding:12px 16px; font-size:14px; color:#555;">{{ payment.adminNotes }}</div>
+        </div>
+        {% endif %}
+
+        {% if payment.rejectionReason %}
+        <div style="margin-top:20px;">
+            <label style="font-size:12px; font-weight:600; color:#c62828; text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:6px;">Rejection Reason</label>
+            <div style="background:#fce4ec; border-radius:8px; padding:12px 16px; font-size:14px; color:#c62828;">{{ payment.rejectionReason }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Reservation details -->
+    {% set res = payment.reservation %}
+    {% if res %}
+    <div class="detail-card">
+        <h3><i class="fas fa-calendar-alt"></i> Reservation</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Code</label>
+                <span>{{ res.reservationCode ?: '#' ~ res.id }}</span>
+            </div>
+            <div class="info-item">
+                <label>Service</label>
+                <span>{{ res.serviceType|title }}</span>
+            </div>
+            <div class="info-item">
+                <label>Total Amount</label>
+                <span>₱{{ res.totalAmount ? res.totalAmount|number_format(2, '.', ',') : '—' }}</span>
+            </div>
+            <div class="info-item">
+                <label>Total Paid</label>
+                <span>₱{{ res.totalPaid|number_format(2, '.', ',') }}</span>
+            </div>
+            <div class="info-item">
+                <label>Balance</label>
+                <span>₱{{ res.remainingBalance|number_format(2, '.', ',') }}</span>
+            </div>
+            <div class="info-item">
+                <label>Reservation Status</label>
+                <span>{{ res.status|title }}</span>
+            </div>
+        </div>
+        <div style="margin-top:16px;">
+            <a href="{{ path('reservation_show', {id: res.id}) }}" class="btn btn-secondary" style="text-decoration:none;">
+                <i class="fas fa-external-link-alt"></i> View Reservation
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions (admin / staff only) -->
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+        {% if payment.status == 'PENDING' %}
+        <div class="detail-card">
+            <h3><i class="fas fa-bolt"></i> Actions</h3>
+            {% if payment.paymentMethod == 'CASH' %}
+            <p style="font-size:13px;color:#888;margin-bottom:14px;"><i class="fas fa-money-bill-wave" style="color:#2e7d32"></i> Cash payment — confirm that you have physically received the cash before approving.</p>
+            {% endif %}
+            <div class="action-bar">
+                <button class="btn btn-approve" onclick="document.getElementById('approveModal').classList.add('active')">
+                    <i class="fas fa-check"></i> Approve Payment
+                </button>
+                <button class="btn btn-reject" onclick="document.getElementById('rejectModal').classList.add('active')">
+                    <i class="fas fa-times"></i> Reject / Request Again
+                </button>
+            </div>
+        </div>
+        {% elseif payment.status == 'APPROVED' %}
+        <div class="detail-card">
+            <h3><i class="fas fa-bolt"></i> Actions</h3>
+            <div class="action-bar">
+                <button class="btn btn-refund" onclick="document.getElementById('refundModal').classList.add('active')">
+                    <i class="fas fa-undo"></i> Refund / Void Payment
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+
+</div>{# /main-content #}
+
+<!-- APPROVE MODAL -->
+<div class="modal-overlay" id="approveModal">
+    <div class="modal-box">
+        <h4><i class="fas fa-check-circle" style="color:#2e7d32"></i> Approve Payment</h4>
+        <p style="color:#555; font-size:14px;">Approving will mark this payment as paid and update the reservation balance.</p>
+        <form method="post" action="{{ path('app_payment_approve', {id: payment.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ payment.id) }}">
+            <label>Admin Notes (optional)</label>
+            <textarea name="admin_notes" rows="3" placeholder="Any notes…"></textarea>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('approveModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-approve"><i class="fas fa-check"></i> Confirm Approve</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="modal-overlay" id="rejectModal">
+    <div class="modal-box">
+        <h4><i class="fas fa-times-circle" style="color:#c62828"></i> Reject Payment</h4>
+        <p style="color:#555; font-size:14px;">The guest will need to re-submit proof of payment.</p>
+        <form method="post" action="{{ path('app_payment_reject', {id: payment.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ payment.id) }}">
+            <label>Reason for Rejection <span style="color:#c62828">*</span></label>
+            <textarea name="rejection_reason" rows="3" placeholder="e.g. Amount mismatch, blurry image…" required></textarea>
+            <label>Admin Notes (optional)</label>
+            <textarea name="admin_notes" rows="2"></textarea>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('rejectModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-reject"><i class="fas fa-times"></i> Confirm Reject</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- REFUND MODAL -->
+<div class="modal-overlay" id="refundModal">
+    <div class="modal-box">
+        <h4><i class="fas fa-undo" style="color:#1565c0"></i> Refund / Void Payment</h4>
+        <p style="color:#555; font-size:14px;">This will void the ₱{{ payment.amount|number_format(2, '.', ',') }} payment and update the reservation balance accordingly.</p>
+        <form method="post" action="{{ path('app_payment_refund', {id: payment.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('refund' ~ payment.id) }}">
+            <label>Reason / Notes <span style="color:#c62828">*</span></label>
+            <textarea name="admin_notes" rows="3" placeholder="e.g. Accidentally recorded, guest requested refund…" required></textarea>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('refundModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-refund"><i class="fas fa-undo"></i> Confirm Void/Refund</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('active'); });
+});
+
+// Live clock
+function updateClock() {
+    const now = new Date();
+    document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+}
+updateClock(); setInterval(updateClock, 1000);
+</script>
+{% endblock %}

@@ -3,11 +3,25 @@
 namespace App\Entity;
 
 use App\Repository\ContactMessageRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new Post(),
+        new Get(),
+        new GetCollection(),
+    ],
+    normalizationContext: ['groups' => ['contact:read']],
+    denormalizationContext: ['groups' => ['contact:write']]
+)]
 #[ORM\Entity(repositoryClass: ContactMessageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class ContactMessage
@@ -15,40 +29,59 @@ class ContactMessage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['contact:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contact:read', 'contact:write'])]
     private ?string $fullName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contact:read', 'contact:write'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['contact:read', 'contact:write'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contact:read', 'contact:write'])]
     private ?string $subject = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['contact:read', 'contact:write'])]
     private ?string $message = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['contact:read'])]
     private string $status = 'unread';
 
     #[ORM\Column]
+    #[Groups(['contact:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['contact:read'])]
     private ?\DateTimeImmutable $readAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['contact:read'])]
     private ?string $notes = null;
 
     #[ORM\Column(length: 45, nullable: true)]
+    #[Groups(['contact:read'])]
     private ?string $ipAddress = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['contact:read'])]
+    private ?\DateTimeImmutable $userSeenAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $pushSentAt = null;
 
     #[ORM\OneToMany(mappedBy: 'contactMessage', targetEntity: ContactReply::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
+    #[Groups(['contact:read'])]
     private Collection $replies;
 
     public function __construct()
@@ -183,6 +216,28 @@ class ContactMessage
             $this->status = 'read';
             $this->readAt = new \DateTimeImmutable();
         }
+    }
+
+    public function getUserSeenAt(): ?\DateTimeImmutable
+    {
+        return $this->userSeenAt;
+    }
+
+    public function markSeenByUser(): void
+    {
+        if ($this->userSeenAt === null) {
+            $this->userSeenAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getPushSentAt(): ?\DateTimeImmutable
+    {
+        return $this->pushSentAt;
+    }
+
+    public function markPushSent(): void
+    {
+        $this->pushSentAt = new \DateTimeImmutable();
     }
 
     public function getReplies(): Collection

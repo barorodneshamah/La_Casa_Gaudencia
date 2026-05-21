@@ -63,6 +63,7 @@ class ActivityLogService
         if ($request) {
             $log->setIpAddress($request->getClientIp());
             $log->setUserAgent($request->headers->get('User-Agent'));
+            $log->setSource($request->headers->get('X-App-Source') === 'mobile' ? 'mobile' : 'web');
         }
 
         $this->entityManager->persist($log);

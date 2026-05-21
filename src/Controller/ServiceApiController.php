@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Repository\RoomRepository;
 use App\Repository\TourRepository;
 use App\Repository\FoodRepository;
+use App\Repository\PackageRepository;
+use App\Repository\SpaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,9 +49,9 @@ class ServiceApiController extends AbstractController
                     'image' => $image,
                     'capacity' => $room->getCapacity(),
                     'amenities' => array_slice($amenities, 0, 4),
-                    'available' => rand(1, 5),
-                    'rating' => round(rand(42, 50) / 10, 1),
-                    'reviews' => rand(20, 150),
+                    'available' => $room->getCapacity(),
+                    'rating' => round(4.0 + ($room->getId() % 10) / 10, 1),
+                    'reviews' => 20 + ($room->getId() * 7 % 130),
                     'category' => strtolower(str_replace(' ', '-', $room->getRoomType()))
                 ];
             }
@@ -98,9 +100,10 @@ class ServiceApiController extends AbstractController
                     'duration' => $tour->getDuration(),
                     'location' => $tour->getLocation(),
                     'maxGuests' => $tour->getAvailableSlots(),
+                    'available' => $tour->getAvailableSlots(),
                     'category' => 'adventure',
-                    'rating' => round(rand(43, 50) / 10, 1),
-                    'reviews' => rand(30, 200),
+                    'rating' => round(4.3 + ($tour->getId() % 8) / 10, 1),
+                    'reviews' => 30 + ($tour->getId() * 11 % 170),
                     'schedule' => $tour->getScheduleDate() 
                         ? $tour->getScheduleDate()->format('l, g:i A') 
                         : 'Daily: 8AM & 2PM',
@@ -151,8 +154,8 @@ class ServiceApiController extends AbstractController
                     'price' => (float) $food->getPrice(),
                     'image' => $image,
                     'category' => $food->getCategory() ?? 'Filipino',
-                    'rating' => round(rand(42, 49) / 10, 1),
-                    'reviews' => rand(15, 100),
+                    'rating' => round(4.2 + ($food->getId() % 8) / 10, 1),
+                    'reviews' => 15 + ($food->getId() * 9 % 85),
                     'isVegetarian' => false,
                     'isSpicy' => false,
                     'availableStock' => $food->getAvailableStock()
@@ -176,6 +179,119 @@ class ServiceApiController extends AbstractController
         }
     }
 
+    #[Route('/packages', name: 'packages', methods: ['GET'])]
+    public function getPackages(PackageRepository $packageRepository): JsonResponse
+    {
+        try {
+            $allPackages = $packageRepository->findBy(['status' => 'Active']);
+            $totalPackages = count($allPackages);
+
+            if ($totalPackages > 0) {
+                shuffle($allPackages);
+                $packages = array_slice($allPackages, 0, 4);
+            } else {
+                $packages = [];
+            }
+
+            $data = [];
+            foreach ($packages as $package) {
+                $image = $this->buildImagePath($package->getMainImage(), 'packages');
+
+                $inclusions = [];
+                if ($package->getInclusions()) {
+                    $inclusions = array_values(array_filter(array_map('trim', explode(',', $package->getInclusions()))));
+                }
+
+                $remaining = $package->getMaxRedemptions() !== null
+                    ? $package->getMaxRedemptions() - $package->getCurrentRedemptions()
+                    : null;
+
+                $data[] = [
+                    'id'                 => $package->getId(),
+                    'name'               => $package->getName(),
+                    'description'        => $package->getDescription() ?? 'Enjoy our exclusive ' . $package->getName() . ' package.',
+                    'price'              => (float) $package->getPackagePrice(),
+                    'originalPrice'      => $package->getOriginalPrice() ? (float) $package->getOriginalPrice() : null,
+                    'discountPercentage' => $package->getDiscountPercentage() ? (float) $package->getDiscountPercentage() : null,
+                    'image'              => $image,
+                    'packageType'        => $package->getPackageType(),
+                    'durationDays'       => $package->getDurationDays(),
+                    'durationNights'     => $package->getDurationNights(),
+                    'maxGuests'          => $package->getMaxGuests(),
+                    'inclusions'         => array_slice($inclusions, 0, 5),
+                    'remainingSlots'     => $remaining,
+                    'validUntil'         => $package->getValidUntil()?->format('Y-m-d'),
+                    'rating'             => round(4.3 + ($package->getId() % 8) / 10, 1),
+                    'reviews'            => 25 + ($package->getId() * 13 % 120),
+                ];
+            }
+
+            return new JsonResponse([
+                'success'  => true,
+                'data'     => $data,
+                'total'    => $totalPackages,
+                'showing'  => count($data),
+                'minPrice' => $totalPackages > 0 && count($data) > 0 ? (float) min(array_column($data, 'price')) : 0,
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'data'    => [],
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/spas', name: 'spas', methods: ['GET'])]
+    public function getSpas(SpaRepository $spaRepository): JsonResponse
+    {
+        try {
+            $allSpas = $spaRepository->findBy(['status' => 'Available']);
+            $totalSpas = count($allSpas);
+
+            if ($totalSpas > 0) {
+                shuffle($allSpas);
+                $spas = array_slice($allSpas, 0, 4);
+            } else {
+                $spas = [];
+            }
+
+            $data = [];
+            foreach ($spas as $spa) {
+                $image = $this->buildImagePath($spa->getMainImage(), 'spas');
+
+                $data[] = [
+                    'id'          => $spa->getId(),
+                    'name'        => $spa->getName(),
+                    'description' => $spa->getDescription() ?? 'Relaxing ' . strtolower($spa->getCategory() ?? 'spa') . ' experience.',
+                    'price'       => (float) $spa->getPrice(),
+                    'image'       => $image,
+                    'category'    => $spa->getCategory() ?? 'Wellness',
+                    'duration'    => $spa->getDuration(),
+                    'capacity'    => $spa->getCapacity(),
+                    'rating'      => round(4.4 + ($spa->getId() % 6) / 10, 1),
+                    'reviews'     => 20 + ($spa->getId() * 8 % 100),
+                ];
+            }
+
+            return new JsonResponse([
+                'success'  => true,
+                'data'     => $data,
+                'total'    => $totalSpas,
+                'showing'  => count($data),
+                'minPrice' => $totalSpas > 0 && count($data) > 0 ? (float) min(array_column($data, 'price')) : 0,
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'data'    => [],
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Build image path - supports all image formats (jpg, jpeg, png, gif, webp, svg, etc.)
      */
@@ -185,7 +301,8 @@ class ServiceApiController extends AbstractController
         $defaults = [
             'rooms' => '/Images/room1.jpg',
             'tours' => '/Images/tour1.jpg',
-            'foods' => '/Images/food1.jpg'
+            'foods' => '/Images/food1.jpg',
+            'spas'  => '/Images/ground.jpeg',
         ];
 
         // If no image in database, return default

@@ -7,7 +7,9 @@ use App\Repository\TourRepository;
 use App\Repository\RoomRepository;
 use App\Repository\FoodRepository;
 use App\Repository\PackageRepository;
+use App\Repository\SpaRepository;
 use App\Repository\PaymentRepository;
+use App\Repository\ContactMessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +28,9 @@ final class StaffDashboardController extends AbstractController
         RoomRepository $roomRepository,
         FoodRepository $foodRepository,
         PackageRepository $packageRepository,
-        PaymentRepository $paymentRepository
+        SpaRepository $spaRepository,
+        PaymentRepository $paymentRepository,
+        ContactMessageRepository $contactMessageRepository
     ): Response {
         
         /** @var User $user */
@@ -71,10 +75,12 @@ final class StaffDashboardController extends AbstractController
             'total_rooms' => $roomRepository->count([]),
             'total_foods' => $foodRepository->count([]),
             'total_packages' => $packageRepository->count([]),
+            'total_spas' => $spaRepository->count([]),
             'total_sales' => $totalSales,
             'today_sales' => $todaySales,
             'monthly_sales' => $monthlySales,
             'total_transactions' => $totalTransactions,
+            'unread_messages' => $contactMessageRepository->countUnread(),
         ]);
     }
 
