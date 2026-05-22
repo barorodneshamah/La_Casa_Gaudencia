@@ -77,6 +77,8 @@ security:
         - { path: ^/use-app,               roles: PUBLIC_ACCESS }
 
         # Protected Web
+        - { path: ^/admin/notifications, roles: ROLE_STAFF }
         - { path: ^/admin,            roles: ROLE_ADMIN }
         - { path: ^/staff,            roles: ROLE_STAFF }
         - { path: ^/my-reservations,  roles: ROLE_USER }
+        - { path: ^/customer,         roles: ROLE_USER }

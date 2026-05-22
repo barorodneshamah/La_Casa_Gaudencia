@@ -16,7 +16,11 @@
     {% block body %}{% endblock %}
     
     {% block javascripts %}{% endblock %}
-    
+
+    {# Notification bells for admin/staff and customer pages #}
+    {% include 'components/_admin_notifications.html.twig' %}
+    {% include 'components/_customer_notifications.html.twig' %}
+
     {# THIS IS THE KEY - Handles browser back-forward cache #}
     {% if app.user %}
     <script>
