@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Our Mobile App - La Casa Gaudencia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #c24a16 0%, #e85d04 60%, #ff8c42 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 52px 44px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 24px 80px rgba(0,0,0,.18);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: #c24a16;
+            font-weight: 700;
+            margin-bottom: 32px;
+            letter-spacing: .5px;
+        }
+
+        .phone-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            color: #2f2f2f;
+            margin-bottom: 14px;
+            line-height: 1.25;
+        }
+
+        .greeting {
+            font-size: 1rem;
+            color: #c24a16;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            font-size: .95rem;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 36px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #fdf8f4;
+            border-radius: 12px;
+            border-left: 4px solid #c24a16;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: #fef0e8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c24a16;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text { font-size: .88rem; font-weight: 500; color: #2f2f2f; }
+        .feature-sub  { font-size: .78rem; color: #888; }
+
+        .store-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .store-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #2f2f2f;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: .88rem;
+            font-weight: 600;
+            transition: background .2s, transform .15s;
+        }
+
+        .store-btn:hover { background: #111; transform: translateY(-2px); }
+        .store-btn i { font-size: 1.4rem; }
+
+        .store-btn-inner { text-align: left; }
+        .store-btn-inner small { display: block; font-size: .68rem; font-weight: 400; opacity: .75; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ccc;
+            font-size: .82rem;
+            margin-bottom: 20px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #eee; }
+
+        .web-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            font-size: .85rem;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .web-link:hover { color: #c24a16; }
+
+        .logout-link {
+            display: block;
+            margin-top: 20px;
+            color: #ccc;
+            font-size: .8rem;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .logout-link:hover { color: #c24a16; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">La Casa Gaudencia</div>
+
+        <span class="phone-icon">📱</span>
+
+        {% if app.user %}
+        <div class="greeting">Welcome, {{ app.user.fullName }}! 👋</div>
+        {% endif %}
+
+        <h1>Use Our Mobile App</h1>
+
+        <p>
+            To book rooms, tours, food, and packages — download the
+            <strong>La Casa Gaudencia</strong> mobile app. Everything you need
+            is right in your pocket.
+        </p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                <div>
+                    <div class="feature-text">Easy Reservations</div>
+                    <div class="feature-sub">Book rooms, tours & packages in minutes</div>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-bell"></i></div>
+                <div>
+                    <div class="feature-text">Real-time Notifications</div>
+                    <div class="feature-sub">Get updates on your booking status instantly</div>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-utensils"></i></div>
+                <div>
+                    <div class="feature-text">Food & Dining</div>
+                    <div class="feature-sub">Order meals and explore the menu</div>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-history"></i></div>
+                <div>
+                    <div class="feature-text">Reservation History</div>
+                    <div class="feature-sub">Track all your past and upcoming bookings</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="store-buttons">
+            <a href="#" class="store-btn">
+                <i class="fab fa-google-play"></i>
+                <div class="store-btn-inner">
+                    <small>GET IT ON</small>
+                    Google Play
+                </div>
+            </a>
+            <a href="#" class="store-btn">
+                <i class="fab fa-apple"></i>
+                <div class="store-btn-inner">
+                    <small>DOWNLOAD ON THE</small>
+                    App Store
+                </div>
+            </a>
+        </div>
+
+        <div class="divider">or</div>
+
+        <a href="{{ path('app_landing') }}" class="web-link">
+            <i class="fas fa-globe"></i> Continue browsing the website
+        </a>
+
+        <a href="{{ path('app_logout') }}" class="logout-link">
+            <i class="fas fa-sign-out-alt"></i> Sign out
+        </a>
+    </div>
+</body>
+</html>

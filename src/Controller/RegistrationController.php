@@ -69,8 +69,7 @@ class RegistrationController extends AbstractController
                 // This way we don't create a user record if email sending fails
                 try {
                     $emailVerificationService->sendVerificationEmail($user, $verificationUrl);
-                } catch (\Exception $e) {
-                    // Log the error but provide user feedback
+                } catch (\Exception) {
                     $this->addFlash('error', 'Registration failed: Could not send verification email. Please check your email address and try again.');
                     return $this->redirectToRoute('app_register');
                 }
@@ -80,8 +79,8 @@ class RegistrationController extends AbstractController
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Registration successful! Please check your email to verify your account.');
-                return $this->redirectToRoute('app_login');
-            } catch (\Exception $e) {
+                return $this->redirectToRoute('customer_use_app');
+            } catch (\Exception) {
                 $this->addFlash('error', 'Registration failed. Please try again.');
                 return $this->redirectToRoute('app_register');
             }
