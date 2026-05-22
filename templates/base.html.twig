@@ -23,7 +23,8 @@
         // Method 1: Handle page show event (back-forward cache)
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                // Page was loaded from bfcache or via back button
+                // Hide immediately so the old page never flashes, then reload
+                document.body.style.visibility = 'hidden';
                 window.location.reload(true);
             }
         });
