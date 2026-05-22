@@ -9,15 +9,17 @@ use App\Repository\PackageRepository;
 use App\Repository\SpaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/services', name: 'api_services_')]
 class ServiceApiController extends AbstractController
 {
     #[Route('/rooms', name: 'rooms', methods: ['GET'])]
-    public function getRooms(RoomRepository $roomRepository): JsonResponse
+    public function getRooms(RoomRepository $roomRepository, Request $request): JsonResponse
     {
         try {
+            $base = $request->getSchemeAndHttpHost();
             $allRooms = $roomRepository->findBy(['status' => 'Available']);
             $totalRooms = count($allRooms);
 
@@ -30,7 +32,7 @@ class ServiceApiController extends AbstractController
 
             $data = [];
             foreach ($rooms as $room) {
-                $image = $this->buildImagePath($room->getMainImage(), 'rooms');
+                $image = $this->buildImagePath($room->getMainImage(), 'rooms', $base);
 
                 $features = $room->getFeatures();
                 if ($features) {
@@ -74,9 +76,10 @@ class ServiceApiController extends AbstractController
     }
 
     #[Route('/tours', name: 'tours', methods: ['GET'])]
-    public function getTours(TourRepository $tourRepository): JsonResponse
+    public function getTours(TourRepository $tourRepository, Request $request): JsonResponse
     {
         try {
+            $base = $request->getSchemeAndHttpHost();
             $allTours = $tourRepository->findBy(['status' => 'Available']);
             $totalTours = count($allTours);
 
@@ -89,7 +92,7 @@ class ServiceApiController extends AbstractController
 
             $data = [];
             foreach ($tours as $tour) {
-                $image = $this->buildImagePath($tour->getMainImage(), 'tours');
+                $image = $this->buildImagePath($tour->getMainImage(), 'tours', $base);
 
                 $data[] = [
                     'id' => $tour->getId(),
@@ -129,9 +132,10 @@ class ServiceApiController extends AbstractController
     }
 
     #[Route('/food', name: 'food', methods: ['GET'])]
-    public function getFood(FoodRepository $foodRepository): JsonResponse
+    public function getFood(FoodRepository $foodRepository, Request $request): JsonResponse
     {
         try {
+            $base = $request->getSchemeAndHttpHost();
             $allFood = $foodRepository->findBy(['status' => 'Available']);
             $totalItems = count($allFood);
 
@@ -144,8 +148,7 @@ class ServiceApiController extends AbstractController
 
             $data = [];
             foreach ($foodItems as $food) {
-                // Use 'foods' folder (with 's') to match your actual folder name
-                $image = $this->buildImagePath($food->getMainImage(), 'foods');
+                $image = $this->buildImagePath($food->getMainImage(), 'foods', $base);
 
                 $data[] = [
                     'id' => $food->getId(),
@@ -180,9 +183,10 @@ class ServiceApiController extends AbstractController
     }
 
     #[Route('/packages', name: 'packages', methods: ['GET'])]
-    public function getPackages(PackageRepository $packageRepository): JsonResponse
+    public function getPackages(PackageRepository $packageRepository, Request $request): JsonResponse
     {
         try {
+            $base = $request->getSchemeAndHttpHost();
             $allPackages = $packageRepository->findBy(['status' => 'Active']);
             $totalPackages = count($allPackages);
 
@@ -195,7 +199,7 @@ class ServiceApiController extends AbstractController
 
             $data = [];
             foreach ($packages as $package) {
-                $image = $this->buildImagePath($package->getMainImage(), 'packages');
+                $image = $this->buildImagePath($package->getMainImage(), 'packages', $base);
 
                 $inclusions = [];
                 if ($package->getInclusions()) {
@@ -244,9 +248,10 @@ class ServiceApiController extends AbstractController
     }
 
     #[Route('/spas', name: 'spas', methods: ['GET'])]
-    public function getSpas(SpaRepository $spaRepository): JsonResponse
+    public function getSpas(SpaRepository $spaRepository, Request $request): JsonResponse
     {
         try {
+            $base = $request->getSchemeAndHttpHost();
             $allSpas = $spaRepository->findBy(['status' => 'Available']);
             $totalSpas = count($allSpas);
 
@@ -259,7 +264,7 @@ class ServiceApiController extends AbstractController
 
             $data = [];
             foreach ($spas as $spa) {
-                $image = $this->buildImagePath($spa->getMainImage(), 'spas');
+                $image = $this->buildImagePath($spa->getMainImage(), 'spas', $base);
 
                 $data[] = [
                     'id'          => $spa->getId(),
@@ -292,43 +297,34 @@ class ServiceApiController extends AbstractController
         }
     }
 
-    /**
-     * Build image path - supports all image formats (jpg, jpeg, png, gif, webp, svg, etc.)
-     */
-    private function buildImagePath(?string $dbImage, string $type): string
+    private function buildImagePath(?string $dbImage, string $type, string $base = ''): string
     {
-        // Default images for each type
         $defaults = [
-            'rooms' => '/Images/room1.jpg',
-            'tours' => '/Images/tour1.jpg',
-            'foods' => '/Images/food1.jpg',
-            'spas'  => '/Images/ground.jpeg',
+            'rooms' => '/images/room1.jpg',
+            'tours' => '/images/tour1.jpg',
+            'foods' => '/images/food1.jpg',
+            'spas'  => '/images/ground.jpeg',
         ];
 
-        // If no image in database, return default
         if (!$dbImage || empty(trim($dbImage))) {
-            return $defaults[$type] ?? '/Images/placeholder.jpg';
+            $path = $defaults[$type] ?? '/images/placeholder.jpg';
+            return $base . $path;
         }
 
         $dbImage = trim($dbImage);
 
-        // If it's already a full URL (http/https), use as-is
         if (str_starts_with($dbImage, 'http://') || str_starts_with($dbImage, 'https://')) {
             return $dbImage;
         }
 
-        // If it already starts with /uploads or /images, use as-is
-        if (str_starts_with($dbImage, '/uploads/') || str_starts_with($dbImage, '/images/') || str_starts_with($dbImage, '/Images/')) {
-            return $dbImage;
+        if (str_starts_with($dbImage, '/')) {
+            return $base . $dbImage;
         }
 
-        // If it starts with uploads/ (no leading slash), add the slash
         if (str_starts_with($dbImage, 'uploads/')) {
-            return '/' . $dbImage;
+            return $base . '/' . $dbImage;
         }
 
-        // Build the path with the type folder
-        // Type should match your actual folder names: rooms, tours, foods
-        return '/uploads/' . $type . '/' . $dbImage;
+        return $base . '/uploads/' . $type . '/' . $dbImage;
     }
 }
