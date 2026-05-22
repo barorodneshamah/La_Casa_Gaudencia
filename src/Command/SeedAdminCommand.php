@@ -39,6 +39,14 @@ class SeedAdminCommand extends Command
                 'roles'    => [User::ROLE_STAFF],
                 'password' => 'staff123',
             ],
+            [
+                'username' => 'customer',
+                'email'    => 'customer@lacasagaudencia.com',
+                'fullName' => 'Test Customer',
+                'roles'    => [User::ROLE_GUEST],
+                'password' => 'customer123',
+                'verified' => true,
+            ],
         ];
 
         foreach ($seeds as $seed) {
@@ -50,6 +58,7 @@ class SeedAdminCommand extends Command
                 $user->setEmail($seed['email']);
                 $user->setFullName($seed['fullName']);
                 $user->setRoles($seed['roles']);
+                $user->setIsVerified($seed['verified'] ?? false);
                 $this->em->persist($user);
                 $output->writeln("Created user: {$seed['username']}");
             } else {
