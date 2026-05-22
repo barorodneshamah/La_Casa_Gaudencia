@@ -121,7 +121,14 @@ class AuthController extends AbstractController
             return $this->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = $this->jwtManager->create($user);
+        try {
+            $token = $this->jwtManager->create($user);
+        } catch (\Throwable $e) {
+            return $this->json([
+                'message' => 'JWT error: ' . $e->getMessage(),
+                'file'    => $e->getFile() . ':' . $e->getLine(),
+            ], 500);
+        }
 
         return $this->json([
             'token'    => $token,
