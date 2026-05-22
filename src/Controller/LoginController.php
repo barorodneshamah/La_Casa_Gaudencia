@@ -30,6 +30,20 @@ class LoginController extends AbstractController
         ]);
     }
 
+    #[Route('/dashboard', name: 'app_dashboard_redirect')]
+    public function dashboardRedirect(): Response
+    {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_admin_dashboard');
+        }
+
+        if ($this->isGranted('ROLE_STAFF')) {
+            return $this->redirectToRoute('app_staff_dashboard');
+        }
+
+        return $this->redirectToRoute('app_landing');
+    }
+
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {

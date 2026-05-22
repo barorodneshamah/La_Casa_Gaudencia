@@ -37,8 +37,8 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
-                default_target_path: /admin/dashboard
-                always_use_default_target_path: false
+                default_target_path: /dashboard
+                always_use_default_target_path: true
                 username_parameter: username
                 password_parameter: password
                 enable_csrf: true
