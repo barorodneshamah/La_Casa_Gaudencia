@@ -36,9 +36,9 @@ try {
 done
 echo "==> Database ready."
 
-# Run pending migrations
-echo "==> Running migrations..."
-php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+# Sync database schema (idempotent — safe to run on every restart)
+echo "==> Syncing database schema..."
+php bin/console doctrine:schema:update --force --no-interaction
 
 # Install Symfony assets
 echo "==> Installing assets..."
