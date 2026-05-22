@@ -41,7 +41,7 @@ class LoginController extends AbstractController
             return $this->redirectToRoute('app_staff_dashboard');
         }
 
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('customer_use_app');
     }
 
     #[Route('/logout', name: 'app_logout')]
