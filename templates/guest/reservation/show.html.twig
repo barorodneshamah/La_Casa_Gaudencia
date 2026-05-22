@@ -1,0 +1,260 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reservation {{ reservation.reservationCode }} - La Casa Gaudencia{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root { --brand: #c24a16; --brand-light: #e85d04; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: #fdf8f4; color: #2f2f2f; min-height: 100vh; }
+
+.topnav { background: #fff; border-bottom: 3px solid var(--brand); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(194,74,22,.1); }
+.topnav-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--brand); text-decoration: none; }
+.topnav-links { display: flex; align-items: center; gap: 8px; }
+.nav-link { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: .9rem; font-weight: 500; color: #555; transition: all .2s; }
+.nav-link:hover { background: #fef0e8; color: var(--brand); }
+.nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .95rem; }
+.nav-user { display: flex; align-items: center; gap: 8px; font-size: .9rem; font-weight: 500; color: #555; }
+
+.page { max-width: 760px; margin: 0 auto; padding: 36px 24px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: #888; text-decoration: none; font-size: .9rem; margin-bottom: 20px; transition: color .2s; }
+.back-link:hover { color: var(--brand); }
+
+.card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.07); overflow: hidden; margin-bottom: 20px; }
+.card-header { background: var(--brand); color: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.card-header h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+.card-header small { font-size: .85rem; opacity: .85; }
+.card-body { padding: 24px; }
+
+.badge { padding: 5px 14px; border-radius: 20px; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.badge-pending { background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+.badge-confirmed { background: #d1f2e1; color: #155724; }
+.badge-cancelled { background: #f8d7da; color: #721c24; }
+.badge-completed { background: #cfe2ff; color: #084298; }
+
+.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f5f5f5; font-size: .9rem; }
+.detail-row:last-child { border-bottom: none; }
+.detail-label { color: #888; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.detail-value { font-weight: 600; color: #2f2f2f; text-align: right; max-width: 60%; }
+
+.section-title { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--brand); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #fef0e8; }
+
+.food-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: .9rem; }
+.food-row:last-child { border-bottom: none; }
+.food-name { font-weight: 500; }
+.food-qty { color: #888; font-size: .82rem; }
+.food-price { font-weight: 600; color: var(--brand); }
+
+.total-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0 0; font-size: 1.1rem; }
+.total-label { font-weight: 600; }
+.total-amount { font-size: 1.4rem; font-weight: 700; color: var(--brand); }
+
+.status-timeline { display: flex; gap: 0; margin: 4px 0 20px; }
+.step { flex: 1; text-align: center; position: relative; }
+.step::before { content: ''; position: absolute; top: 14px; left: 50%; right: -50%; height: 3px; background: #e0e0e0; z-index: 0; }
+.step:last-child::before { display: none; }
+.step-dot { width: 28px; height: 28px; border-radius: 50%; background: #e0e0e0; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: .75rem; position: relative; z-index: 1; }
+.step-dot.active { background: var(--brand); }
+.step-dot.done { background: #27ae60; }
+.step-label { font-size: .72rem; color: #888; font-weight: 500; }
+.step.active .step-label { color: var(--brand); font-weight: 700; }
+
+.btn-cancel { background: #fde8e8; color: #c0392b; border: none; padding: 12px 24px; border-radius: 10px; font-size: .9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .2s; }
+.btn-cancel:hover { background: #f8d7da; }
+.btn-back { background: #f0f0f0; color: #333; border: none; padding: 12px 24px; border-radius: 10px; font-size: .9rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background .2s; }
+.btn-back:hover { background: #e0e0e0; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+
+.img-thumb { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<nav class="topnav">
+    <a href="{{ path('app_landing') }}" class="topnav-logo">La Casa Gaudencia</a>
+    <div class="topnav-links">
+        <a href="{{ path('app_landing') }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="{{ path('guest_reservation_index') }}" class="nav-link"><i class="fas fa-calendar-alt"></i> My Reservations</a>
+        <a href="{{ path('guest_reservation_book') }}" class="nav-link"><i class="fas fa-plus"></i> Book Now</a>
+    </div>
+    <div class="nav-user">
+        <div class="nav-avatar">{{ app.user.fullName|first|upper }}</div>
+        <span>{{ app.user.fullName }}</span>
+        <a href="{{ path('app_logout') }}" class="nav-link" style="color:#c0392b"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+</nav>
+
+<div class="page">
+    <a href="{{ path('guest_reservation_index') }}" class="back-link"><i class="fas fa-arrow-left"></i> Back to My Reservations</a>
+
+    {% set status = reservation.status|lower %}
+
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h2>Reservation Details</h2>
+                <small>{{ reservation.reservationCode }}</small>
+            </div>
+            <span class="badge badge-{{ status }}">{{ reservation.status }}</span>
+        </div>
+        <div class="card-body">
+            <!-- Status timeline -->
+            <div class="status-timeline">
+                <div class="step {% if status in ['pending','confirmed','completed'] %}done{% endif %}">
+                    <div class="step-dot {% if status in ['pending','confirmed','completed'] %}done{% endif %}"><i class="fas fa-check"></i></div>
+                    <div class="step-label">Submitted</div>
+                </div>
+                <div class="step {% if status == 'confirmed' or status == 'completed' %}done{% elseif status == 'pending' %}active{% endif %}">
+                    <div class="step-dot {% if status == 'confirmed' or status == 'completed' %}done{% elseif status == 'pending' %}active{% endif %}"><i class="fas fa-hourglass-half"></i></div>
+                    <div class="step-label">Pending</div>
+                </div>
+                <div class="step {% if status == 'completed' %}done{% elseif status == 'confirmed' %}active{% endif %}">
+                    <div class="step-dot {% if status == 'completed' %}done{% elseif status == 'confirmed' %}active{% endif %}"><i class="fas fa-thumbs-up"></i></div>
+                    <div class="step-label">Confirmed</div>
+                </div>
+                <div class="step {% if status == 'completed' %}active{% endif %}">
+                    <div class="step-dot {% if status == 'completed' %}done{% endif %}"><i class="fas fa-star"></i></div>
+                    <div class="step-label">Completed</div>
+                </div>
+            </div>
+
+            <div class="section-title">Booking Info</div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-user"></i> Guest</span>
+                <span class="detail-value">{{ reservation.guest.fullName }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-phone"></i> Contact</span>
+                <span class="detail-value">{{ reservation.contactPhone ?? '—' }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-users"></i> Guests</span>
+                <span class="detail-value">{{ reservation.numberOfGuests }}</span>
+            </div>
+            {% if reservation.specialRequests %}
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-comment"></i> Special Requests</span>
+                <span class="detail-value">{{ reservation.specialRequests }}</span>
+            </div>
+            {% endif %}
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-credit-card"></i> Payment</span>
+                <span class="detail-value">{{ reservation.paymentStatus }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if reservation.room %}
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title"><i class="fas fa-bed"></i> Room</div>
+            {% if reservation.room.mainImage %}
+                <img src="{{ asset('uploads/rooms/' ~ reservation.room.mainImage) }}" alt="{{ reservation.room.roomType }}" class="img-thumb">
+            {% endif %}
+            <div class="detail-row">
+                <span class="detail-label">Room</span>
+                <span class="detail-value">{{ reservation.room.roomType }} — #{{ reservation.room.roomNumber }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-calendar-check"></i> Check-in</span>
+                <span class="detail-value">{{ reservation.checkInDate|date('F d, Y') }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-calendar-times"></i> Check-out</span>
+                <span class="detail-value">{{ reservation.checkOutDate|date('F d, Y') }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Nights</span>
+                <span class="detail-value">{{ reservation.checkInDate|date('U') is not empty ? ((reservation.checkOutDate.timestamp - reservation.checkInDate.timestamp) / 86400)|round : '—' }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Rate / Night</span>
+                <span class="detail-value">₱{{ reservation.room.pricePerNight|number_format(2) }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if reservation.tour %}
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title"><i class="fas fa-map-marked-alt"></i> Tour</div>
+            {% if reservation.tour.mainImage %}
+                <img src="{{ asset('uploads/tours/' ~ reservation.tour.mainImage) }}" alt="{{ reservation.tour.name }}" class="img-thumb">
+            {% endif %}
+            <div class="detail-row">
+                <span class="detail-label">Tour</span>
+                <span class="detail-value">{{ reservation.tour.name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-calendar-day"></i> Date</span>
+                <span class="detail-value">{{ reservation.tourDate|date('F d, Y') }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label"><i class="fas fa-users"></i> Participants</span>
+                <span class="detail-value">{{ reservation.tourParticipants }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Rate / Person</span>
+                <span class="detail-value">₱{{ reservation.tour.price|number_format(2) }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if reservation.package %}
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title"><i class="fas fa-box-open"></i> Package</div>
+            <div class="detail-row">
+                <span class="detail-label">Package</span>
+                <span class="detail-value">{{ reservation.package.name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Price</span>
+                <span class="detail-value">₱{{ reservation.package.packagePrice|number_format(2) }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if foodDetails is not empty %}
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title"><i class="fas fa-utensils"></i> Food Items</div>
+            {% for item in foodDetails %}
+            <div class="food-row">
+                <div>
+                    <div class="food-name">{{ item.food.name }}</div>
+                    <div class="food-qty">× {{ item.quantity }} @ ₱{{ item.food.price|number_format(2) }}</div>
+                </div>
+                <div class="food-price">₱{{ item.subtotal|number_format(2) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="total-row">
+                <span class="total-label">Total Amount</span>
+                <span class="total-amount">₱{{ reservation.totalAmount|number_format(2) }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{{ path('guest_reservation_index') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+        {% if reservation.isPending() %}
+        <form method="post" action="{{ path('guest_reservation_cancel', {id: reservation.id}) }}" onsubmit="return confirm('Are you sure you want to cancel this reservation?')">
+            <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ reservation.id) }}">
+            <button type="submit" class="btn-cancel"><i class="fas fa-times-circle"></i> Cancel Reservation</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

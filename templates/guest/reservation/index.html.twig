@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Reservations - La Casa Gaudencia{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --brand: #c24a16;
+    --brand-light: #e85d04;
+    --bg: #fdf8f4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #2f2f2f; min-height: 100vh; }
+
+/* NAV */
+.topnav {
+    background: #fff;
+    border-bottom: 3px solid var(--brand);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(194,74,22,.1);
+}
+.topnav-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--brand); text-decoration: none; }
+.topnav-links { display: flex; align-items: center; gap: 8px; }
+.nav-link { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: .9rem; font-weight: 500; color: #555; transition: all .2s; }
+.nav-link:hover, .nav-link.active { background: #fef0e8; color: var(--brand); }
+.nav-user { display: flex; align-items: center; gap: 8px; font-size: .9rem; font-weight: 500; color: #555; }
+.nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .95rem; }
+
+/* PAGE */
+.page { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #2f2f2f; }
+.btn-primary { background: var(--brand); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background .2s; }
+.btn-primary:hover { background: var(--brand-light); }
+
+/* FLASH */
+.flash { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: .9rem; font-weight: 500; }
+.flash-success { background: #e8f8ee; color: #1a7a3c; border-left: 4px solid #1a7a3c; }
+.flash-error { background: #fde8e8; color: #c0392b; border-left: 4px solid #c0392b; }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 80px 24px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.05); }
+.empty-icon { font-size: 3.5rem; color: #ddd; margin-bottom: 16px; }
+.empty-state h3 { font-size: 1.3rem; color: #555; margin-bottom: 8px; }
+.empty-state p { color: #888; margin-bottom: 24px; }
+
+/* CARD */
+.reservation-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    padding: 24px;
+    margin-bottom: 16px;
+    border-left: 5px solid #ddd;
+    transition: box-shadow .2s, transform .2s;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.reservation-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.1); transform: translateY(-2px); }
+.reservation-card.status-pending { border-left-color: #f39c12; }
+.reservation-card.status-confirmed { border-left-color: #27ae60; }
+.reservation-card.status-cancelled { border-left-color: #e74c3c; opacity: .8; }
+.reservation-card.status-completed { border-left-color: #3498db; }
+
+.card-main { flex: 1; min-width: 200px; }
+.card-code { font-size: .8rem; color: #888; font-weight: 500; margin-bottom: 4px; }
+.card-title { font-size: 1.05rem; font-weight: 600; color: #2f2f2f; margin-bottom: 8px; }
+.card-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: .85rem; color: #666; }
+.card-meta span { display: flex; align-items: center; gap: 5px; }
+
+.card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.card-amount { font-size: 1.2rem; font-weight: 700; color: var(--brand); }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.badge-pending { background: #fef3cd; color: #856404; }
+.badge-confirmed { background: #d1f2e1; color: #155724; }
+.badge-cancelled { background: #f8d7da; color: #721c24; }
+.badge-completed { background: #cfe2ff; color: #084298; }
+.badge-paid { background: #d1f2e1; color: #155724; }
+.badge-unpaid { background: #f8d7da; color: #721c24; }
+.badge-partial { background: #fff3cd; color: #856404; }
+.card-actions { display: flex; gap: 8px; }
+.btn-sm { padding: 7px 14px; border-radius: 8px; font-size: .82rem; font-weight: 600; text-decoration: none; transition: all .2s; }
+.btn-view { background: #f0f0f0; color: #333; border: none; cursor: pointer; }
+.btn-view:hover { background: #e0e0e0; }
+.btn-cancel { background: #fde8e8; color: #c0392b; border: none; cursor: pointer; }
+.btn-cancel:hover { background: #f8d7da; }
+</style>
+{% endblock %}
+
+{% block body %}
+<nav class="topnav">
+    <a href="{{ path('app_landing') }}" class="topnav-logo">La Casa Gaudencia</a>
+    <div class="topnav-links">
+        <a href="{{ path('app_landing') }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="{{ path('guest_reservation_index') }}" class="nav-link active"><i class="fas fa-calendar-alt"></i> My Reservations</a>
+        <a href="{{ path('guest_reservation_book') }}" class="nav-link"><i class="fas fa-plus"></i> Book Now</a>
+    </div>
+    <div class="nav-user">
+        <div class="nav-avatar">{{ app.user.fullName|first|upper }}</div>
+        <span>{{ app.user.fullName }}</span>
+        <a href="{{ path('app_logout') }}" class="nav-link" style="color:#c0392b"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+</nav>
+
+<div class="page">
+    {% for msg in app.flashes('success') %}
+        <div class="flash flash-success"><i class="fas fa-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> {{ msg }}</div>
+    {% endfor %}
+
+    <div class="page-header">
+        <h1 class="page-title">My Reservations</h1>
+        <a href="{{ path('guest_reservation_book') }}" class="btn-primary">
+            <i class="fas fa-plus"></i> Book a Service
+        </a>
+    </div>
+
+    {% if reservations is empty %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
+            <h3>No reservations yet</h3>
+            <p>Book a room, tour, package, or food service to get started.</p>
+            <a href="{{ path('guest_reservation_book') }}" class="btn-primary">
+                <i class="fas fa-concierge-bell"></i> Make a Reservation
+            </a>
+        </div>
+    {% else %}
+        {% for reservation in reservations %}
+            {% set status = reservation.status|lower %}
+            <div class="reservation-card status-{{ status }}">
+                <div class="card-main">
+                    <div class="card-code">{{ reservation.reservationCode }}</div>
+                    <div class="card-title">
+                        {% if reservation.room %}
+                            <i class="fas fa-bed" style="color:var(--brand)"></i>
+                            {{ reservation.room.roomType }} — Room {{ reservation.room.roomNumber }}
+                        {% elseif reservation.tour %}
+                            <i class="fas fa-map-marked-alt" style="color:var(--brand)"></i>
+                            {{ reservation.tour.name }}
+                        {% elseif reservation.package %}
+                            <i class="fas fa-box-open" style="color:var(--brand)"></i>
+                            {{ reservation.package.name }}
+                        {% else %}
+                            <i class="fas fa-utensils" style="color:var(--brand)"></i>
+                            Food Order
+                        {% endif %}
+                    </div>
+                    <div class="card-meta">
+                        {% if reservation.checkInDate %}
+                            <span><i class="fas fa-calendar-check"></i> {{ reservation.checkInDate|date('M d') }} – {{ reservation.checkOutDate|date('M d, Y') }}</span>
+                        {% endif %}
+                        {% if reservation.tourDate %}
+                            <span><i class="fas fa-calendar-day"></i> {{ reservation.tourDate|date('M d, Y') }}</span>
+                        {% endif %}
+                        <span><i class="fas fa-users"></i> {{ reservation.numberOfGuests }} guest(s)</span>
+                        <span><i class="fas fa-clock"></i> {{ reservation.createdAt is defined and reservation.createdAt ? reservation.createdAt|date('M d, Y') : 'N/A' }}</span>
+                    </div>
+                </div>
+                <div class="card-right">
+                    <div class="card-amount">₱{{ reservation.totalAmount|number_format(2) }}</div>
+                    <div>
+                        <span class="badge badge-{{ status }}">{{ status|capitalize }}</span>
+                        &nbsp;
+                        <span class="badge badge-{{ reservation.paymentStatus|lower }}">{{ reservation.paymentStatus }}</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ path('guest_reservation_show', {id: reservation.id}) }}" class="btn-sm btn-view">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        {% if reservation.isPending() %}
+                        <form method="post" action="{{ path('guest_reservation_cancel', {id: reservation.id}) }}" onsubmit="return confirm('Cancel this reservation?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ reservation.id) }}">
+                            <button type="submit" class="btn-sm btn-cancel"><i class="fas fa-times"></i> Cancel</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
