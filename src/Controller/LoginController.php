@@ -21,7 +21,7 @@ class LoginController extends AbstractController
                 return $this->redirectToRoute('app_staff_dashboard');
             }
 
-            return $this->redirectToRoute('guest_reservation_index');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('security/login.html.twig', [
@@ -41,7 +41,7 @@ class LoginController extends AbstractController
             return $this->redirectToRoute('app_staff_dashboard');
         }
 
-        return $this->redirectToRoute('guest_reservation_index');
+        return $this->redirectToRoute('app_home');
     }
 
     #[Route('/logout', name: 'app_logout')]
