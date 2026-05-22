@@ -40,6 +40,10 @@ echo "==> Database ready."
 echo "==> Syncing database schema..."
 php bin/console doctrine:schema:update --force --no-interaction
 
+# Seed default admin/staff accounts (idempotent — re-hashes password on every start)
+echo "==> Seeding admin accounts..."
+php bin/console app:seed-admin --no-interaction
+
 # Install Symfony assets
 echo "==> Installing assets..."
 php bin/console assets:install --no-interaction
