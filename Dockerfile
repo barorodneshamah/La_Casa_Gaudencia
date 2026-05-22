@@ -45,6 +45,9 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
+# Symfony requires .env to exist even in prod (actual values come from Railway env vars)
+RUN touch .env
+
 # Install PHP dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install \
     --no-dev \
