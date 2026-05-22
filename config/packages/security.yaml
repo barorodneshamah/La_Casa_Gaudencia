@@ -18,7 +18,7 @@ security:
 
         # Public API routes — no auth needed
         api_public:
-            pattern: ^/api/(login|register|auth/google|services|products|tours|rooms|foods|packages)
+            pattern: ^/api/(login|register|auth/google|services|products|tours|rooms|foods|packages|logout)
             security: false
 
         # JWT-protected API routes
@@ -54,6 +54,7 @@ security:
     access_control:
         # Public API
         - { path: ^/api/login,        roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout,       roles: PUBLIC_ACCESS }
         - { path: ^/api/register,     roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/google,  roles: PUBLIC_ACCESS }
         - { path: ^/api/services,     roles: PUBLIC_ACCESS }

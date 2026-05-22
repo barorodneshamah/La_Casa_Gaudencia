@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\ActivityLogService;
 use App\Service\EmailVerificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Google\Client as GoogleClient;
@@ -23,7 +24,8 @@ class AuthController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private JWTTokenManagerInterface $jwtManager,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private ActivityLogService $activityLog
     ) {}
 
     #[Route('/register', name: 'api_register', methods: ['POST'])]
@@ -128,6 +130,8 @@ class AuthController extends AbstractController
             ], 500);
         }
 
+        try { $this->activityLog->logLogin($user); } catch (\Throwable) {}
+
         return $this->json([
             'token'    => $token,
             'id'       => $user->getId(),
@@ -136,6 +140,17 @@ class AuthController extends AbstractController
             'fullName' => $user->getFullName(),
             'roles'    => $user->getRoles(),
         ]);
+    }
+
+    #[Route('/logout', name: 'api_logout', methods: ['POST'])]
+    public function logout(): JsonResponse
+    {
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        if ($user) {
+            try { $this->activityLog->logLogout($user); } catch (\Throwable) {}
+        }
+        return $this->json(['success' => true]);
     }
 
     #[Route('/fcm-token', name: 'api_fcm_token', methods: ['POST'])]

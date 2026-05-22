@@ -3,11 +3,14 @@
 namespace App\EventSubscriber;
 
 use App\Entity\ActivityLog;
-use App\Entity\User;
-use App\Entity\Tour;
 use App\Entity\Food;
-
+use App\Entity\Package;
+use App\Entity\Payment;
+use App\Entity\Reservation;
 use App\Entity\Room;
+use App\Entity\Spa;
+use App\Entity\Tour;
+use App\Entity\User;
 use App\Service\ActivityLogService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -25,15 +28,15 @@ class EntityActivitySubscriber
     private ActivityLogService $activityLogService;
     private array $oldEntityData = [];
     
-    // Entities to track
     private const TRACKED_ENTITIES = [
         User::class,
         Room::class,
         Tour::class,
         Food::class,
-        #Package::class,
-        #CustomItinerary::class,
-        #Booking::class,
+        Package::class,
+        Spa::class,
+        Reservation::class,
+        Payment::class,
     ];
 
     public function __construct(ActivityLogService $activityLogService)
