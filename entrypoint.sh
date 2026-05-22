@@ -36,6 +36,17 @@ try {
 done
 echo "==> Database ready."
 
+# Generate JWT keypair if keys are missing (they are gitignored)
+echo "==> Checking JWT keys..."
+mkdir -p config/jwt
+if [ ! -f config/jwt/private.pem ]; then
+    echo "    Generating JWT keypair..."
+    php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction
+    echo "    JWT keypair generated."
+else
+    echo "    JWT keys already exist."
+fi
+
 # Sync database schema (idempotent — safe to run on every restart)
 echo "==> Syncing database schema..."
 php bin/console doctrine:schema:update --force --no-interaction
