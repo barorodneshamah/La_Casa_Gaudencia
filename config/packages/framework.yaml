@@ -1,6 +1,6 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
-    secret: '%env(APP_SECRET)%'
+    secret: '%env(default:app_secret_default:APP_SECRET)%'
 
     # Trust ngrok / reverse proxy
     trusted_proxies: '127.0.0.1,REMOTE_ADDR'

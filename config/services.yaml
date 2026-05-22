@@ -4,6 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    jwt_passphrase: '424e71ea0d036c0255066b2fa385115bd7d1027e2d584668b68620e68c709fad'
+    app_secret_default: 'fdhzgagfrhts'
+    cors_allow_all: '^https?://.*$'
     room_images_directory: '%kernel.project_dir%/public/uploads/rooms'
     tour_images_directory: '%kernel.project_dir%/public/uploads/tours'
     food_images_directory: '%kernel.project_dir%/public/uploads/foods'
