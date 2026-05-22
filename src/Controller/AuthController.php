@@ -23,9 +23,7 @@ class AuthController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private JWTTokenManagerInterface $jwtManager,
-        private LoggerInterface $logger,
-        #[Autowire('%env(GOOGLE_CLIENT_ID)%')]
-        private string $googleClientId
+        private LoggerInterface $logger
     ) {}
 
     #[Route('/register', name: 'api_register', methods: ['POST'])]
@@ -163,8 +161,10 @@ class AuthController extends AbstractController
     }
 
     #[Route('/auth/google', name: 'api_auth_google', methods: ['POST'])]
-    public function googleAuth(Request $request): JsonResponse
-    {
+    public function googleAuth(
+        Request $request,
+        #[Autowire('%env(default::GOOGLE_CLIENT_ID)%')] string $googleClientId = ''
+    ): JsonResponse {
         try {
             $data = json_decode($request->getContent(), true);
             $idToken = $data['idToken'] ?? null;
@@ -174,7 +174,7 @@ class AuthController extends AbstractController
             }
 
             // Verify token with Google client library
-            $googleClient = new GoogleClient(['client_id' => $this->googleClientId]);
+            $googleClient = new GoogleClient(['client_id' => $googleClientId]);
             $payload = $googleClient->verifyIdToken($idToken);
 
             if (!$payload || !isset($payload['email'])) {
