@@ -21,6 +21,7 @@ class LandingController extends AbstractController
         private FoodRepository $foodRepo
     ) {}
 
+    #[Route('/', name: 'app_home')]
     #[Route('/landing', name: 'app_landing')]
     public function index(): Response
     {
