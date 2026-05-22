@@ -434,13 +434,13 @@ document.querySelectorAll('.share-btn').forEach(function (btn) {
         var imageSrc = item.image || '';
         if (!imageSrc || imageSrc === '') {
             if (type === 'accommodations') {
-                imageSrc = '/Images/room1.jpg';
+                imageSrc = '/images/room1.jpg';
             } else if (type === 'tours') {
-                imageSrc = '/Images/tour1.jpg';
+                imageSrc = '/images/tour1.jpg';
             } else if (type === 'dining') {
-                imageSrc = '/Images/food1.jpg';
+                imageSrc = '/images/food1.jpg';
             } else {
-                imageSrc = '/Images/placeholder.jpg';
+                imageSrc = '/images/placeholder.jpg';
             }
         }
 
@@ -455,7 +455,7 @@ document.querySelectorAll('.share-btn').forEach(function (btn) {
                     'alt="' + safeName + '" ' +
                     'class="card-image" ' +
                     'loading="lazy" ' +
-                    'onerror="this.onerror=null; this.src=\'/Images/placeholder.jpg\';" ' +
+                    'onerror="this.onerror=null; this.src=\'/images/placeholder.jpg\';" ' +
                 '/>' +
                 badgeHTML +
                 '<div class="card-hover-overlay">' +
