@@ -62,6 +62,9 @@ class Spa
     #[Groups(['spa:detail'])]
     private ?array $galleryImages = [];
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isOffer = false;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -132,4 +135,12 @@ class Spa
 
     public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
+
+    public function isOffer(): bool { return $this->isOffer; }
+    public function setIsOffer(bool $isOffer): static { $this->isOffer = $isOffer; return $this; }
+
+    public function isNew(): bool
+    {
+        return $this->createdAt !== null && $this->createdAt >= new \DateTimeImmutable('-7 days');
+    }
 }

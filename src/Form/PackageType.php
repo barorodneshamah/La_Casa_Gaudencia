@@ -100,6 +100,11 @@ class PackageType extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'form-check-input'],
             ])
+            ->add('isOffer', CheckboxType::class, [
+                'label'    => 'Mark as Special Offer',
+                'required' => false,
+                'attr'     => ['class' => 'form-check-input'],
+            ])
             ->add('status', ChoiceType::class, [
                 'label' => 'Status',
                 'choices' => [

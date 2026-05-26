@@ -10,7 +10,10 @@
       "Bash(php composer.phar show)",
       "Bash(composer show *)",
       "Bash(findstr /i \"brevo mailer sendinblue\")",
-      "Bash(composer require *)"
+      "Bash(composer require *)",
+      "Bash(php bin/console dbal:run-sql \"SELECT id, image_uri FROM share_wall_post WHERE image_uri IS NOT NULL\")",
+      "Bash(php bin/console dbal:run-sql \"SELECT id, image_uri, caption FROM share_wall_post ORDER BY id DESC LIMIT 5\")",
+      "Bash(php bin/console dbal:run-sql \"SELECT id, image_uri, caption FROM share_wall_post ORDER BY id DESC LIMIT 10\")"
     ]
   }
 }

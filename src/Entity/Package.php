@@ -114,6 +114,10 @@ class Package
     #[ORM\Column]
     private bool $isFeatured = false;
 
+    #[ORM\Column(options: ['default' => false])]
+    #[Groups(['package:read'])]
+    private bool $isOffer = false;
+
     #[ORM\ManyToMany(targetEntity: Tour::class)]
     #[ORM\JoinTable(name: 'package_tours')]
     #[Groups(['package:detail'])]
@@ -406,6 +410,14 @@ class Package
     {
         $this->isFeatured = $isFeatured;
         return $this;
+    }
+
+    public function isOffer(): bool { return $this->isOffer; }
+    public function setIsOffer(bool $isOffer): static { $this->isOffer = $isOffer; return $this; }
+
+    public function isNew(): bool
+    {
+        return $this->createdAt !== null && $this->createdAt >= new \DateTimeImmutable('-7 days');
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable

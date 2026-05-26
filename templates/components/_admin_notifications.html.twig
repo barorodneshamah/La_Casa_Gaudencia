@@ -1,6 +1,7 @@
-{# Admin/Staff notification bell – injected into .topbar-right on every page #}
+{# Admin/Staff notification bell – only rendered for ROLE_STAFF and above #}
 {% if app.user and is_granted('ROLE_STAFF') %}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 .notif-bell-btn {
     position: relative;
@@ -31,17 +32,46 @@
     padding: 0 3px;
     line-height: 1;
 }
+/* Floating fallback when no topbar-right exists */
+.notif-bell-floating {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 52px;
+    height: 52px;
+    background: #c24a16;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(194,74,22,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 8999;
+    transition: transform .2s;
+}
+.notif-bell-floating:hover { transform: scale(1.1); }
+.notif-bell-floating .notif-bell-badge {
+    border: 2px solid #c24a16;
+}
 #notifGlobalDropdown {
     display: none;
     position: fixed;
     top: 70px;
     right: 20px;
-    width: 320px;
+    width: 340px;
     background: white;
     border-radius: 14px;
     box-shadow: 0 8px 32px rgba(0,0,0,.18);
     z-index: 9000;
     overflow: hidden;
+}
+#notifGlobalDropdown.from-float {
+    top: auto;
+    bottom: 88px;
+    right: 20px;
 }
 #notifGlobalToastContainer {
     position: fixed;
@@ -56,22 +86,22 @@
 #notifGlobalToastContainer > * { pointer-events: auto; }
 </style>
 
-<!-- Booking Bell Wrapper (JS injects into .topbar-right) -->
+<!-- Bell wrapper (JS moves this into .topbar-right or shows as floating button) -->
 <div id="notifGlobalBellWrap" style="position:relative;display:none;">
-    <button class="notif-bell-btn" id="notifGlobalBellBtn" title="Booking Alerts" onclick="toggleGlobalNotifDropdown()">
-        <i class="fas fa-calendar-check"></i>
+    <button class="notif-bell-btn" id="notifGlobalBellBtn" title="Notifications" onclick="toggleGlobalNotifDropdown()">
+        <i class="fas fa-bell"></i>
         <span class="notif-bell-badge" id="notifGlobalBadge" style="display:none;">0</span>
     </button>
 </div>
 
-<!-- Notification Dropdown (appended to body, positioned fixed) -->
+<!-- Notification Dropdown -->
 <div id="notifGlobalDropdown">
     <div style="padding:14px 18px;background:#c24a16;color:white;font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;">
-        <span><i class="fas fa-calendar-check"></i> Booking Alerts</span>
+        <span><i class="fas fa-bell"></i> Notifications</span>
         <button onclick="clearGlobalNotifBadge()" style="background:rgba(255,255,255,.2);border:none;color:white;border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;">Clear</button>
     </div>
-    <div id="notifGlobalList" style="max-height:300px;overflow-y:auto;padding:8px 0;">
-        <div style="padding:20px;text-align:center;color:#aaa;font-size:13px;">No new alerts</div>
+    <div id="notifGlobalList" style="max-height:340px;overflow-y:auto;padding:8px 0;">
+        <div style="padding:20px;text-align:center;color:#aaa;font-size:13px;">No new notifications</div>
     </div>
 </div>
 
@@ -80,18 +110,39 @@
 
 <script>
 (function() {
-    // Move bell into .topbar-right on DOMContentLoaded
+    const TYPE_META = {
+        reservation: { icon: 'fa-calendar-check', color: '#7b1fa2' },
+        payment:     { icon: 'fa-money-bill-wave', color: '#2e7d32' },
+        message:     { icon: 'fa-envelope',        color: '#1565c0' },
+    };
+
+    function getMeta(type) {
+        return TYPE_META[type] || { icon: 'fa-bell', color: '#c24a16' };
+    }
+
+    let usingFloat = false;
+
+    // Set true when dashboard pre-signals via window.noGlobalBell = true
+    let noBell = !!window.noGlobalBell;
+
     function mountBell() {
+        if (noBell) return;
+
         const topbarRight = document.querySelector('.topbar-right');
         const wrap = document.getElementById('notifGlobalBellWrap');
-        if (!topbarRight || !wrap) return;
+        if (!wrap) return;
 
-        // Avoid double-mount if already a child of topbar-right
-        if (topbarRight.contains(wrap)) { wrap.style.display = ''; return; }
+        if (topbarRight && topbarRight.dataset.noGlobalBell === 'true') {
+            noBell = true;
+            return;
+        }
 
-        // Insert before the first child (datetime-display)
-        topbarRight.insertBefore(wrap, topbarRight.firstChild);
-        wrap.style.display = '';
+        if (topbarRight) {
+            if (topbarRight.contains(wrap)) { wrap.style.display = ''; return; }
+            topbarRight.insertBefore(wrap, topbarRight.firstChild);
+            wrap.style.display = '';
+        }
+        // No floating fallback — all admin/staff pages have .topbar-right
     }
 
     if (document.readyState === 'loading') {
@@ -100,18 +151,29 @@
         mountBell();
     }
 
-    // ── Polling ────────────────────────────────────────────────────────────
-    let lastChecked = Math.floor(Date.now() / 1000) - 300;
-    let storedNotifs = [];
+    const LS_KEY_TS    = 'adminNotifLastChecked';
+    const LS_KEY_LIST  = 'adminNotifStored';
+    const LS_KEY_SEEN  = 'adminNotifSeenIds';
+    // On first ever load use now so historical toasts don't fire; thereafter persist across navigations
+    let lastChecked   = parseInt(localStorage.getItem(LS_KEY_TS) || '0', 10) || Math.floor(Date.now() / 1000);
+    let storedNotifs  = JSON.parse(localStorage.getItem(LS_KEY_LIST) || '[]');
+    // seenIds tracks every notification key ever shown as a toast — prevents re-toasting on re-poll
+    let seenIds       = new Set(JSON.parse(localStorage.getItem(LS_KEY_SEEN) || '[]'));
+
+    function saveSeen() {
+        let arr = [...seenIds];
+        if (arr.length > 300) arr = arr.slice(arr.length - 300);
+        seenIds = new Set(arr);
+        localStorage.setItem(LS_KEY_SEEN, JSON.stringify(arr));
+    }
 
     function showNotifToast(msg, detail, url, type) {
-        const icon  = type === 'reservation' ? 'fa-calendar-check' : 'fa-money-bill-wave';
-        const color = type === 'reservation' ? '#7b1fa2' : '#2e7d32';
+        const { icon, color } = getMeta(type);
         const t = document.createElement('div');
         t.style.cssText = `background:white;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.18);
             padding:14px 18px;min-width:280px;max-width:340px;border-left:4px solid ${color};
             display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:opacity .5s;`;
-        t.innerHTML = `<i class="fas ${icon}" style="color:${color};margin-top:2px;font-size:18px;"></i>
+        t.innerHTML = `<i class="fas ${icon}" style="color:${color};margin-top:2px;font-size:18px;flex-shrink:0;"></i>
             <div><div style="font-weight:700;font-size:14px;color:#222;">${msg}</div>
             <div style="font-size:12px;color:#777;margin-top:3px;">${detail}</div></div>`;
         t.onclick = () => { window.location.href = url; };
@@ -124,28 +186,36 @@
         const list = document.getElementById('notifGlobalList');
         if (!list) return;
         if (!notifs.length) {
-            list.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-size:13px;">No new alerts</div>';
+            list.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-size:13px;">No new notifications</div>';
             return;
         }
-        list.innerHTML = notifs.map(n => {
-            const icon  = n.type === 'reservation' ? 'fa-calendar-check' : 'fa-money-bill-wave';
-            const color = n.type === 'reservation' ? '#7b1fa2' : '#2e7d32';
-            return `<a href="${n.url}" style="display:flex;gap:12px;padding:12px 18px;text-decoration:none;color:inherit;border-bottom:1px solid #f5f5f5;">
-                <i class="fas ${icon}" style="color:${color};margin-top:2px;"></i>
-                <div><div style="font-weight:600;font-size:13px;">${n.message}</div>
-                <div style="font-size:11px;color:#999;">${n.detail} · ${n.time}</div></div></a>`;
+        // Unread items always float to the top
+        const sorted = [...notifs].sort((a, b) => (b.unread ? 1 : 0) - (a.unread ? 1 : 0));
+        list.innerHTML = sorted.map(n => {
+            const { icon, color } = getMeta(n.type);
+            const rowBg     = n.unread ? `background:#fff8f6;border-left:3px solid ${color};` : '';
+            const titleW    = n.unread ? '700' : '500';
+            const dotHtml   = n.unread ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${color};margin-left:5px;vertical-align:middle;flex-shrink:0;"></span>` : '';
+            return `<a href="${n.url}" style="display:flex;gap:12px;padding:12px 18px;text-decoration:none;color:inherit;border-bottom:1px solid #f5f5f5;align-items:flex-start;${rowBg}">
+                <i class="fas ${icon}" style="color:${color};margin-top:3px;flex-shrink:0;"></i>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:0;">
+                        <span style="font-weight:${titleW};font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.message}</span>${dotHtml}
+                    </div>
+                    <div style="font-size:11px;color:#999;margin-top:2px;">${n.detail} · ${n.time}</div>
+                </div></a>`;
         }).join('');
     }
 
     function updateGlobalBadge(count) {
-        const badge = document.getElementById('notifGlobalBadge');
-        if (!badge) return;
-        if (count > 0) {
-            badge.textContent = count > 9 ? '9+' : count;
-            badge.style.display = '';
-        } else {
-            badge.style.display = 'none';
-        }
+        document.querySelectorAll('#notifGlobalBadge').forEach(badge => {
+            if (count > 0) {
+                badge.textContent = count > 9 ? '9+' : count;
+                badge.style.display = '';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
     }
 
     async function pollAdminNotifs() {
@@ -153,39 +223,68 @@
             const res = await fetch(`/admin/notifications/pending?since=${lastChecked}`, { credentials: 'same-origin' });
             if (!res.ok) return;
             const data = await res.json();
-            if (data.count > 0) {
-                data.notifications.forEach(n => showNotifToast(n.message, n.detail, n.url, n.type));
-                storedNotifs = [...data.notifications, ...storedNotifs].slice(0, 20);
-                renderGlobalDropdown(storedNotifs);
-                updateGlobalBadge(storedNotifs.length);
+
+            // Filter to only notifications not yet shown as toasts
+            const fresh = (data.notifications || []).filter(n => !seenIds.has(n.type + ':' + n.id));
+
+            if (fresh.length > 0) {
+                fresh.forEach(n => showNotifToast(n.message, n.detail, n.url, n.type));
+                fresh.forEach(n => seenIds.add(n.type + ':' + n.id));
+                saveSeen();
+
+                // Merge into dropdown list without duplicates, flagged as unread
+                const existingKeys = new Set(storedNotifs.map(n => n.type + ':' + n.id));
+                const toAdd = fresh
+                    .filter(n => !existingKeys.has(n.type + ':' + n.id))
+                    .map(n => ({ ...n, unread: true }));
+                if (toAdd.length) {
+                    storedNotifs = [...toAdd, ...storedNotifs].slice(0, 20);
+                    localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
+                    if (!noBell) renderGlobalDropdown(storedNotifs);
+                    if (!noBell) updateGlobalBadge(storedNotifs.length);
+                }
             }
+
             lastChecked = data.checkedAt;
+            localStorage.setItem(LS_KEY_TS, String(lastChecked));
         } catch(e) {}
     }
 
     window.toggleGlobalNotifDropdown = function() {
         const d = document.getElementById('notifGlobalDropdown');
         if (!d) return;
-        d.style.display = d.style.display === 'none' ? 'block' : 'none';
-        renderGlobalDropdown(storedNotifs);
+        if (d.style.display !== 'block') {
+            d.style.display = 'block';
+            // Mark all as read the moment the user opens the dropdown
+            storedNotifs = storedNotifs.map(n => ({ ...n, unread: false }));
+            localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
+            renderGlobalDropdown(storedNotifs);
+            pollAdminNotifs().then(() => renderGlobalDropdown(storedNotifs));
+        } else {
+            d.style.display = 'none';
+        }
     };
 
     window.clearGlobalNotifBadge = function() {
         storedNotifs = [];
+        localStorage.setItem(LS_KEY_LIST, '[]');
         updateGlobalBadge(0);
         renderGlobalDropdown([]);
     };
 
     document.addEventListener('click', function(e) {
-        const wrap = document.getElementById('notifGlobalBellWrap');
-        const drop = document.getElementById('notifGlobalDropdown');
-        if (drop && wrap && !wrap.contains(e.target) && !drop.contains(e.target)) {
-            drop.style.display = 'none';
-        }
+        const wrap   = document.getElementById('notifGlobalBellWrap');
+        const flt    = document.getElementById('notifFloatBtn');
+        const drop   = document.getElementById('notifGlobalDropdown');
+        const inside = (wrap && wrap.contains(e.target)) || (flt && flt.contains(e.target)) || (drop && drop.contains(e.target));
+        if (drop && !inside) drop.style.display = 'none';
     });
 
+    // Restore badge from previous session immediately (before first poll)
+    if (storedNotifs.length) updateGlobalBadge(storedNotifs.length);
+
     pollAdminNotifs();
-    setInterval(pollAdminNotifs, 30000);
+    setInterval(pollAdminNotifs, 8000);
 })();
 </script>
 

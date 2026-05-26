@@ -6,6 +6,7 @@ use App\Repository\ReservationRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,13 +24,17 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => ['reservation:read']]
         ),
         new Get(
-            security: "is_granted('ROLE_GUEST') or object.guest == user",
+            security: "is_granted('ROLE_STAFF') or is_granted('ROLE_ADMIN') or object.getGuest() == user",
             normalizationContext: ['groups' => ['reservation:read', 'reservation:detail']]
         ),
         new Post(
             security: "is_granted('ROLE_GUEST')",
             denormalizationContext: ['groups' => ['reservation:write']]
-        )
+        ),
+        new Patch(
+            security: "is_granted('ROLE_STAFF') or is_granted('ROLE_ADMIN') or (is_granted('ROLE_GUEST') and object.getGuest() == user)",
+            denormalizationContext: ['groups' => ['reservation:reschedule']]
+        ),
     ]
 )]
 class Reservation
@@ -44,6 +49,7 @@ class Reservation
     public const STATUS_CONFIRMED = 'CONFIRMED';
     public const STATUS_CANCELLED = 'CANCELLED';
     public const STATUS_COMPLETED = 'COMPLETED';
+    public const STATUS_RESCHEDULED = 'RESCHEDULED';
 
     public const PAYMENT_UNPAID = 'UNPAID';
     public const PAYMENT_PARTIAL = 'PARTIAL';
@@ -75,11 +81,11 @@ class Reservation
     private ?Room $room = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['reservation:read', 'reservation:write'])]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:reschedule'])]
     private ?\DateTimeInterface $checkInDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['reservation:read', 'reservation:write'])]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:reschedule'])]
     private ?\DateTimeInterface $checkOutDate = null;
 
     #[ORM\ManyToOne(targetEntity: Tour::class)]
@@ -92,7 +98,7 @@ class Reservation
     private ?int $tourParticipants = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['reservation:read', 'reservation:write'])]
+    #[Groups(['reservation:read', 'reservation:write', 'reservation:reschedule'])]
     private ?\DateTimeInterface $tourDate = null;
 
     #[ORM\ManyToOne(targetEntity: Package::class)]
@@ -125,8 +131,8 @@ class Reservation
     private ?string $totalAmount = '0.00';
 
     #[ORM\Column(length: 20)]
-    #[Groups(['reservation:read'])]
-    #[Assert\Choice(choices: [self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_CANCELLED, self::STATUS_COMPLETED])]
+    #[Groups(['reservation:read', 'reservation:reschedule'])]
+    #[Assert\Choice(choices: [self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_CANCELLED, self::STATUS_COMPLETED, self::STATUS_RESCHEDULED])]
     private ?string $status = self::STATUS_PENDING;
 
     #[ORM\Column(length: 20)]
@@ -149,6 +155,11 @@ class Reservation
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['reservation:read'])]
+    private ?self $extensionOf = null;
 
     #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'reservation', cascade: ['persist'])]
     private Collection $payments;
@@ -379,4 +390,8 @@ class Reservation
             default => 'secondary',
         };
     }
+
+    public function getExtensionOf(): ?self { return $this->extensionOf; }
+    public function setExtensionOf(?self $reservation): self { $this->extensionOf = $reservation; return $this; }
+    public function isExtension(): bool { return $this->extensionOf !== null; }
 }

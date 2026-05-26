@@ -21,7 +21,7 @@ class CustomerNotificationController extends AbstractController
     ): JsonResponse {
         $user = $this->getUser();
         $since = $request->query->get('since');
-        $sinceDate = $since ? new \DateTime('@' . (int) $since) : new \DateTime('-5 minutes');
+        $sinceDate = $since ? new \DateTime('@' . (int) $since) : new \DateTime('-1 hour');
 
         $reservations = $reservationRepo->createQueryBuilder('r')
             ->where('r.guest = :user')

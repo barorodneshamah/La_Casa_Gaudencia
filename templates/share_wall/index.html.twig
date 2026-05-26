@@ -1,0 +1,769 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Share Wall Management{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --brand-primary: #c24a16;
+    --brand-primary-light: #e85d04;
+    --brand-text: #2f2f2f;
+    --brand-text-muted: #888888;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #2f2f2f;
+    background-image:
+        linear-gradient(rgba(255, 252, 236, 0.78), rgba(242, 236, 208, 0.78)),
+        url('{{ asset("images/ground.jpeg") }}');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar-accent {
+    position: fixed;
+    top: 0; left: 0;
+    width: 8px; height: 100vh;
+    background-color: #c24a16;
+    border-radius: 0 6px 6px 0;
+    z-index: 30;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0; left: 8px;
+    width: 260px; height: 100vh;
+    background: white;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 28px;
+    border-radius: 0 12px 12px 0;
+    z-index: 20;
+}
+
+.brand { text-align: center; margin-bottom: 30px; }
+.brand img { width: 75px; height: 75px; margin-bottom: 8px; }
+.brand h1 { font-family: 'Playfair Display', serif; color: #c24a16; font-size: 22px; margin: 0; }
+.brand small { color: #777; font-size: 12px; }
+
+.sidebar-separator {
+    width: 75%;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #d1d1d1, transparent);
+    margin: 10px 0 15px 0;
+}
+
+.sidebar ul { list-style: none; width: 100%; padding: 0; }
+.sidebar ul li a {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 35px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2f2f2f;
+    text-decoration: none;
+    transition: all .25s ease;
+}
+.sidebar ul li svg { width: 20px; height: 20px; fill: #888; transition: .25s; }
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #c24a16;
+    color: white;
+    margin-left: -12px;
+    border-radius: 0 30px 30px 0;
+    padding-left: 48px;
+}
+.sidebar ul li a:hover svg,
+.sidebar ul li.active a svg { fill: white !important; }
+
+.sidebar-logout {
+    width: 100%;
+    padding: 20px 30px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.logout-btn:hover { transform: translateY(-2px); }
+
+/* ===== TOPBAR ===== */
+@keyframes topbarShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.topbar {
+    margin-left: 268px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 35px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(120deg, #c24a16 0%, #e85d04 45%, #c24a16 100%);
+    background-size: 200% 200%;
+    animation: topbarShift 10s cubic-bezier(.2,.8,.2,1) infinite;
+}
+
+.topbar-left { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 20px; }
+
+.datetime-display {
+    text-align: right;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+}
+.datetime-display .time { font-size: 14px; font-weight: 600; }
+.datetime-display .date { font-size: 10px; color: rgba(255,255,255,0.8); }
+
+/* ===== MOBILE ===== */
+.mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 15; }
+.mobile-overlay.active { display: block; }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 268px;
+    padding: 32px;
+    min-height: calc(100vh - 70px);
+}
+
+/* ===== WELCOME SECTION ===== */
+.welcome-section {
+    background: linear-gradient(135deg, #fff 0%, #faf9f5 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(194,74,22,0.1);
+}
+.welcome-text h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--brand-text); margin-bottom: 8px; }
+.welcome-text p { color: var(--brand-text-muted); font-size: 15px; margin: 0; }
+.welcome-stats {
+    display: flex;
+    gap: 20px;
+}
+.welcome-stat {
+    text-align: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #c24a16 0%, #e85d04 100%);
+    border-radius: 12px;
+    color: white;
+}
+.welcome-stat .number { font-size: 28px; font-weight: 700; line-height: 1; }
+.welcome-stat .label { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+/* ===== SECTION HEADER ===== */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--brand-text);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.section-title i { color: var(--brand-primary); font-size: 20px; }
+
+/* ===== FLASH ===== */
+.alert {
+    padding: 14px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert-danger   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* ===== FILTER TABS ===== */
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+.filter-tab {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1.5px solid #e0e0e0;
+    background: white;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--brand-text-muted);
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    transition: all .2s ease;
+}
+.filter-tab:hover,
+.filter-tab.active {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    background: rgba(194,74,22,0.06);
+}
+
+/* ===== POSTS GRID ===== */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* ===== POST CARD ===== */
+.post-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.post-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.post-card.pinned { border-color: var(--brand-primary); }
+.post-card.hidden-post { opacity: .65; }
+
+.post-image { width: 100%; height: 200px; object-fit: cover; display: block; }
+.post-image-placeholder {
+    width: 100%; height: 120px;
+    background: linear-gradient(135deg, #fdf0e8, #fce4d6);
+    display: flex; align-items: center; justify-content: center;
+    color: #e0a080; font-size: 2.5rem;
+}
+
+.post-body { padding: 20px; }
+
+.post-author-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.post-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #c24a16, #e85d04);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; flex-shrink: 0;
+}
+.post-author-name { font-weight: 700; font-size: 14px; color: var(--brand-text); }
+.post-author-time { font-size: 12px; color: var(--brand-text-muted); margin-top: 1px; }
+
+.post-badges { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.badge-pin {
+    background: linear-gradient(135deg, #c24a16, #e85d04);
+    color: white; font-size: 11px; padding: 3px 10px;
+    border-radius: 20px; font-weight: 600;
+}
+.badge-hidden {
+    background: #6c757d; color: white;
+    font-size: 11px; padding: 3px 10px;
+    border-radius: 20px; font-weight: 600;
+}
+
+.service-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 10px;
+    background: rgba(194,74,22,0.1);
+    color: var(--brand-primary);
+}
+
+.post-caption {
+    font-size: 14px;
+    color: var(--brand-text);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.post-stats {
+    display: flex;
+    gap: 18px;
+    font-size: 13px;
+    color: var(--brand-text-muted);
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.post-stats i { margin-right: 4px; color: var(--brand-primary); }
+
+.post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-action {
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    transition: all .2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-pin    { background: rgba(194,74,22,0.1); color: var(--brand-primary); }
+.btn-pin:hover { background: var(--brand-primary); color: white; }
+.btn-hide   { background: rgba(108,117,125,0.1); color: #6c757d; }
+.btn-hide:hover { background: #6c757d; color: white; }
+.btn-show   { background: rgba(40,167,69,0.1); color: #28a745; }
+.btn-show:hover { background: #28a745; color: white; }
+.btn-delete { background: rgba(220,53,69,0.1); color: #dc3545; }
+.btn-delete:hover { background: #dc3545; color: white; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.empty-state i { font-size: 4rem; color: #ddd; margin-bottom: 16px; display: block; }
+.empty-state h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--brand-text); margin-bottom: 8px; }
+.empty-state p { color: var(--brand-text-muted); font-size: 14px; }
+
+/* ===== DELETE MODAL ===== */
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: white; border-radius: 20px; padding: 36px;
+    max-width: 420px; width: 90%;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+}
+.modal-box h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 12px; color: var(--brand-text); }
+.modal-box p { color: var(--brand-text-muted); font-size: 14px; margin-bottom: 28px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.btn-cancel {
+    padding: 11px 22px; border-radius: 10px;
+    border: 1.5px solid #ddd; background: white;
+    cursor: pointer; font-family: 'Roboto', sans-serif;
+    font-size: 14px; font-weight: 500;
+    transition: all .2s;
+}
+.btn-cancel:hover { border-color: #bbb; background: #f9f9f9; }
+.btn-confirm-delete {
+    padding: 11px 22px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white; cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px; font-weight: 700;
+    transition: all .2s;
+    box-shadow: 0 4px 14px rgba(220,53,69,0.3);
+}
+.btn-confirm-delete:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(220,53,69,0.4); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .sidebar, .sidebar-accent { display: none; }
+    .main-content, .topbar { margin-left: 0; }
+    .welcome-section { flex-direction: column; gap: 20px; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="sidebar-accent"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="brand">
+        <img src="/images/WEB.png" alt="Logo">
+        <h1>La Casa Gaudencia</h1>
+        <small>
+            {% if is_granted('ROLE_ADMIN') %}Admin Panel
+            {% elseif is_granted('ROLE_STAFF') %}Staff Panel{% endif %}
+        </small>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <ul>
+    {% if is_granted('ROLE_ADMIN') %}
+        <li>
+            <a href="{{ path('app_admin_dashboard') }}">
+                <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_user_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05C17.48 13.23 20 14.5 20 16v3h4v-3c0-2.66-5.33-4-8-4z"/></svg>
+                User Management
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_admin_services') }}">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>
+                Reservations
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>
+                Payments
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_contact_message_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                Messages
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_activity_log_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                Activity Logs
+            </a>
+        </li>
+        <li class="active">
+            <a href="{{ path('admin_share_wall_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                Share Wall
+            </a>
+        </li>
+    {% elseif is_granted('ROLE_STAFF') %}
+        <li>
+            <a href="{{ path('app_staff_dashboard') }}">
+                <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('staff_services') }}">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>
+                Services
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('reservation_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>
+                Reservations
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_payment_dashboard') }}">
+                <svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>
+                Payments
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('app_contact_message_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                Messages
+            </a>
+        </li>
+        <li class="active">
+            <a href="{{ path('admin_share_wall_index') }}">
+                <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                Share Wall
+            </a>
+        </li>
+    {% endif %}
+    </ul>
+
+    <div class="sidebar-logout">
+        <a href="{{ path('app_logout') }}" class="logout-btn">Log Out</a>
+    </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">Share Wall</div>
+    <div class="topbar-right">
+        {% block global_notifications %}
+        {% include 'components/_admin_notifications.html.twig' %}
+        {% include 'components/_customer_notifications.html.twig' %}
+        {% endblock %}
+        <div class="datetime-display">
+            <div class="time" id="currentTime">00:00 AM</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ msg }}</div>
+    {% endfor %}
+
+    <!-- WELCOME -->
+    <div class="welcome-section">
+        <div class="welcome-text">
+            <h2>Share Wall Management</h2>
+            <p>Moderate community posts from guests and travelers. Pin highlights, hide inappropriate content, and keep the wall fresh.</p>
+        </div>
+        <div class="welcome-stats">
+            {% set published = posts|filter(p => p.status == 'published')|length %}
+            {% set hidden = posts|filter(p => p.status == 'hidden')|length %}
+            {% set pinned = posts|filter(p => p.isPinned)|length %}
+            <div class="welcome-stat">
+                <div class="number">{{ published }}</div>
+                <div class="label">Published</div>
+            </div>
+            <div class="welcome-stat" style="background: linear-gradient(135deg,#6c757d,#495057)">
+                <div class="number">{{ hidden }}</div>
+                <div class="label">Hidden</div>
+            </div>
+            <div class="welcome-stat" style="background: linear-gradient(135deg,#f57f17,#ffb300)">
+                <div class="number">{{ pinned }}</div>
+                <div class="label">Pinned</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION HEADER + FILTERS -->
+    <div class="section-header">
+        <h3 class="section-title"><i class="fas fa-stream"></i> Community Posts</h3>
+        <span style="font-size:14px; color: var(--brand-text-muted);">{{ posts|length }} total post{{ posts|length != 1 ? 's' : '' }}</span>
+    </div>
+
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="published"><i class="fas fa-eye"></i> Published</button>
+        <button class="filter-tab" data-filter="hidden"><i class="fas fa-eye-slash"></i> Hidden</button>
+        <button class="filter-tab" data-filter="pinned"><i class="fas fa-thumbtack"></i> Pinned</button>
+        <button class="filter-tab" data-filter="room">Rooms</button>
+        <button class="filter-tab" data-filter="tour">Tours</button>
+        <button class="filter-tab" data-filter="spa">Spa</button>
+        <button class="filter-tab" data-filter="dining">Dining</button>
+        <button class="filter-tab" data-filter="package">Packages</button>
+    </div>
+
+    <!-- POSTS GRID -->
+    <div class="posts-grid" id="postsGrid">
+
+        {% if posts is empty %}
+        <div class="empty-state">
+            <i class="fas fa-stream"></i>
+            <h3>No posts yet</h3>
+            <p>Community posts from the mobile app will appear here.</p>
+        </div>
+        {% endif %}
+
+        {% for post in posts %}
+        <div class="post-card {{ post.isPinned ? 'pinned' : '' }} {{ post.status == 'hidden' ? 'hidden-post' : '' }}"
+             data-status="{{ post.status }}"
+             data-pinned="{{ post.isPinned ? 'true' : 'false' }}"
+             data-tag="{{ post.serviceTag ?? '' }}"
+             id="post-{{ post.id }}">
+
+            {% if post.imageUri %}
+                <img class="post-image" src="{{ post.imageUri }}" alt="Post image" loading="lazy">
+            {% else %}
+                <div class="post-image-placeholder">
+                    <i class="fas fa-image"></i>
+                </div>
+            {% endif %}
+
+            <div class="post-body">
+                <div class="post-author-row">
+                    <div class="post-avatar">{{ post.author.fullName ? post.author.fullName|first|upper : post.author.username|first|upper }}</div>
+                    <div>
+                        <div class="post-author-name">{{ post.author.fullName ?: post.author.username }}</div>
+                        <div class="post-author-time">{{ post.createdAt|date('M d, Y · H:i') }}</div>
+                    </div>
+                    <div class="post-badges">
+                        {% if post.isPinned %}<span class="badge-pin"><i class="fas fa-thumbtack"></i> Pinned</span>{% endif %}
+                        {% if post.status == 'hidden' %}<span class="badge-hidden"><i class="fas fa-eye-slash"></i> Hidden</span>{% endif %}
+                    </div>
+                </div>
+
+                {% if post.serviceTag %}
+                    <span class="service-tag">{{ post.serviceTag }}</span>
+                {% endif %}
+
+                <p class="post-caption">{{ post.caption }}</p>
+
+                <div class="post-stats">
+                    <span><i class="fas fa-heart"></i> {{ post.likedByIds|length }} like{{ post.likedByIds|length != 1 ? 's' : '' }}</span>
+                    <span><i class="fas fa-comment"></i> {{ post.comments|length }} comment{{ post.comments|length != 1 ? 's' : '' }}</span>
+                </div>
+
+                <div class="post-actions">
+                    <button class="btn-action btn-pin"
+                            onclick="togglePin({{ post.id }}, this)">
+                        <i class="fas fa-thumbtack"></i>
+                        {{ post.isPinned ? 'Unpin' : 'Pin' }}
+                    </button>
+                    <button class="btn-action {{ post.status == 'published' ? 'btn-hide' : 'btn-show' }}"
+                            onclick="toggleStatus({{ post.id }}, this)">
+                        <i class="fas {{ post.status == 'published' ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+                        {{ post.status == 'published' ? 'Hide' : 'Show' }}
+                    </button>
+                    <button class="btn-action btn-delete"
+                            onclick="confirmDelete({{ post.id }}, '{{ csrf_token('delete_wall_post_' ~ post.id) }}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <h3><i class="fas fa-trash" style="color:#dc3545;margin-right:10px;"></i>Delete Post?</h3>
+        <p>This will permanently remove the post and all its comments. This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <form id="deleteForm" method="POST">
+                <input type="hidden" name="_token" id="deleteToken">
+                <button type="submit" class="btn-confirm-delete"><i class="fas fa-trash"></i> Delete Post</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Clock
+function updateClock() {
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const d = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    const el = document.getElementById('currentTime');
+    const dl = document.getElementById('currentDate');
+    if (el) el.textContent = t;
+    if (dl) dl.textContent = d;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Filter tabs
+document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.post-card').forEach(card => {
+            let show = true;
+            if      (filter === 'published') show = card.dataset.status === 'published';
+            else if (filter === 'hidden')    show = card.dataset.status === 'hidden';
+            else if (filter === 'pinned')    show = card.dataset.pinned === 'true';
+            else if (filter !== 'all')       show = card.dataset.tag === filter;
+            card.style.display = show ? '' : 'none';
+        });
+    });
+});
+
+// Toggle pin
+async function togglePin(id, btn) {
+    const res = await fetch(`/dashboard/share-wall/${id}/toggle-pin`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const card = document.getElementById('post-' + id);
+    card.dataset.pinned = data.isPinned ? 'true' : 'false';
+    card.classList.toggle('pinned', data.isPinned);
+    btn.innerHTML = `<i class="fas fa-thumbtack"></i> ${data.isPinned ? 'Unpin' : 'Pin'}`;
+    const badges = card.querySelector('.post-badges');
+    const pinBadge = badges.querySelector('.badge-pin');
+    if (data.isPinned && !pinBadge) {
+        badges.insertAdjacentHTML('afterbegin', '<span class="badge-pin"><i class="fas fa-thumbtack"></i> Pinned</span>');
+    } else if (!data.isPinned && pinBadge) {
+        pinBadge.remove();
+    }
+}
+
+// Toggle hide/show
+async function toggleStatus(id, btn) {
+    const res = await fetch(`/dashboard/share-wall/${id}/toggle-status`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const card = document.getElementById('post-' + id);
+    card.dataset.status = data.status;
+    card.classList.toggle('hidden-post', data.status === 'hidden');
+    if (data.status === 'published') {
+        btn.className = 'btn-action btn-hide';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+    } else {
+        btn.className = 'btn-action btn-show';
+        btn.innerHTML = '<i class="fas fa-eye"></i> Show';
+    }
+    const badges = card.querySelector('.post-badges');
+    const hBadge = badges.querySelector('.badge-hidden');
+    if (data.status === 'hidden' && !hBadge) {
+        badges.insertAdjacentHTML('beforeend', '<span class="badge-hidden"><i class="fas fa-eye-slash"></i> Hidden</span>');
+    } else if (data.status === 'published' && hBadge) {
+        hBadge.remove();
+    }
+}
+
+// Delete modal
+function confirmDelete(id, token) {
+    document.getElementById('deleteForm').action = `/dashboard/share-wall/${id}/delete`;
+    document.getElementById('deleteToken').value = token;
+    document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+}
+document.getElementById('deleteModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeDeleteModal();
+});
+</script>
+{% endblock %}

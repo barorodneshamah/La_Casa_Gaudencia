@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Tour;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -114,6 +115,10 @@ class TourType extends AbstractType
                 'attr' => [
                     'class' => 'form-control'
                 ]
+            ])
+            ->add('isOffer', CheckboxType::class, [
+                'label'    => 'Mark as Special Offer',
+                'required' => false,
             ])
             ->add('mainImageFile', FileType::class, [
                 'label' => 'Main Image',

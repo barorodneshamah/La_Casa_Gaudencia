@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Spa;
 use App\Form\SpaType;
 use App\Repository\SpaRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -19,7 +21,11 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[IsGranted('ROLE_ADMIN')]
 final class SpaController extends AbstractController
 {
-    public function __construct(private string $spaImagesDirectory) {}
+    public function __construct(
+        private string $spaImagesDirectory,
+        private NotificationService $notifications,
+        private UserRepository $users,
+    ) {}
 
     #[Route(name: 'app_spa_index', methods: ['GET'])]
     public function index(SpaRepository $spaRepository): Response
@@ -59,6 +65,12 @@ final class SpaController extends AbstractController
 
             $em->persist($spa);
             $em->flush();
+
+            $label = $spa->isOffer() ? '🏷️ New Spa Offer!' : '💆 New Spa Service Available!';
+            $body  = ($spa->isOffer() ? 'Special offer: ' : 'New spa service: ') . $spa->getName() . '.';
+            try {
+                $this->notifications->broadcastToCustomers($this->users, $label, $body, ['type' => 'new_service', 'serviceType' => 'spa']);
+            } catch (\Throwable) {}
 
             $this->addFlash('success', 'Spa & Wellness service created successfully!');
 

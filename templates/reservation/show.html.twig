@@ -126,6 +126,7 @@ body {
 .summary-box .value.status-confirmed { color: #2e7d32; }
 .summary-box .value.status-cancelled { color: #c62828; }
 .summary-box .value.status-completed { color: #1565c0; }
+.summary-box .value.status-rescheduled { color: #6a1b9a; }
 .summary-box .value.payment-paid { color: #2e7d32; }
 .summary-box .value.payment-unpaid { color: #c62828; }
 .summary-box .value.amount { color: #c24a16; }
@@ -202,6 +203,36 @@ body {
 .approval-info .info-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 .approval-info .info-value { font-size: 14px; color: #333; font-weight: 500; }
 
+.btn-extend  { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); color: white; box-shadow: 0 4px 15px rgba(109,40,217,0.3); }
+.btn-extend:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(109,40,217,0.4); }
+.btn-rebook  { background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%); color: white; box-shadow: 0 4px 15px rgba(6,182,212,0.3); }
+.btn-rebook:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,182,212,0.4); }
+.btn-reschedule-accept { background: linear-gradient(135deg, #6a1b9a 0%, #ab47bc 100%); color: white; box-shadow: 0 4px 15px rgba(106,27,154,0.35); }
+.btn-reschedule-accept:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(106,27,154,0.45); }
+.reschedule-info-banner { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: 1.5px solid #ce93d8; border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+.reschedule-info-banner .ri-title { font-size: 12px; font-weight: 700; color: #6a1b9a; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.reschedule-info-banner .ri-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px solid #e1bee7; }
+.reschedule-info-banner .ri-row:last-child { border-bottom: none; }
+.reschedule-info-banner .ri-label { color: #7b1fa2; font-weight: 500; }
+.reschedule-info-banner .ri-value { color: #4a148c; font-weight: 700; }
+
+/* ===== MODALS ===== */
+.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-backdrop.active { display: flex; }
+.modal-box { background: white; border-radius: 18px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px; }
+.modal-icon.extend { background: rgba(109,40,217,0.1); color: #6d28d9; }
+.modal-icon.rebook { background: rgba(6,182,212,0.1);  color: #0891b2; }
+.modal-title { text-align: center; font-family: 'Playfair Display', serif; font-size: 22px; color: #2f2f2f; margin-bottom: 6px; }
+.modal-sub { text-align: center; font-size: 13px; color: #888; margin-bottom: 24px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-actions .btn-action-full { margin-bottom: 0; }
+.btn-cancel-modal { background: #f5f5f5; color: #555; border: 1.5px solid #ddd; }
+.btn-cancel-modal:hover { background: #e8e8e8; transform: translateY(-1px); }
+.form-input { width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: all 0.3s ease; font-family: inherit; background: #fafafa; color: #333; }
+.form-input:focus { border-color: #6d28d9; outline: none; box-shadow: 0 0 0 4px rgba(109,40,217,0.1); background: white; }
+.form-input.rebook:focus { border-color: #0891b2; box-shadow: 0 0 0 4px rgba(6,182,212,0.1); }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
     .info-grid { grid-template-columns: 1fr; }
@@ -250,6 +281,14 @@ body {
             </a>
         </li>
         <li><a href="{{ path('app_activity_log_index') }}"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>Activity Logs</a></li>
+        <li>
+            <a href="{{ path('admin_share_wall_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                </svg>
+                Share Wall
+            </a>
+        </li>
     {% elseif is_granted('ROLE_STAFF') %}
         <li><a href="{{ path('app_staff_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
         <li><a href="{{ path('staff_services') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>Services</a></li>
@@ -261,6 +300,15 @@ body {
                 Messages
             </a>
         </li>
+        <li>
+            <a href="{{ path('admin_share_wall_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                </svg>
+                Share Wall
+            </a>
+        </li>
+        
     {% endif %}
     </ul>
 
@@ -321,7 +369,7 @@ body {
         <div class="summary-box">
             <div class="label">Reservation Status</div>
             <div class="value status-{{ reservation.status|lower }}">
-                <i class="fas fa-{{ reservation.status == 'PENDING' ? 'clock' : (reservation.status == 'CONFIRMED' ? 'check-circle' : (reservation.status == 'CANCELLED' ? 'times-circle' : 'flag-checkered')) }}"></i>
+                <i class="fas fa-{{ reservation.status == 'PENDING' ? 'clock' : (reservation.status == 'CONFIRMED' ? 'check-circle' : (reservation.status == 'CANCELLED' ? 'times-circle' : (reservation.status == 'RESCHEDULED' ? 'calendar-alt' : 'flag-checkered'))) }}"></i>
                 {{ reservation.status }}
             </div>
         </div>
@@ -562,6 +610,8 @@ body {
                     <i class="fas fa-cogs"></i> Actions
                 </div>
                 <div class="card-body">
+
+                    {# ── Status-based primary actions ── #}
                     {% if reservation.isPending %}
 
                         <form action="{{ path('reservation_approve', {id: reservation.id}) }}" method="POST">
@@ -589,7 +639,7 @@ body {
                         </form>
 
                     {% elseif reservation.isConfirmed %}
-                        
+
                         <form action="{{ path('reservation_complete', {id: reservation.id}) }}" method="POST">
                             <input type="hidden" name="_token" value="{{ csrf_token('complete' ~ reservation.id) }}">
                             <button type="submit" class="btn-action-full btn-info">
@@ -597,12 +647,75 @@ body {
                             </button>
                         </form>
 
-                    {% else %}
+                    {% elseif reservation.status == 'RESCHEDULED' %}
+
+                        {# ── New dates summary ── #}
+                        <div class="reschedule-info-banner">
+                            <div class="ri-title"><i class="fas fa-calendar-alt"></i> Requested New Dates</div>
+                            {% if reservation.checkInDate %}
+                            <div class="ri-row">
+                                <span class="ri-label">Check-in</span>
+                                <span class="ri-value">{{ reservation.checkInDate|date('M d, Y') }}</span>
+                            </div>
+                            {% endif %}
+                            {% if reservation.checkOutDate %}
+                            <div class="ri-row">
+                                <span class="ri-label">Check-out</span>
+                                <span class="ri-value">{{ reservation.checkOutDate|date('M d, Y') }}</span>
+                            </div>
+                            {% endif %}
+                            {% if reservation.tourDate %}
+                            <div class="ri-row">
+                                <span class="ri-label">Tour / Appointment Date</span>
+                                <span class="ri-value">{{ reservation.tourDate|date('M d, Y') }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <form action="{{ path('reservation_accept_reschedule', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('accept_reschedule' ~ reservation.id) }}">
+                            <div class="form-group">
+                                <label class="form-label">Admin Notes (Optional)</label>
+                                <textarea name="notes" class="form-textarea" placeholder="Add confirmation notes..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-action-full btn-reschedule-accept">
+                                <i class="fas fa-calendar-check"></i> ACCEPT Reschedule
+                            </button>
+                        </form>
+
+                        <div class="divider"></div>
+
+                        <form action="{{ path('reservation_decline_reschedule', {id: reservation.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('decline_reschedule' ~ reservation.id) }}">
+                            <div class="form-group">
+                                <label class="form-label">Decline Reason *</label>
+                                <textarea name="reason" class="form-textarea" placeholder="Enter reason for declining..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-action-full btn-danger">
+                                <i class="fas fa-times-circle"></i> DECLINE Reschedule
+                            </button>
+                        </form>
+
+                    {% elseif reservation.status == 'CANCELLED' %}
                         <div class="no-action">
                             <i class="fas fa-ban"></i>
-                            <p>No actions available for this reservation.</p>
+                            <p>This reservation has been cancelled.</p>
                         </div>
                     {% endif %}
+
+                    {# ── Extend Stay + Reschedule — visible for ALL services, any status except CANCELLED ── #}
+                    {% if reservation.status != 'CANCELLED' %}
+                        <div class="divider" style="margin-top: 6px;"></div>
+                        <button type="button" class="btn-action-full btn-extend"
+                            onclick="document.getElementById('extendModal').classList.add('active')">
+                            <i class="fas fa-calendar-plus"></i> Extend Stay
+                        </button>
+                        <button type="button" class="btn-action-full btn-rebook"
+                            onclick="document.getElementById('rebookModal').classList.add('active')">
+                            <i class="fas fa-calendar-alt"></i> Reschedule
+                        </button>
+                    {% endif %}
+
                 </div>
             </div>
 
@@ -636,6 +749,200 @@ body {
     </div>
 
 </div>
+
+{# ===== EXTEND STAY MODAL — all services, any non-cancelled status ===== #}
+{% if reservation.status != 'CANCELLED' %}
+<div class="modal-backdrop" id="extendModal" onclick="if(event.target===this)this.classList.remove('active')">
+    <div class="modal-box">
+        <div class="modal-icon extend"><i class="fas fa-calendar-plus"></i></div>
+        <h3 class="modal-title">Extend Stay</h3>
+        <p class="modal-sub">
+            Extend the booking for <strong>{{ reservation.reservationCode }}</strong>
+            ({{ reservation.serviceType|upper }}).
+            The guest will be notified.
+        </p>
+
+        <form action="{{ path('reservation_extend', {id: reservation.id}) }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('extend' ~ reservation.id) }}">
+
+            {# Room: push checkout date forward #}
+            {% if reservation.room %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-sign-out-alt" style="color:#6d28d9;margin-right:4px;"></i>
+                    New Check-out Date
+                    <span style="color:#888;font-weight:400;">(current: {{ reservation.checkOutDate|date('M d, Y') }})</span>
+                </label>
+                <input type="date" name="new_checkout" class="form-input"
+                    min="{{ reservation.checkOutDate|date_modify('+1 day')|date('Y-m-d') }}"
+                    value="{{ reservation.checkOutDate|date_modify('+1 day')|date('Y-m-d') }}">
+            </div>
+            {% endif %}
+
+            {# Tour: extend with more participants or a later end date (stored as new check-out) #}
+            {% if reservation.tour %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user-friends" style="color:#6d28d9;margin-right:4px;"></i>
+                    Additional Participants
+                </label>
+                <input type="number" name="new_participants" class="form-input" min="1"
+                    value="{{ reservation.tourParticipants ?? 1 }}"
+                    placeholder="Total participants after extension">
+            </div>
+            {% endif %}
+
+            {# Spa: new session date #}
+            {% if reservation.spa %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-spa" style="color:#6d28d9;margin-right:4px;"></i>
+                    Additional Session Date
+                </label>
+                <input type="date" name="new_spa_date" class="form-input">
+            </div>
+            {% endif %}
+
+            {# Package: new check-out date #}
+            {% if reservation.package and not reservation.room %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-gift" style="color:#6d28d9;margin-right:4px;"></i>
+                    New End Date
+                </label>
+                <input type="date" name="new_checkout" class="form-input">
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Notes (optional)</label>
+                <textarea name="extend_notes" class="form-textarea" style="min-height:70px;"
+                    placeholder="e.g. Guest requested 2 more nights, same room rate..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-action-full btn-cancel-modal"
+                    onclick="document.getElementById('extendModal').classList.remove('active')">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn-action-full btn-extend">
+                    <i class="fas fa-calendar-plus"></i> Confirm Extension
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# ===== RESCHEDULE MODAL — all services, any non-cancelled status ===== #}
+<div class="modal-backdrop" id="rebookModal" onclick="if(event.target===this)this.classList.remove('active')">
+    <div class="modal-box">
+        <div class="modal-icon rebook"><i class="fas fa-calendar-alt"></i></div>
+        <h3 class="modal-title">Reschedule</h3>
+        <p class="modal-sub">
+            Pick new dates for <strong>{{ reservation.reservationCode }}</strong>
+            ({{ reservation.serviceType|upper }}).
+            The guest will be notified.
+        </p>
+
+        <form action="{{ path('reservation_extend', {id: reservation.id}) }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('extend' ~ reservation.id) }}">
+
+            {# Room: new check-in and check-out #}
+            {% if reservation.room %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-sign-in-alt" style="color:#0891b2;margin-right:4px;"></i>
+                    New Check-in Date
+                    <span style="color:#888;font-weight:400;">(current: {{ reservation.checkInDate|date('M d, Y') }})</span>
+                </label>
+                <input type="date" name="new_checkin" class="form-input rebook"
+                    value="{{ reservation.checkInDate|date('Y-m-d') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-sign-out-alt" style="color:#0891b2;margin-right:4px;"></i>
+                    New Check-out Date
+                    <span style="color:#888;font-weight:400;">(current: {{ reservation.checkOutDate|date('M d, Y') }})</span>
+                </label>
+                <input type="date" name="new_checkout" class="form-input rebook"
+                    value="{{ reservation.checkOutDate|date('Y-m-d') }}">
+            </div>
+            {% endif %}
+
+            {# Tour: new date and participants #}
+            {% if reservation.tour %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-day" style="color:#0891b2;margin-right:4px;"></i>
+                    New Tour Date
+                    <span style="color:#888;font-weight:400;">(current: {{ reservation.tourDate|date('M d, Y') }})</span>
+                </label>
+                <input type="date" name="new_tour_date" class="form-input rebook"
+                    value="{{ reservation.tourDate|date('Y-m-d') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Participants</label>
+                <input type="number" name="new_participants" class="form-input rebook"
+                    min="1" value="{{ reservation.tourParticipants ?? 1 }}">
+            </div>
+            {% endif %}
+
+            {# Spa: new appointment date #}
+            {% if reservation.spa %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-spa" style="color:#0891b2;margin-right:4px;"></i>
+                    New Appointment Date
+                </label>
+                <input type="date" name="new_spa_date" class="form-input rebook">
+            </div>
+            {% endif %}
+
+            {# Package: new check-in and check-out #}
+            {% if reservation.package and not reservation.room %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-gift" style="color:#0891b2;margin-right:4px;"></i>
+                    New Start Date
+                </label>
+                <input type="date" name="new_checkin" class="form-input rebook">
+            </div>
+            <div class="form-group">
+                <label class="form-label">New End Date</label>
+                <input type="date" name="new_checkout" class="form-input rebook">
+            </div>
+            {% endif %}
+
+            {# Food-only: no date fields — use notes #}
+            {% if not reservation.room and not reservation.tour and not reservation.spa and not reservation.package %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-day" style="color:#0891b2;margin-right:4px;"></i>
+                    New Preferred Date / Time
+                </label>
+                <input type="date" name="new_tour_date" class="form-input rebook">
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Notes (optional)</label>
+                <textarea name="extend_notes" class="form-textarea" style="min-height:70px;"
+                    placeholder="e.g. Guest prefers morning slot, new preferred dates..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-action-full btn-cancel-modal"
+                    onclick="document.getElementById('rebookModal').classList.remove('active')">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn-action-full btn-rebook">
+                    <i class="fas fa-calendar-check"></i> Confirm Reschedule
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
 
 
 {% endblock %}

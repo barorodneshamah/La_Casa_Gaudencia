@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Room;
 use App\Form\RoomType;
 use App\Repository\RoomRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -16,6 +18,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/room')]
 final class RoomController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notifications,
+        private UserRepository $users,
+    ) {}
     #[Route(name: 'app_room_index', methods: ['GET'])]
     public function index(RoomRepository $roomRepository): Response
     {
@@ -55,6 +61,14 @@ final class RoomController extends AbstractController
 
             $entityManager->persist($room);
             $entityManager->flush();
+
+            $label = $room->isOffer() ? '🏷️ New Room Offer!' : '🏨 New Room Available!';
+            $body  = ($room->isOffer() ? 'Special offer: ' : 'New room added: ')
+                   . $room->getRoomType() . ' — Room ' . $room->getRoomNumber()
+                   . ' at ₱' . number_format((float)$room->getPricePerNight(), 2) . '/night.';
+            try {
+                $this->notifications->broadcastToCustomers($this->users, $label, $body, ['type' => 'new_service', 'serviceType' => 'room']);
+            } catch (\Throwable) {}
 
             $this->addFlash('success', 'Room "' . $room->getRoomNumber() . '" has been created successfully!');
 

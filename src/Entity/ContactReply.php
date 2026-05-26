@@ -27,7 +27,7 @@ class ContactReply
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['reply:read'])]
+    #[Groups(['reply:read', 'contact:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: ContactMessage::class, inversedBy: 'replies')]
@@ -37,15 +37,15 @@ class ContactReply
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['reply:read', 'reply:write'])]
+    #[Groups(['reply:read', 'reply:write', 'contact:read'])]
     private ?User $repliedBy = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['reply:read', 'reply:write'])]
+    #[Groups(['reply:read', 'reply:write', 'contact:read'])]
     private ?string $replyMessage = null;
 
     #[ORM\Column]
-    #[Groups(['reply:read'])]
+    #[Groups(['reply:read', 'contact:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\PrePersist]

@@ -135,13 +135,30 @@ body {
             <li><a href="{{ path('reservation_index') }}"><svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>Reservations</a></li>
             <li class="active"><a href="{{ path('app_payment_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>Payments</a></li>
             <li><a href="{{ path('app_activity_log_index') }}"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>Activity Logs</a></li>
+        <li>
+            <a href="{{ path('admin_share_wall_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                </svg>
+                Share Wall
+            </a>
+        </li>
         {% elseif is_granted('ROLE_STAFF') %}
             <li><a href="{{ path('app_staff_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
             <li><a href="{{ path('staff_services') }}"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 4h10v2H4v-2zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>Services</a></li>
             <li><a href="{{ path('reservation_index') }}"><svg viewBox="0 0 24 24"><path d="M20 6h-2V4h-2v2H8V4H6v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm0 14H4V10h16v10z"/></svg>Reservations</a></li>
             <li class="active"><a href="{{ path('app_payment_dashboard') }}"><svg viewBox="0 0 24 24"><path d="M2 6h20v2H2V6zm0 4h20v8H2v-8zm0 10h20v2H2v-2z"/></svg>Payments</a></li>
             <li><a href="{{ path('app_contact_message_index') }}"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>Messages</a></li>
-        {% endif %}
+        <li>
+            <a href="{{ path('admin_share_wall_index') }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                </svg>
+                Share Wall
+            </a>
+        </li>
+        
+    {% endif %}
     </ul>
     <div class="sidebar-logout">
         <a href="{{ path('app_logout') }}" class="logout-btn">Log Out</a>
@@ -284,13 +301,7 @@ body {
         {% if payment.status == 'PENDING' %}
         <div class="detail-card">
             <h3><i class="fas fa-bolt"></i> Actions</h3>
-            {% if payment.paymentMethod == 'CASH' %}
-            <p style="font-size:13px;color:#888;margin-bottom:14px;"><i class="fas fa-money-bill-wave" style="color:#2e7d32"></i> Cash payment — confirm that you have physically received the cash before approving.</p>
-            {% endif %}
             <div class="action-bar">
-                <button class="btn btn-approve" onclick="document.getElementById('approveModal').classList.add('active')">
-                    <i class="fas fa-check"></i> Approve Payment
-                </button>
                 <button class="btn btn-reject" onclick="document.getElementById('rejectModal').classList.add('active')">
                     <i class="fas fa-times"></i> Reject / Request Again
                 </button>
@@ -309,23 +320,6 @@ body {
     {% endif %}
 
 </div>{# /main-content #}
-
-<!-- APPROVE MODAL -->
-<div class="modal-overlay" id="approveModal">
-    <div class="modal-box">
-        <h4><i class="fas fa-check-circle" style="color:#2e7d32"></i> Approve Payment</h4>
-        <p style="color:#555; font-size:14px;">Approving will mark this payment as paid and update the reservation balance.</p>
-        <form method="post" action="{{ path('app_payment_approve', {id: payment.id}) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ payment.id) }}">
-            <label>Admin Notes (optional)</label>
-            <textarea name="admin_notes" rows="3" placeholder="Any notes…"></textarea>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="document.getElementById('approveModal').classList.remove('active')">Cancel</button>
-                <button type="submit" class="btn btn-approve"><i class="fas fa-check"></i> Confirm Approve</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- REJECT MODAL -->
 <div class="modal-overlay" id="rejectModal">

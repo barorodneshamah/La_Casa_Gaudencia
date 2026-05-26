@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -9,7 +10,7 @@
     <meta http-equiv="Expires" content="0">
     
     <title>{% block title %}Welcome!{% endblock %}</title>
-    
+
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
@@ -17,9 +18,11 @@
     
     {% block javascripts %}{% endblock %}
 
-    {# Notification bells for admin/staff and customer pages #}
+    {# Notification bells — dashboards override this block with empty to suppress #}
+    {% block global_notifications %}
     {% include 'components/_admin_notifications.html.twig' %}
     {% include 'components/_customer_notifications.html.twig' %}
+    {% endblock %}
 
     {# THIS IS THE KEY - Handles browser back-forward cache #}
     {% if app.user %}

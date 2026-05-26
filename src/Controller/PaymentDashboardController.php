@@ -7,6 +7,7 @@ use App\Entity\Reservation;
 use App\Repository\PaymentRepository;
 use App\Repository\ReservationRepository;
 use App\Service\NotificationService;
+use App\Service\WebSocketPublisher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/payments')]
 class PaymentDashboardController extends AbstractController
 {
+    public function __construct(private WebSocketPublisher $ws) {}
+
     #[Route('', name: 'app_payment_dashboard', methods: ['GET'])]
     public function index(
         PaymentRepository $paymentRepository,
@@ -194,19 +197,22 @@ class PaymentDashboardController extends AbstractController
 
     private function pushToGuest(Payment $payment, NotificationService $notificationService, string $title, string $body, string $type): void
     {
+        $guest = $payment->getPaidBy();
+        if (!$guest) return;
+
+        $data = ['type' => $type, 'paymentId' => (string) $payment->getId(), 'transactionRef' => $payment->getTransactionReference()];
+
+        // WebSocket push — reaches the mobile app in real time
         try {
-            $guest = $payment->getPaidBy();
-            if ($guest && $guest->getFcmToken()) {
-                $notificationService->sendToDevice(
-                    $guest->getFcmToken(),
-                    $title,
-                    $body,
-                    ['type' => $type, 'paymentId' => (string) $payment->getId(), 'transactionRef' => $payment->getTransactionReference()],
-                    'payment_' . $payment->getId()
-                );
+            $this->ws->pushToUser($guest->getUsername(), $title, $body, 'payment', $data);
+        } catch (\Throwable) {}
+
+        // FCM fallback
+        try {
+            if ($guest->getFcmToken()) {
+                $notificationService->sendToDevice($guest->getFcmToken(), $title, $body, $data, 'payment_' . $payment->getId());
             }
-        } catch (\Throwable) {
-        }
+        } catch (\Throwable) {}
     }
 
     #[Route('/payment/{id}/refund', name: 'app_payment_refund', methods: ['POST'])]
@@ -219,8 +225,7 @@ class PaymentDashboardController extends AbstractController
             throw $this->createAccessDeniedException('Only admin and staff can refund payments.');
         }
         if ($this->isCsrfTokenValid('refund'.$payment->getId(), $request->request->get('_token'))) {
-            $payment->setStatus(Payment::STATUS_REFUNDED);
-            $payment->setAdminNotes($request->request->get('admin_notes'));
+            $message = $this->refundPaymentAmount($payment, $request->request->get('admin_notes'), $entityManager);
 
             // Update reservation
             $reservation = $payment->getReservation();
@@ -228,7 +233,7 @@ class PaymentDashboardController extends AbstractController
 
             $entityManager->flush();
 
-            $this->addFlash('success', 'Payment refunded.');
+            $this->addFlash('success', $message);
         }
 
         return $this->redirectToRoute('app_payment_show', ['id' => $payment->getId()]);
@@ -242,5 +247,58 @@ class PaymentDashboardController extends AbstractController
         return $this->render('payment_dashboard/pending.html.twig', [
             'payments' => $payments,
         ]);
+    }
+
+    private function refundPaymentAmount(Payment $payment, ?string $adminNotes, EntityManagerInterface $entityManager): string
+    {
+        $reservation = $payment->getReservation();
+        $paymentAmount = (float) $payment->getAmount();
+        $approvedTotal = $reservation ? $reservation->getTotalPaid() : $paymentAmount;
+        $requiredTotal = $reservation ? max(0.0, (float) $reservation->getTotalAmount()) : 0.0;
+        $excessAmount = max(0.0, $approvedTotal - $requiredTotal);
+
+        if ($payment->getStatus() === Payment::STATUS_APPROVED && $excessAmount > 0) {
+            $refundAmount = min($paymentAmount, $excessAmount);
+            $keptAmount = $paymentAmount - $refundAmount;
+
+            if ($keptAmount > 0) {
+                $payment->setAmount(number_format($keptAmount, 2, '.', ''));
+                $payment->setAdminNotes($this->appendNote($payment->getAdminNotes(), sprintf(
+                    'Refunded excess amount of PHP %.2f.',
+                    $refundAmount
+                )));
+
+                $refund = new Payment();
+                $refund->setReservation($reservation);
+                $refund->setPaidBy($payment->getPaidBy());
+                $refund->setAmount(number_format($refundAmount, 2, '.', ''));
+                $refund->setPaymentMethod($payment->getPaymentMethod() ?? Payment::METHOD_CASH);
+                $refund->setReferenceNumber($payment->getReferenceNumber() ?: 'N/A');
+                $refund->setGuestNotes($payment->getGuestNotes());
+                $refund->setAdminNotes($adminNotes ?: 'Excess payment refunded.');
+                $refund->setStatus(Payment::STATUS_REFUNDED);
+                $refund->setApprovedBy($this->getUser());
+                $refund->setApprovedAt(new \DateTime());
+                $entityManager->persist($refund);
+            } else {
+                $payment->setStatus(Payment::STATUS_REFUNDED);
+                $payment->setAdminNotes($this->appendNote($adminNotes, 'Full payment amount was excess and refunded.'));
+            }
+
+            return sprintf('Excess payment refunded: PHP %.2f.', $refundAmount);
+        }
+
+        $payment->setStatus(Payment::STATUS_REFUNDED);
+        $payment->setAdminNotes($adminNotes);
+
+        return 'Payment refunded.';
+    }
+
+    private function appendNote(?string $existing, ?string $note): ?string
+    {
+        if (!$note) return $existing;
+        if (!$existing) return $note;
+
+        return $existing . "\n" . $note;
     }
 }

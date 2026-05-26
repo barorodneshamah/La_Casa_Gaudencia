@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\ApiProperty;
 use App\Repository\UserRepository;
@@ -40,6 +41,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             validationContext: ['groups' => ['user:create']]
         ),
         new Put(
+            security: "is_granted('ROLE_ADMIN') or object == user",
+            denormalizationContext: ['groups' => ['user:write']],
+            validationContext: ['groups' => ['user:update']]
+        ),
+        new Patch(
             security: "is_granted('ROLE_ADMIN') or object == user",
             denormalizationContext: ['groups' => ['user:write']],
             validationContext: ['groups' => ['user:update']]

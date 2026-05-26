@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Tour;
 use App\Form\TourType;
 use App\Repository\TourRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -19,8 +21,11 @@ final class TourController extends AbstractController
 {
     private string $tourImagesDirectory;
 
-    public function __construct(string $tourImagesDirectory)
-    {
+    public function __construct(
+        string $tourImagesDirectory,
+        private NotificationService $notifications,
+        private UserRepository $users,
+    ) {
         $this->tourImagesDirectory = $tourImagesDirectory;
     }
 
@@ -64,6 +69,13 @@ final class TourController extends AbstractController
 
             $entityManager->persist($tour);
             $entityManager->flush();
+
+            $label = $tour->isOffer() ? '🏷️ New Tour Offer!' : '🗺️ New Tour Available!';
+            $body  = ($tour->isOffer() ? 'Special offer: ' : 'New tour added: ')
+                   . $tour->getName() . ' — ₱' . number_format((float)$tour->getPrice(), 2) . '/person.';
+            try {
+                $this->notifications->broadcastToCustomers($this->users, $label, $body, ['type' => 'new_service', 'serviceType' => 'tour']);
+            } catch (\Throwable) {}
 
             $this->addFlash('success', 'Tour created successfully!');
 

@@ -12,6 +12,7 @@ parameters:
     food_images_directory: '%kernel.project_dir%/public/uploads/foods'
     package_images_directory: '%kernel.project_dir%/public/uploads/packages'
     spa_images_directory: '%kernel.project_dir%/public/uploads/spas'
+    share_wall_images_directory: '%kernel.project_dir%/public/uploads/share_wall'
     google_client_id: '%env(GOOGLE_CLIENT_ID)%'
 
 services:
@@ -39,6 +40,10 @@ services:
     App\Controller\SpaController:
         arguments:
             $spaImagesDirectory: '%spa_images_directory%'
+
+    App\Controller\ShareWallApiController:
+        arguments:
+            $shareWallImagesDirectory: '%share_wall_images_directory%'
 
     # API Platform Data Persisters
     App\DataPersister\UserDataPersister:

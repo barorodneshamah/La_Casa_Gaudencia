@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Package;
 use App\Form\PackageType;
 use App\Repository\PackageRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -21,6 +23,8 @@ class PackageController extends AbstractController
     public function __construct(
         private EntityManagerInterface $em,
         private SluggerInterface $slugger,
+        private NotificationService $notifications,
+        private UserRepository $users,
         private string $uploadDir = 'uploads/packages'
     ) {}
 
@@ -52,6 +56,13 @@ class PackageController extends AbstractController
 
             $this->em->persist($package);
             $this->em->flush();
+
+            $label = $package->isOffer() ? '🏷️ New Package Offer!' : '📦 New Package Available!';
+            $body  = ($package->isOffer() ? 'Special offer: ' : 'New package: ')
+                   . $package->getName() . ' — ₱' . number_format((float)$package->getPackagePrice(), 2) . '.';
+            try {
+                $this->notifications->broadcastToCustomers($this->users, $label, $body, ['type' => 'new_service', 'serviceType' => 'package']);
+            } catch (\Throwable) {}
 
             $this->addFlash('success', 'Package "' . $package->getName() . '" created successfully!');
             return $this->redirectToRoute('app_package_index');

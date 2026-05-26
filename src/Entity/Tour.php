@@ -74,6 +74,10 @@ class Tour
     #[ORM\ManyToMany(targetEntity: Package::class, mappedBy: 'tours')]
     private Collection $packages;
 
+    #[ORM\Column(options: ['default' => false])]
+    #[Groups(['tour:read'])]
+    private bool $isOffer = false;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -329,5 +333,13 @@ class Tour
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    public function isOffer(): bool { return $this->isOffer; }
+    public function setIsOffer(bool $isOffer): static { $this->isOffer = $isOffer; return $this; }
+
+    public function isNew(): bool
+    {
+        return $this->createdAt !== null && $this->createdAt >= new \DateTimeImmutable('-7 days');
     }
 }

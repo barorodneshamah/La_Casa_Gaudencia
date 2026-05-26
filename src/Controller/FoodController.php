@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Food;
 use App\Form\FoodType;
 use App\Repository\FoodRepository;
+use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -17,6 +19,11 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/food')]
 final class FoodController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notifications,
+        private UserRepository $users,
+    ) {}
+
     #[Route(name: 'app_food_index', methods: ['GET'])]
     public function index(FoodRepository $foodRepository): Response
     {
@@ -56,6 +63,13 @@ final class FoodController extends AbstractController
 
             $entityManager->persist($food);
             $entityManager->flush();
+
+            $label = $food->isOffer() ? '🏷️ New Food Offer!' : '🍽️ New Menu Item Available!';
+            $body  = ($food->isOffer() ? 'Special offer: ' : 'New item on the menu: ')
+                   . $food->getName() . ' — ₱' . number_format((float)$food->getPrice(), 2) . '.';
+            try {
+                $this->notifications->broadcastToCustomers($this->users, $label, $body, ['type' => 'new_service', 'serviceType' => 'food']);
+            } catch (\Throwable) {}
 
             $this->addFlash('success', 'Food item "' . $food->getName() . '" has been created successfully!');
 

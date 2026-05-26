@@ -53,6 +53,9 @@
 <!-- Review Feed -->
 <div class="review-feed" id="reviewFeed">
 
+    {# Dynamic posts injected by JS below the static cards #}
+    <div id="dynamicWallPosts"></div>
+
     {# ── Card 1: Culture ── #}
     <div class="review-card" data-category="culture" data-card-id="1">
         <div class="review-image-wrapper"
@@ -226,6 +229,42 @@
 </div>
 
     <!-- Share Your Story CTA -->
+    <script>
+    (function () {
+        fetch('/api/wall/posts?limit=12')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (!data || !data.posts || !data.posts.length) return;
+                var container = document.getElementById('dynamicWallPosts');
+                if (!container) return;
+                container.innerHTML = data.posts.map(function (post) {
+                    var avatar = (post.authorName || 'G')[0].toUpperCase();
+                    var tag    = post.serviceTag
+                        ? '<span style="display:inline-block;background:#c24a16;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-bottom:8px;">' + post.serviceTag + '</span>'
+                        : '';
+                    var image  = post.imageUri
+                        ? '<div class="review-image-wrapper"><img src="' + post.imageUri + '" class="review-image" alt="Guest post" onerror="this.parentElement.style.display=\'none\'"/></div>'
+                        : '<div class="review-image-wrapper" style="background:#f5ede8;display:flex;align-items:center;justify-content:center;height:200px;"><i class="fas fa-image" style="font-size:40px;color:#ddd;"></i></div>';
+                    var date   = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+                    return '<div class="review-card" data-category="all" data-card-id="d' + post.id + '" style="border:2px solid #f5ede8;">'
+                        + image
+                        + '<div class="review-content">'
+                        + '<div class="review-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>'
+                        + tag
+                        + '<p class="review-text">' + (post.caption || '') + '</p>'
+                        + '<div class="review-author">'
+                        + '<div style="width:36px;height:36px;border-radius:50%;background:#c24a16;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">' + avatar + '</div>'
+                        + '<div class="review-author-info"><span class="name">' + (post.authorName || 'Guest') + '</span><span class="post-date">' + date + '</span></div>'
+                        + '</div></div>'
+                        + '<div class="review-actions">'
+                        + '<button class="action-btn like-btn" data-requires-auth="true"><i class="far fa-heart"></i> <span>' + (post.likedBy ? post.likedBy.length : 0) + '</span></button>'
+                        + '<button class="action-btn comment-btn" data-requires-auth="true"><i class="far fa-comment"></i> <span>' + (post.comments ? post.comments.length : 0) + '</span></button>'
+                        + '</div></div>';
+                }).join('');
+            })
+            .catch(function () {});
+    })();
+    </script>
     <div class="sharewall-cta">
         <a href="{{ path('app_login') }}" class="sharewall-cta-btn">
             <i class="fas fa-pen-fancy"></i> Share Your Story

@@ -10,10 +10,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['roomNumber'], message: 'Room number "{{ value }}" is already in use.')]
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['room:read', 'package:detail']]),
@@ -28,7 +30,7 @@ class Room
     #[Groups(['room:read', 'package:detail'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 40)]
+    #[ORM\Column(length: 40, unique: true)]
     #[Groups(['room:read', 'package:detail'])]
     private ?string $roomNumber = null;
 
@@ -91,6 +93,10 @@ class Room
      */
     #[ORM\ManyToMany(targetEntity: Package::class, mappedBy: 'rooms')]
     private Collection $packages;
+
+    #[ORM\Column(options: ['default' => false])]
+    #[Groups(['room:read'])]
+    private bool $isOffer = false;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -344,5 +350,13 @@ class Room
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    public function isOffer(): bool { return $this->isOffer; }
+    public function setIsOffer(bool $isOffer): static { $this->isOffer = $isOffer; return $this; }
+
+    public function isNew(): bool
+    {
+        return $this->createdAt !== null && $this->createdAt >= new \DateTimeImmutable('-7 days');
     }
 }

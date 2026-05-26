@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Repository\UserRepository;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 
@@ -11,14 +12,13 @@ class NotificationService
     public function __construct(string $firebaseCredentialsPath)
     {
         if (!file_exists($firebaseCredentialsPath)) {
-            return; // Firebase not configured — notifications will be silently skipped
+            return;
         }
 
         try {
             $firebase = (new Factory)->withServiceAccount($firebaseCredentialsPath);
             $this->messaging = $firebase->createMessaging();
         } catch (\Throwable) {
-            // Invalid credentials — silently disable notifications
         }
     }
 
@@ -29,9 +29,9 @@ class NotificationService
         }
 
         $config = [
-            'token' => $fcmToken,
+            'token'        => $fcmToken,
             'notification' => ['title' => $title, 'body' => $body],
-            'data' => array_map('strval', $data),
+            'data'         => array_map('strval', $data),
         ];
 
         if ($collapseKey !== null) {
@@ -40,5 +40,28 @@ class NotificationService
         }
 
         $this->messaging->send(CloudMessage::fromArray($config));
+    }
+
+    /**
+     * Broadcast a notification to every customer that has an FCM token.
+     * Silently skips users without a token and absorbs per-device errors.
+     */
+    public function broadcastToCustomers(UserRepository $users, string $title, string $body, array $data = []): void
+    {
+        if ($this->messaging === null) {
+            return;
+        }
+
+        foreach ($users->findAll() as $user) {
+            $token = $user->getFcmToken();
+            if (!$token) {
+                continue;
+            }
+            try {
+                $this->sendToDevice($token, $title, $body, $data);
+            } catch (\Throwable) {
+                // one bad token must not abort the whole broadcast
+            }
+        }
     }
 }

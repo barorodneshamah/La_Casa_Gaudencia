@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php bin/console doctrine:migrations:execute --up \"DoctrineMigrations\\\\Version20260524200000\" --no-interaction)",
+      "Bash(cd \"/c/Users/ACER/la_casa_gaudencia\" && grep -rl \"app_logout\\\\|sidebar-logout\\\\|logout-btn\" templates/ --include=\"*.twig\" | sort)",
+      "Read(//c/c/Users/ACER/la_casa_gaudencia/**)",
+      "Bash(python3 /tmp/run_sw.py)",
+      "Bash(python3 -)",
+      "Bash(php -r \"echo file_exists\\('C:/Users/ACER/la_casa_gaudencia/templates/activity_log/index.html.twig'\\) ? 'YES' : 'NO';\")",
+      "Bash(sed -i 's|/c/Users/ACER/la_casa_gaudencia/templates|C:/Users/ACER/la_casa_gaudencia/templates|' /tmp/add_sharewall.php)",
+      "Bash(php /tmp/add_sharewall.php)",
+      "Bash(php \"c:/Users/ACER/la_casa_gaudencia/bin/console\" debug:router --show-controllers)",
+      "Bash(php bin/console doctrine:migrations:execute --up \"DoctrineMigrations\\\\\\\\Version20260524210000\" --no-interaction)",
+      "Bash(php bin/console doctrine:migrations:status)",
+      "Bash(php bin/console doctrine:migrations:list)",
+      "Bash(php bin/console doctrine:migrations:version --add \"DoctrineMigrations\\\\Version20260407000001\" --no-interaction)",
+      "Bash(php bin/console doctrine:migrations:execute --up \"DoctrineMigrations\\\\Version20260524174807\" --no-interaction)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\ACER\\Projects\\Baroro\\src\\app\\api",
+      "c:\\Users\\ACER\\Projects\\Baroro\\src\\screens"
+    ]
+  }
+}

@@ -1,5 +1,9 @@
 # config/packages/security.yaml
 security:
+    role_hierarchy:
+        ROLE_STAFF: [ROLE_USER]
+        ROLE_ADMIN: [ROLE_STAFF]
+
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
         App\Entity\User:
@@ -18,7 +22,7 @@ security:
 
         # Public API routes — no auth needed
         api_public:
-            pattern: ^/api/(login|register|auth/google|services|products|tours|rooms|foods|packages|logout)
+            pattern: ^/api/(login|register|auth/google|services|products|tours|rooms|foods|packages|spas|logout)
             security: false
 
         # JWT-protected API routes
@@ -63,6 +67,9 @@ security:
         - { path: ^/api/rooms,        roles: PUBLIC_ACCESS }
         - { path: ^/api/foods,        roles: PUBLIC_ACCESS }
         - { path: ^/api/packages,     roles: PUBLIC_ACCESS }
+        - { path: ^/api/spas,         roles: PUBLIC_ACCESS }
+        - { path: ^/api/wall/posts$,   roles: PUBLIC_ACCESS }
+        - { path: ^/api/wall/featured, roles: PUBLIC_ACCESS }
 
         # Protected API
         - { path: ^/api,              roles: IS_AUTHENTICATED_FULLY }

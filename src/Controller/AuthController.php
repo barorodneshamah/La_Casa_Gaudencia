@@ -175,6 +175,35 @@ class AuthController extends AbstractController
         return $this->json(['success' => true]);
     }
 
+    #[Route('/change-password', name: 'api_change_password', methods: ['POST'])]
+    public function changePassword(
+        Request $request,
+        UserPasswordHasherInterface $hasher
+    ): JsonResponse {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $newPassword = $data['newPassword'] ?? '';
+        $confirmPassword = $data['confirmPassword'] ?? '';
+
+        if (strlen($newPassword) < 6) {
+            return $this->json(['message' => 'New password must be at least 6 characters'], 400);
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            return $this->json(['message' => 'Passwords do not match'], 400);
+        }
+
+        $user->setPassword($hasher->hashPassword($user, $newPassword));
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true, 'message' => 'Password changed.']);
+    }
+
     #[Route('/auth/google', name: 'api_auth_google', methods: ['POST'])]
     public function googleAuth(
         Request $request,
