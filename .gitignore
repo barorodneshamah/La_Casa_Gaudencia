@@ -26,6 +26,4 @@
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
-###> claude ###
-.claude/
-###< claude ###
+
