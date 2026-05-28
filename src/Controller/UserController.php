@@ -4,6 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\ContactReplyRepository;
+use App\Repository\ReservationRepository;
+use App\Repository\ShareWallCommentRepository;
+use App\Repository\ShareWallPostRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -91,19 +95,44 @@ final class UserController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user): Response
-    {
-        // Prevent deleting yourself
+    public function delete(
+        Request $request,
+        User $user,
+        ReservationRepository $reservationRepo,
+        ShareWallPostRepository $postRepo,
+        ShareWallCommentRepository $commentRepo,
+        ContactReplyRepository $contactReplyRepo,
+    ): Response {
         if ($user === $this->getUser()) {
             $this->addFlash('error', 'You cannot delete yourself!');
             return $this->redirectToRoute('app_user_index');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
-            $this->entityManager->remove($user);
-            $this->entityManager->flush();
-            $this->addFlash('success', 'User deleted successfully!');
+        if (!$this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_user_index');
         }
+
+        // Block deletion if user has reservations (business records must be preserved)
+        $reservations = $reservationRepo->findBy(['guest' => $user]);
+        if (count($reservations) > 0) {
+            $this->addFlash('error', 'Cannot delete user "' . $user->getUsername() . '" because they have ' . count($reservations) . ' reservation(s). Remove their reservations first.');
+            return $this->redirectToRoute('app_user_index');
+        }
+
+        // Delete user-generated content that has no business value
+        foreach ($commentRepo->findBy(['author' => $user]) as $comment) {
+            $this->entityManager->remove($comment);
+        }
+        foreach ($postRepo->findBy(['author' => $user]) as $post) {
+            $this->entityManager->remove($post);
+        }
+        foreach ($contactReplyRepo->findBy(['repliedBy' => $user]) as $reply) {
+            $this->entityManager->remove($reply);
+        }
+
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
+        $this->addFlash('success', 'User "' . $user->getUsername() . '" deleted successfully!');
 
         return $this->redirectToRoute('app_user_index');
     }
