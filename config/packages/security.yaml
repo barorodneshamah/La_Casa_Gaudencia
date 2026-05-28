@@ -22,7 +22,7 @@ security:
 
         # Public API routes — no auth needed
         api_public:
-            pattern: ^/api/(login|register|auth/google|services|products|tours|rooms|foods|packages|spas|logout)
+            pattern: ^/api/(login|register|auth/google|logout)(?:$|/)
             security: false
 
         # JWT-protected API routes
@@ -61,13 +61,17 @@ security:
         - { path: ^/api/logout,       roles: PUBLIC_ACCESS }
         - { path: ^/api/register,     roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/google,  roles: PUBLIC_ACCESS }
-        - { path: ^/api/services,     roles: PUBLIC_ACCESS }
-        - { path: ^/api/products,     roles: PUBLIC_ACCESS }
-        - { path: ^/api/tours,        roles: PUBLIC_ACCESS }
-        - { path: ^/api/rooms,        roles: PUBLIC_ACCESS }
-        - { path: ^/api/foods,        roles: PUBLIC_ACCESS }
-        - { path: ^/api/packages,     roles: PUBLIC_ACCESS }
-        - { path: ^/api/spas,         roles: PUBLIC_ACCESS }
+        - { path: ^/api/services/upload-image, roles: ROLE_STAFF }
+        - { path: ^/api/services/(rooms|tours|food|packages|spas)$, roles: ROLE_STAFF, methods: [POST] }
+        - { path: ^/api/services/packages/\d+, roles: ROLE_STAFF, methods: [PUT, PATCH, DELETE] }
+        - { path: ^/api/(rooms|tours|foods|spas)/\d+, roles: ROLE_STAFF, methods: [PUT, PATCH, DELETE] }
+        - { path: ^/api/services,     roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/products,     roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/tours,        roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/rooms,        roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/foods,        roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/packages,     roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/spas,         roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/wall/posts$,   roles: PUBLIC_ACCESS }
         - { path: ^/api/wall/featured, roles: PUBLIC_ACCESS }
 

@@ -9,6 +9,7 @@ use App\Entity\Package as TravelPackage;
 use App\Entity\Payment;
 use App\Entity\Reservation;
 use App\Entity\Room;
+use App\Entity\Spa;
 use App\Entity\Tour;
 use App\Entity\User;
 use App\Repository\UserRepository;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/api')]
 class MobileAdminApiController extends AbstractController
@@ -70,6 +72,21 @@ class MobileAdminApiController extends AbstractController
         $this->em->flush();
 
         return $this->json(['message' => 'User updated.', 'user' => $this->userData($user)]);
+    }
+
+    #[Route('/admin/users/{id}', name: 'api_mobile_admin_user_delete', methods: ['DELETE'])]
+    public function deleteAdminUser(User $user): JsonResponse
+    {
+        if ($blocked = $this->adminOnly()) return $blocked;
+
+        if ($user === $this->getUser()) {
+            return $this->json(['message' => 'You cannot delete your own account from mobile.'], 422);
+        }
+
+        $this->em->remove($user);
+        $this->em->flush();
+
+        return $this->json(['message' => 'User deleted.']);
     }
 
     #[Route('/payments/{id}/approve', name: 'api_mobile_payment_approve', methods: ['POST'])]
@@ -428,6 +445,84 @@ class MobileAdminApiController extends AbstractController
         return $this->json(['message' => 'Package deleted.']);
     }
 
+    #[Route('/services/spas', name: 'api_mobile_spa_create', methods: ['POST'])]
+    public function createSpa(Request $request): JsonResponse
+    {
+        if ($blocked = $this->staffOnly()) return $blocked;
+
+        $spa = new Spa();
+        $this->applySpa($spa, $this->jsonBody($request));
+        $this->em->persist($spa);
+        $this->em->flush();
+
+        return $this->json(['message' => 'Spa service created.', 'spa' => $this->spaData($spa)], 201);
+    }
+
+    #[Route('/spas/{id}', name: 'api_mobile_spa_update', methods: ['PUT', 'PATCH'])]
+    public function updateSpa(Spa $spa, Request $request): JsonResponse
+    {
+        if ($blocked = $this->staffOnly()) return $blocked;
+
+        $this->applySpa($spa, $this->jsonBody($request));
+        $this->em->flush();
+
+        return $this->json(['message' => 'Spa service updated.', 'spa' => $this->spaData($spa)]);
+    }
+
+    #[Route('/spas/{id}', name: 'api_mobile_spa_delete', methods: ['DELETE'])]
+    public function deleteSpa(Spa $spa): JsonResponse
+    {
+        if ($blocked = $this->staffOnly()) return $blocked;
+
+        $this->em->remove($spa);
+        $this->em->flush();
+
+        return $this->json(['message' => 'Spa service deleted.']);
+    }
+
+    #[Route('/services/upload-image', name: 'api_mobile_service_upload_image', methods: ['POST'])]
+    public function uploadServiceImage(Request $request, SluggerInterface $slugger): JsonResponse
+    {
+        if ($blocked = $this->staffOnly()) return $blocked;
+
+        $file = $request->files->get('file');
+        if (!$file) {
+            return $this->json(['error' => 'No file uploaded.'], 422);
+        }
+
+        $serviceType = (string) $request->request->get('serviceType', '');
+        $folders = [
+            'rooms' => 'rooms',
+            'tours' => 'tours',
+            'foods' => 'foods',
+            'packages' => 'packages',
+            'spas' => 'spas',
+        ];
+        if (!isset($folders[$serviceType])) {
+            return $this->json(['error' => 'Invalid service type.'], 422);
+        }
+
+        $mimeType = $file->getMimeType();
+        if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
+            return $this->json(['error' => 'Please upload a valid image.'], 422);
+        }
+
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeName = $slugger->slug($originalName ?: 'service-image')->lower();
+        $extension = $file->guessExtension() ?: 'jpg';
+        $fileName = sprintf('%s_%s_%s.%s', rtrim($serviceType, 's'), $safeName, uniqid(), $extension);
+        $relativeDir = 'uploads/' . $folders[$serviceType];
+        $targetDir = $this->getParameter('kernel.project_dir') . '/public/' . $relativeDir;
+
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+
+        $file->move($targetDir, $fileName);
+
+        return $this->json(['url' => $relativeDir . '/' . $fileName]);
+    }
+
     private function staffOnly(): ?JsonResponse
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_STAFF')) {
@@ -513,6 +608,11 @@ class MobileAdminApiController extends AbstractController
 
     private function applyPackage(TravelPackage $package, array $data): void
     {
+        $autoCalculatePrices = (bool) ($data['autoCalculatePrices'] ?? false);
+        $requestedDiscount = array_key_exists('discountPercentage', $data)
+            ? max(0.0, min(100.0, (float) $data['discountPercentage']))
+            : null;
+
         if (array_key_exists('name', $data)) $package->setName((string) $data['name']);
         if (array_key_exists('description', $data)) $package->setDescription((string) $data['description']);
         if (array_key_exists('originalPrice', $data)) $package->setOriginalPrice((string) $data['originalPrice']);
@@ -533,6 +633,77 @@ class MobileAdminApiController extends AbstractController
         if (array_key_exists('maxGuests', $data)) $package->setMaxGuests((int) $data['maxGuests']);
         if (array_key_exists('isFeatured', $data)) $package->setIsFeatured((bool) $data['isFeatured']);
         if (array_key_exists('isOffer', $data)) $package->setIsOffer((bool) $data['isOffer']);
+        if (array_key_exists('roomIds', $data) || array_key_exists('rooms', $data)) {
+            foreach ($package->getRooms()->toArray() as $room) {
+                $package->removeRoom($room);
+            }
+            foreach ($this->idsFrom($data['roomIds'] ?? $data['rooms']) as $id) {
+                $room = $this->em->getRepository(Room::class)->find($id);
+                if ($room) $package->addRoom($room);
+            }
+        }
+        if (array_key_exists('tourIds', $data) || array_key_exists('tours', $data)) {
+            foreach ($package->getTours()->toArray() as $tour) {
+                $package->removeTour($tour);
+            }
+            foreach ($this->idsFrom($data['tourIds'] ?? $data['tours']) as $id) {
+                $tour = $this->em->getRepository(Tour::class)->find($id);
+                if ($tour) $package->addTour($tour);
+            }
+        }
+        if (array_key_exists('foodIds', $data) || array_key_exists('foods', $data)) {
+            foreach ($package->getFoods()->toArray() as $food) {
+                $package->removeFood($food);
+            }
+            foreach ($this->idsFrom($data['foodIds'] ?? $data['foods']) as $id) {
+                $food = $this->em->getRepository(Food::class)->find($id);
+                if ($food) $package->addFood($food);
+            }
+        }
+
+        $package->calculateOriginalPrice();
+        if ($autoCalculatePrices) {
+            $originalPrice = (float) ($package->getOriginalPrice() ?? 0);
+            if ($originalPrice > 0 && $requestedDiscount !== null) {
+                $packagePrice = $originalPrice - ($originalPrice * $requestedDiscount / 100);
+                $package->setPackagePrice(number_format(max(0, $packagePrice), 2, '.', ''));
+            } elseif ($originalPrice > 0 && (float) ($package->getPackagePrice() ?? 0) <= 0) {
+                $package->setPackagePrice(number_format($originalPrice, 2, '.', ''));
+            }
+        }
+        $package->calculateDiscount();
+    }
+
+    private function idsFrom(mixed $value): array
+    {
+        if ($value === null || $value === '') return [];
+        $values = is_array($value) ? $value : explode(',', (string) $value);
+
+        return array_values(array_unique(array_filter(array_map(
+            function (mixed $item): int {
+                $raw = is_array($item) ? ($item['id'] ?? 0) : $item;
+                if (is_string($raw) && preg_match('/(\d+)$/', $raw, $matches)) {
+                    return (int) $matches[1];
+                }
+                return (int) $raw;
+            },
+            $values
+        ))));
+    }
+
+    private function applySpa(Spa $spa, array $data): void
+    {
+        if (array_key_exists('name', $data)) $spa->setName((string) $data['name']);
+        if (array_key_exists('description', $data)) $spa->setDescription((string) $data['description']);
+        if (array_key_exists('price', $data)) $spa->setPrice((string) $data['price']);
+        if (array_key_exists('duration', $data)) $spa->setDuration((string) $data['duration']);
+        if (array_key_exists('capacity', $data)) $spa->setCapacity((int) $data['capacity']);
+        if (array_key_exists('availableSlots', $data)) $spa->setCapacity((int) $data['availableSlots']);
+        if (array_key_exists('category', $data)) $spa->setCategory((string) $data['category']);
+        if (array_key_exists('status', $data)) $spa->setStatus((string) $data['status']);
+        if (array_key_exists('mainImage', $data)) $spa->setMainImage($data['mainImage']);
+        if (array_key_exists('galleryImages', $data)) $spa->setGalleryImages($data['galleryImages']);
+        if (array_key_exists('isOffer', $data)) $spa->setIsOffer((bool) $data['isOffer']);
     }
 
     private function applyExtensionToOriginal(Reservation $reservation): void
@@ -842,6 +1013,29 @@ class MobileAdminApiController extends AbstractController
             'maxGuests' => $package->getMaxGuests(),
             'isFeatured' => $package->isFeatured(),
             'isOffer' => $package->isOffer(),
+            'roomIds' => array_map(fn (Room $room) => $room->getId(), $package->getRooms()->toArray()),
+            'tourIds' => array_map(fn (Tour $tour) => $tour->getId(), $package->getTours()->toArray()),
+            'foodIds' => array_map(fn (Food $food) => $food->getId(), $package->getFoods()->toArray()),
+            'rooms' => array_map(fn (Room $room) => $this->roomData($room), $package->getRooms()->toArray()),
+            'tours' => array_map(fn (Tour $tour) => $this->tourData($tour), $package->getTours()->toArray()),
+            'foods' => array_map(fn (Food $food) => $this->foodData($food), $package->getFoods()->toArray()),
+        ];
+    }
+
+    private function spaData(Spa $spa): array
+    {
+        return [
+            'id' => $spa->getId(),
+            'name' => $spa->getName(),
+            'description' => $spa->getDescription(),
+            'price' => $spa->getPrice(),
+            'duration' => $spa->getDuration(),
+            'capacity' => $spa->getCapacity(),
+            'category' => $spa->getCategory(),
+            'status' => $spa->getStatus(),
+            'mainImage' => $spa->getMainImage(),
+            'galleryImages' => $spa->getGalleryImages(),
+            'isOffer' => $spa->isOffer(),
         ];
     }
 }

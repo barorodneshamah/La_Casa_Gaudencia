@@ -14,22 +14,31 @@ const http      = require('http');
 
 const WS_PORT = 9090;
 
-// userId (string) → Set<WebSocket>  (one user may have several open sockets)
+// userId / username / email (string) → Set<WebSocket>
+// One user may have several open sockets and several identity aliases.
 const userSockets = new Map();
 
 // ── JWT userId extraction (no signature verification needed for school demo) ──
 
-function decodeUserId(token) {
+function decodeIdentityAliases(token) {
   try {
     const payloadB64 = token.split('.')[1];
     const json       = Buffer.from(payloadB64, 'base64url').toString('utf8');
     const payload    = JSON.parse(json);
-    // Symfony LexikJWTAuthenticationBundle stores the username in 'username'
-    // and may or may not include 'id'; fall back to a timestamp so we always
-    // get a non-null key.
-    return String(payload.id ?? payload.sub ?? payload.username ?? Date.now());
+
+    // Symfony/Lexik payloads can contain id, sub, username, email, or user_identifier.
+    // Mobile API pushes often target username, while JWT may expose numeric id first.
+    return [
+      payload.username,
+      payload.user_identifier,
+      payload.email,
+      payload.sub,
+      payload.id,
+    ]
+      .filter(value => value !== undefined && value !== null && String(value).trim() !== '')
+      .map(value => String(value));
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -134,18 +143,20 @@ wss.on('connection', (ws, req) => {
   // Extract token from query string: ws://host:9090?token=JWT
   const urlObj = new URL(req.url, `http://localhost:${WS_PORT}`);
   const token  = urlObj.searchParams.get('token') ?? '';
-  const userId = decodeUserId(token);
+  const aliases = decodeIdentityAliases(token);
 
-  if (!userId) {
+  if (aliases.length === 0) {
     ws.close(4001, 'Unauthorized — missing or invalid token');
     return;
   }
 
   // Register
-  if (!userSockets.has(userId)) userSockets.set(userId, new Set());
-  userSockets.get(userId).add(ws);
+  aliases.forEach(alias => {
+    if (!userSockets.has(alias)) userSockets.set(alias, new Set());
+    userSockets.get(alias).add(ws);
+  });
 
-  console.log(`[WS] Connected    user=${userId}  users=${userSockets.size}`);
+  console.log(`[WS] Connected    aliases=${aliases.join(',')}  users=${userSockets.size}`);
 
   // Welcome handshake — mobile client uses this to confirm the link is live
   ws.send(JSON.stringify({
@@ -168,21 +179,23 @@ wss.on('connection', (ws, req) => {
         ws.send(JSON.stringify({ type: 'pong', ts: Date.now() }));
         return;
       }
-      console.log(`[WS] Message from user=${userId}:`, msg);
+      console.log(`[WS] Message from aliases=${aliases.join(',')}:`, msg);
     } catch { /* ignore malformed */ }
   });
 
   ws.on('close', code => {
-    const sockets = userSockets.get(userId);
-    if (sockets) {
-      sockets.delete(ws);
-      if (sockets.size === 0) userSockets.delete(userId);
-    }
-    console.log(`[WS] Disconnected user=${userId}  code=${code}  users=${userSockets.size}`);
+    aliases.forEach(alias => {
+      const sockets = userSockets.get(alias);
+      if (sockets) {
+        sockets.delete(ws);
+        if (sockets.size === 0) userSockets.delete(alias);
+      }
+    });
+    console.log(`[WS] Disconnected aliases=${aliases.join(',')}  code=${code}  users=${userSockets.size}`);
   });
 
   ws.on('error', err => {
-    console.error(`[WS] Error user=${userId}:`, err.message);
+    console.error(`[WS] Error aliases=${aliases.join(',')}:`, err.message);
   });
 });
 
