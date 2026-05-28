@@ -43,8 +43,10 @@ class GoogleAuthenticator extends OAuth2Authenticator
 
                 $email = $googleUser->getEmail();
 
-                // Find or create user
+                // Find by email first, then fall back to username match
                 $user = $this->entityManager->getRepository(User::class)
+                    ->findOneBy(['email' => $email])
+                    ?? $this->entityManager->getRepository(User::class)
                     ->findOneBy(['username' => $email]);
 
                 if (!$user) {
