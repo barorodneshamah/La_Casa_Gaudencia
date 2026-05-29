@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)file:///C:/Users/ACER/Desktop/txt.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>DFD Level 1 — Baroro Resort Management System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #fff; padding: 16px; }
+    .header { text-align: center; margin-bottom: 12px; }
+    .header h1 { font-size: 18px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+    .header p  { font-size: 12px; color: #555; margin-top: 3px; }
+    svg { display: block; margin: 0 auto; }
+    @media print { body { padding: 4px; } }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>Data Flow Diagram — Level 1</h1>
+  <p>Baroro Resort Management System &nbsp;|&nbsp; La Casa Gaudencia</p>
+</div>
+
+<svg width="1300" height="1020" viewBox="0 0 1300 1020" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0,0 L10,5 L0,10 Z" fill="#444"></path>
+  </marker>
+  <marker id="arrg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+    <path d="M0,0 L10,5 L0,10 Z" fill="#888"></path>
+  </marker>
+</defs>
+
+<!-- background -->
+<rect width="1300" height="1020" fill="#fafafa" rx="4"></rect>
+
+<!-- ── COLUMN HEADERS ── -->
+<text x="65" y="20" font-size="10" fill="#999" text-anchor="middle" font-style="italic">External Entities</text>
+<text x="310" y="20" font-size="10" fill="#999" text-anchor="middle" font-style="italic">Processes</text>
+<text x="625" y="20" font-size="10" fill="#999" text-anchor="middle" font-style="italic">Data Stores</text>
+<text x="945" y="20" font-size="10" fill="#999" text-anchor="middle" font-style="italic">Outputs / Views</text>
+
+<!-- guide lines -->
+<line x1="148" y1="28" x2="148" y2="958" stroke="#e8e8e8" stroke-dasharray="4,4"></line>
+<line x1="470" y1="28" x2="470" y2="958" stroke="#e8e8e8" stroke-dasharray="4,4"></line>
+<line x1="775" y1="28" x2="775" y2="958" stroke="#e8e8e8" stroke-dasharray="4,4"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 1  —  P1: Authenticate User   cy=100
+     ═══════════════════════════════════════════════════ -->
+
+<!-- entities -->
+<rect x="5" y="58" width="108" height="24" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"></rect>
+<text x="59" y="75" font-size="9.5" text-anchor="middle" fill="#1e3a8a">Customer</text>
+
+<rect x="5" y="88" width="108" height="24" rx="2" fill="#d1fae5" stroke="#059669" stroke-width="1.5"></rect>
+<text x="59" y="105" font-size="9.5" text-anchor="middle" fill="#064e3b">Staff</text>
+
+<rect x="5" y="118" width="108" height="24" rx="2" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"></rect>
+<text x="59" y="135" font-size="9.5" text-anchor="middle" fill="#831843">Admin</text>
+
+<!-- entity → P1 arrows -->
+<line x1="113" y1="70" x2="254" y2="95" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<line x1="113" y1="100" x2="255" y2="100" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<line x1="113" y1="130" x2="254" y2="105" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="182" y="78" font-size="8" fill="#555">Login Credentials</text>
+
+<!-- P1 circle -->
+<circle cx="310" cy="100" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="94" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P1</text>
+<text x="310" y="107" font-size="9" text-anchor="middle" fill="#78350f">Authenticate</text>
+<text x="310" y="119" font-size="9" text-anchor="middle" fill="#78350f">User</text>
+
+<!-- D1 Users -->
+<line x1="488" y1="80" x2="762" y2="80" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="120" x2="762" y2="120" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="80" x2="488" y2="120" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="80" x2="528" y2="120" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="105" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D1</text>
+<text x="644" y="97" font-size="10" text-anchor="middle" fill="#14532d">User Data Store</text>
+<text x="644" y="112" font-size="8.5" text-anchor="middle" fill="#555">(Users, Roles, Profiles, Tokens)</text>
+
+<!-- P1 ↔ D1 -->
+<line x1="364" y1="93" x2="486" y2="87" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="82" font-size="8" fill="#555">Verify / Store User</text>
+<line x1="486" y1="113" x2="364" y2="107" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="124" font-size="8" fill="#555">Auth Token / User Data</text>
+
+<!-- O1 -->
+<rect x="790" y="82" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="98" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Profile /</text>
+<text x="890" y="112" font-size="9.5" text-anchor="middle" fill="#4c1d95">User Dashboard</text>
+<line x1="762" y1="100" x2="788" y2="100" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 2  —  P2: Manage Services   cy=228
+     ═══════════════════════════════════════════════════ -->
+
+<rect x="5" y="216" width="108" height="24" rx="2" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"></rect>
+<text x="59" y="233" font-size="9.5" text-anchor="middle" fill="#831843">Admin</text>
+
+<line x1="113" y1="228" x2="255" y2="228" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="180" y="222" font-size="8" fill="#555">Service Data (CRUD)</text>
+
+<circle cx="310" cy="228" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="222" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P2</text>
+<text x="310" y="235" font-size="9" text-anchor="middle" fill="#78350f">Manage</text>
+<text x="310" y="247" font-size="9" text-anchor="middle" fill="#78350f">Services</text>
+
+<!-- D2 Services -->
+<line x1="488" y1="208" x2="762" y2="208" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="248" x2="762" y2="248" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="208" x2="488" y2="248" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="208" x2="528" y2="248" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="233" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D2</text>
+<text x="644" y="225" font-size="10" text-anchor="middle" fill="#14532d">Service Data Store</text>
+<text x="644" y="240" font-size="8.5" text-anchor="middle" fill="#555">(Rooms, Tours, Food, Packages, Spa)</text>
+
+<line x1="364" y1="221" x2="486" y2="215" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="210" font-size="8" fill="#555">Save / Update Service</text>
+<line x1="486" y1="241" x2="364" y2="235" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="252" font-size="8" fill="#555">Service Data</text>
+
+<rect x="790" y="210" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="226" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Service</text>
+<text x="890" y="240" font-size="9.5" text-anchor="middle" fill="#4c1d95">Catalog</text>
+<line x1="762" y1="228" x2="788" y2="228" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 3  —  P3: Manage Reservations   cy=360
+     ═══════════════════════════════════════════════════ -->
+
+<rect x="5" y="328" width="108" height="24" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"></rect>
+<text x="59" y="345" font-size="9.5" text-anchor="middle" fill="#1e3a8a">Customer</text>
+
+<rect x="5" y="358" width="108" height="24" rx="2" fill="#d1fae5" stroke="#059669" stroke-width="1.5"></rect>
+<text x="59" y="375" font-size="9.5" text-anchor="middle" fill="#064e3b">Staff</text>
+
+<rect x="5" y="388" width="108" height="24" rx="2" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"></rect>
+<text x="59" y="405" font-size="9.5" text-anchor="middle" fill="#831843">Admin</text>
+
+<line x1="113" y1="340" x2="254" y2="353" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="180" y="336" font-size="8" fill="#555">Reservation Request</text>
+<line x1="113" y1="370" x2="255" y2="361" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="178" y="381" font-size="8" fill="#555">Approve / Reject</text>
+<line x1="113" y1="400" x2="254" y2="369" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<circle cx="310" cy="360" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="354" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P3</text>
+<text x="310" y="367" font-size="9" text-anchor="middle" fill="#78350f">Manage</text>
+<text x="310" y="379" font-size="9" text-anchor="middle" fill="#78350f">Reservations</text>
+
+<!-- D3 Reservations -->
+<line x1="488" y1="340" x2="762" y2="340" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="380" x2="762" y2="380" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="340" x2="488" y2="380" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="340" x2="528" y2="380" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="365" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D3</text>
+<text x="644" y="357" font-size="10" text-anchor="middle" fill="#14532d">Reservation Data Store</text>
+<text x="644" y="372" font-size="8.5" text-anchor="middle" fill="#555">(Bookings, Status, Dates, Service Type)</text>
+
+<line x1="364" y1="353" x2="486" y2="347" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="342" font-size="8" fill="#555">Save Reservation</text>
+<line x1="486" y1="373" x2="364" y2="367" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="384" font-size="8" fill="#555">Reservation Data</text>
+
+<!-- D2 → P3: service availability check (dashed) -->
+<path d="M 528 248 Q 508 294 508 340" stroke="#888" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arrg)"></path>
+<text x="475" y="297" font-size="7.5" fill="#888" text-anchor="middle">Service</text>
+<text x="475" y="307" font-size="7.5" fill="#888" text-anchor="middle">Availability</text>
+
+<rect x="790" y="342" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="358" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Reservation</text>
+<text x="890" y="372" font-size="9.5" text-anchor="middle" fill="#4c1d95">Details</text>
+<line x1="762" y1="360" x2="788" y2="360" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 4  —  P4: Process Payments   cy=490
+     ═══════════════════════════════════════════════════ -->
+
+<rect x="5" y="458" width="108" height="24" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"></rect>
+<text x="59" y="475" font-size="9.5" text-anchor="middle" fill="#1e3a8a">Customer</text>
+
+<rect x="5" y="488" width="108" height="24" rx="2" fill="#d1fae5" stroke="#059669" stroke-width="1.5"></rect>
+<text x="59" y="505" font-size="9.5" text-anchor="middle" fill="#064e3b">Staff</text>
+
+<rect x="5" y="518" width="108" height="24" rx="2" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"></rect>
+<text x="59" y="535" font-size="9.5" text-anchor="middle" fill="#831843">Admin</text>
+
+<line x1="113" y1="470" x2="254" y2="483" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="180" y="466" font-size="8" fill="#555">Payment Details</text>
+<line x1="113" y1="500" x2="255" y2="491" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="178" y="511" font-size="8" fill="#555">Approve / Refund</text>
+<line x1="113" y1="530" x2="254" y2="499" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<circle cx="310" cy="490" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="484" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P4</text>
+<text x="310" y="497" font-size="9" text-anchor="middle" fill="#78350f">Process</text>
+<text x="310" y="509" font-size="9" text-anchor="middle" fill="#78350f">Payments</text>
+
+<!-- D4 Payments -->
+<line x1="488" y1="470" x2="762" y2="470" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="510" x2="762" y2="510" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="470" x2="488" y2="510" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="470" x2="528" y2="510" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="495" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D4</text>
+<text x="644" y="487" font-size="10" text-anchor="middle" fill="#14532d">Payment Data Store</text>
+<text x="644" y="502" font-size="8.5" text-anchor="middle" fill="#555">(Payments, Method, Status, Proof)</text>
+
+<line x1="364" y1="483" x2="486" y2="477" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="472" font-size="8" fill="#555">Save Payment</text>
+<line x1="486" y1="503" x2="364" y2="497" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="514" font-size="8" fill="#555">Payment Data</text>
+
+<!-- D3 → P4: reservation reference (dashed) -->
+<path d="M 528 380 Q 508 425 508 470" stroke="#888" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arrg)"></path>
+<text x="475" y="427" font-size="7.5" fill="#888" text-anchor="middle">Reservation</text>
+<text x="475" y="437" font-size="7.5" fill="#888" text-anchor="middle">Reference</text>
+
+<rect x="790" y="472" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="488" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Payment</text>
+<text x="890" y="502" font-size="9.5" text-anchor="middle" fill="#4c1d95">Status</text>
+<line x1="762" y1="490" x2="788" y2="490" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 5  —  P5: Handle Communications   cy=618
+     ═══════════════════════════════════════════════════ -->
+
+<rect x="5" y="604" width="108" height="24" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"></rect>
+<text x="59" y="621" font-size="9.5" text-anchor="middle" fill="#1e3a8a">Customer</text>
+
+<rect x="5" y="633" width="108" height="24" rx="2" fill="#d1fae5" stroke="#059669" stroke-width="1.5"></rect>
+<text x="59" y="650" font-size="9.5" text-anchor="middle" fill="#064e3b">Staff</text>
+
+<line x1="113" y1="616" x2="254" y2="613" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="180" y="609" font-size="8" fill="#555">Contact Message</text>
+<line x1="113" y1="645" x2="254" y2="625" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="178" y="658" font-size="8" fill="#555">Send Reply</text>
+
+<circle cx="310" cy="618" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="610" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P5</text>
+<text x="310" y="623" font-size="9" text-anchor="middle" fill="#78350f">Handle</text>
+<text x="310" y="635" font-size="9" text-anchor="middle" fill="#78350f">Communications</text>
+
+<!-- D5 Messages -->
+<line x1="488" y1="598" x2="762" y2="598" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="638" x2="762" y2="638" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="598" x2="488" y2="638" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="598" x2="528" y2="638" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="623" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D5</text>
+<text x="644" y="615" font-size="10" text-anchor="middle" fill="#14532d">Message Data Store</text>
+<text x="644" y="630" font-size="8.5" text-anchor="middle" fill="#555">(Contact Messages, Replies, Status)</text>
+
+<line x1="364" y1="611" x2="486" y2="605" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="600" font-size="8" fill="#555">Save Message</text>
+<line x1="486" y1="631" x2="364" y2="625" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="642" font-size="8" fill="#555">Message / Reply Data</text>
+
+<rect x="790" y="600" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="616" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Messages /</text>
+<text x="890" y="630" font-size="9.5" text-anchor="middle" fill="#4c1d95">Replies</text>
+<line x1="762" y1="618" x2="788" y2="618" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 6  —  P6: Manage Share Wall   cy=745
+     ═══════════════════════════════════════════════════ -->
+
+<rect x="5" y="733" width="108" height="24" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"></rect>
+<text x="59" y="750" font-size="9.5" text-anchor="middle" fill="#1e3a8a">Customer</text>
+
+<line x1="113" y1="745" x2="255" y2="745" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="180" y="739" font-size="8" fill="#555">Post / Like / Comment</text>
+
+<circle cx="310" cy="745" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="739" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P6</text>
+<text x="310" y="752" font-size="9" text-anchor="middle" fill="#78350f">Manage</text>
+<text x="310" y="764" font-size="9" text-anchor="middle" fill="#78350f">Share Wall</text>
+
+<!-- D6 Wall Posts -->
+<line x1="488" y1="725" x2="762" y2="725" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="765" x2="762" y2="765" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="725" x2="488" y2="765" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="725" x2="528" y2="765" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="750" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D6</text>
+<text x="644" y="742" font-size="10" text-anchor="middle" fill="#14532d">Wall Post Data Store</text>
+<text x="644" y="757" font-size="8.5" text-anchor="middle" fill="#555">(Posts, Likes, Comments, Images)</text>
+
+<line x1="364" y1="738" x2="486" y2="732" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="727" font-size="8" fill="#555">Save Post / Like</text>
+<line x1="486" y1="758" x2="364" y2="752" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="769" font-size="8" fill="#555">Post Data</text>
+
+<rect x="790" y="727" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="743" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Community</text>
+<text x="890" y="757" font-size="9.5" text-anchor="middle" fill="#4c1d95">Share Wall</text>
+<line x1="762" y1="745" x2="788" y2="745" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ═══════════════════════════════════════════════════
+     ROW 7  —  P7: Notifications & Reporting   cy=875
+     ═══════════════════════════════════════════════════ -->
+
+<rect x="5" y="857" width="108" height="24" rx="2" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"></rect>
+<text x="59" y="874" font-size="9.5" text-anchor="middle" fill="#831843">Admin</text>
+
+<rect x="5" y="887" width="108" height="24" rx="2" fill="#d1fae5" stroke="#059669" stroke-width="1.5"></rect>
+<text x="59" y="904" font-size="9.5" text-anchor="middle" fill="#064e3b">Staff</text>
+
+<line x1="113" y1="869" x2="254" y2="871" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="178" y="863" font-size="8" fill="#555">View Logs Request</text>
+<line x1="113" y1="899" x2="254" y2="880" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<circle cx="310" cy="875" r="54" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"></circle>
+<text x="310" y="866" font-size="10" font-weight="bold" text-anchor="middle" fill="#78350f">P7</text>
+<text x="310" y="879" font-size="9" text-anchor="middle" fill="#78350f">Notifications</text>
+<text x="310" y="891" font-size="9" text-anchor="middle" fill="#78350f">&amp; Reporting</text>
+
+<!-- D7 Logs & Notifications -->
+<line x1="488" y1="855" x2="762" y2="855" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="895" x2="762" y2="895" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="488" y1="855" x2="488" y2="895" stroke="#16a34a" stroke-width="1.5"></line>
+<line x1="528" y1="855" x2="528" y2="895" stroke="#16a34a" stroke-width="1.5"></line>
+<text x="508" y="880" font-size="9" text-anchor="middle" fill="#14532d" font-weight="bold">D7</text>
+<text x="644" y="872" font-size="10" text-anchor="middle" fill="#14532d">Log &amp; Notification Store</text>
+<text x="644" y="887" font-size="8.5" text-anchor="middle" fill="#555">(Activity Logs, Notifications, Events)</text>
+
+<line x1="364" y1="868" x2="486" y2="862" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="857" font-size="8" fill="#555">Log Activity</text>
+<line x1="486" y1="888" x2="364" y2="882" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="422" y="899" font-size="8" fill="#555">Log / Notification Data</text>
+
+<!-- D4 → D7: payment events trigger notifications (dashed) -->
+<path d="M 528 510 Q 508 685 508 855" stroke="#888" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arrg)"></path>
+<text x="462" y="685" font-size="7.5" fill="#888" text-anchor="middle">Payment</text>
+<text x="462" y="695" font-size="7.5" fill="#888" text-anchor="middle">Events</text>
+
+<!-- D3 → D7: reservation events trigger notifications (dashed) -->
+<path d="M 540 380 Q 460 615 460 855" stroke="#888" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arrg)"></path>
+<text x="435" y="610" font-size="7.5" fill="#888" text-anchor="middle">Reservation</text>
+<text x="435" y="620" font-size="7.5" fill="#888" text-anchor="middle">Events</text>
+
+<rect x="790" y="857" width="200" height="36" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"></rect>
+<text x="890" y="873" font-size="9.5" text-anchor="middle" fill="#4c1d95">View Reports /</text>
+<text x="890" y="887" font-size="9.5" text-anchor="middle" fill="#4c1d95">Activity Logs</text>
+<line x1="762" y1="875" x2="788" y2="875" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+
+<!-- ══════════════════════════════════════════════════
+     LEGEND
+     ══════════════════════════════════════════════════ -->
+<rect x="8" y="966" width="1284" height="46" fill="#f5f5f5" rx="3" stroke="#ccc" stroke-width="1"></rect>
+<text x="18" y="982" font-size="9.5" fill="#333" font-weight="bold">LEGEND:</text>
+
+<!-- entity -->
+<rect x="78" y="970" width="72" height="20" rx="2" fill="#dbeafe" stroke="#2563eb" stroke-width="1.3"></rect>
+<text x="114" y="985" font-size="8.5" text-anchor="middle" fill="#1e3a8a">Customer/Staff/Admin</text>
+<text x="158" y="985" font-size="8.5" fill="#555">= External Entity</text>
+
+<!-- process -->
+<circle cx="268" cy="980" r="11" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"></circle>
+<text x="268" y="984" font-size="8" text-anchor="middle" fill="#78350f">Pn</text>
+<text x="284" y="985" font-size="8.5" fill="#555">= Process</text>
+
+<!-- data store -->
+<line x1="355" y1="971" x2="445" y2="971" stroke="#16a34a" stroke-width="1.3"></line>
+<line x1="355" y1="989" x2="445" y2="989" stroke="#16a34a" stroke-width="1.3"></line>
+<line x1="355" y1="971" x2="355" y2="989" stroke="#16a34a" stroke-width="1.3"></line>
+<line x1="378" y1="971" x2="378" y2="989" stroke="#16a34a" stroke-width="1.3"></line>
+<text x="366" y="984" font-size="8" text-anchor="middle" fill="#14532d">Dn</text>
+<text x="411" y="984" font-size="8" text-anchor="middle" fill="#14532d">Name</text>
+<text x="452" y="985" font-size="8.5" fill="#555">= Data Store (Yourdon)</text>
+
+<!-- output -->
+<rect x="565" y="970" width="75" height="20" rx="3" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.3"></rect>
+<text x="602" y="985" font-size="8.5" text-anchor="middle" fill="#4c1d95">View Output</text>
+<text x="646" y="985" font-size="8.5" fill="#555">= Output / View</text>
+
+<!-- solid arrow -->
+<line x1="730" y1="980" x2="775" y2="980" stroke="#444" stroke-width="1.2" marker-end="url(#arr)"></line>
+<text x="780" y="985" font-size="8.5" fill="#555">= Data Flow</text>
+
+<!-- dashed arrow -->
+<line x1="880" y1="980" x2="925" y2="980" stroke="#888" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrg)"></line>
+<text x="932" y="985" font-size="8.5" fill="#555">= Cross-process / Event Flow</text>
+
+<!-- system note -->
+<text x="1280" y="1010" font-size="8" fill="#aaa" text-anchor="end">Baroro v1.0 — La Casa Gaudencia Resort Management System</text>
+</svg>
+
+<div style="text-align:center;margin-top:8px;font-size:10px;color:#888;">
+  DFD Level 1 &nbsp;|&nbsp; Baroro Resort Management System &nbsp;|&nbsp; La Casa Gaudencia
+</div>
+
+
+</body></html>

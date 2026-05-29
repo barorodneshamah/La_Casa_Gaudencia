@@ -22,14 +22,8 @@ class ShareWallPostRepository extends ServiceEntityRepository
     public function findPublished(int $limit = 30, int $offset = 0): array
     {
         return $this->createQueryBuilder('p')
-            ->join('p.author', 'u')
             ->where('p.status = :status')
-            ->andWhere('p.authorNameOverride IS NULL')
-            ->andWhere('u.roles NOT LIKE :adminRole')
-            ->andWhere('u.roles NOT LIKE :staffRole')
             ->setParameter('status', 'published')
-            ->setParameter('adminRole', '%ROLE_ADMIN%')
-            ->setParameter('staffRole', '%ROLE_STAFF%')
             ->orderBy('p.isPinned', 'DESC')
             ->addOrderBy('p.createdAt', 'DESC')
             ->setMaxResults($limit)
@@ -42,14 +36,8 @@ class ShareWallPostRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('p')
             ->select('COUNT(p.id)')
-            ->join('p.author', 'u')
             ->where('p.status = :status')
-            ->andWhere('p.authorNameOverride IS NULL')
-            ->andWhere('u.roles NOT LIKE :adminRole')
-            ->andWhere('u.roles NOT LIKE :staffRole')
             ->setParameter('status', 'published')
-            ->setParameter('adminRole', '%ROLE_ADMIN%')
-            ->setParameter('staffRole', '%ROLE_STAFF%')
             ->getQuery()
             ->getSingleScalarResult();
     }

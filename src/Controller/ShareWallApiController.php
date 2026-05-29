@@ -186,6 +186,16 @@ class ShareWallApiController extends AbstractController
         return $this->json(['comment' => $this->serializeComment($comment)], 201);
     }
 
+    #[Route('/posts/{id}/pin', name: 'api_wall_posts_pin', methods: ['POST'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function pin(ShareWallPost $post, EntityManagerInterface $em): JsonResponse
+    {
+        $post->setIsPinned(!$post->isPinned());
+        $em->flush();
+
+        return $this->json(['isPinned' => $post->isPinned()]);
+    }
+
     #[Route('/posts/{id}', name: 'api_wall_posts_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
     public function delete(ShareWallPost $post, EntityManagerInterface $em): JsonResponse
