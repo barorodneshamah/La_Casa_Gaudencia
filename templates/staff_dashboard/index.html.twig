@@ -1432,7 +1432,8 @@ refreshBell();
             if (!data) return;
             const url = new URL(data.hubUrl);
             ['/topic/contact-messages', '/topic/reservations', '/topic/payments'].forEach(t => url.searchParams.append('topic', t));
-            const es = new EventSource(url.toString(), { headers: { Authorization: 'Bearer ' + data.token } });
+            url.searchParams.set('authorization', data.token);
+            const es = new EventSource(url.toString());
             es.onmessage = function (e) {
                 try {
                     const payload = JSON.parse(e.data);

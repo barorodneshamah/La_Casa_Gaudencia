@@ -27,6 +27,8 @@ RUN apt-get update && apt-get install -y \
         opcache \
     && pecl install apcu \
     && docker-php-ext-enable apcu opcache \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -47,6 +49,9 @@ COPY . .
 
 # Symfony requires .env to exist even in prod (actual values come from Railway env vars)
 RUN touch .env
+
+# Install WebSocket server dependencies
+RUN cd websocket-server && npm install --omit=dev
 
 # Install PHP dependencies
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install \

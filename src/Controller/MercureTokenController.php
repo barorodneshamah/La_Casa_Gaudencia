@@ -12,24 +12,21 @@ class MercureTokenController extends AbstractController
 {
     public function __construct(
         #[Autowire('%env(MERCURE_JWT_SECRET)%')]
-        private string $mercureSecret
+        private string $mercureSecret,
+        #[Autowire('%env(MERCURE_PUBLIC_URL)%')]
+        private string $mercurePublicUrl,
     ) {}
 
     #[Route('/api/mercure/token', name: 'api_mercure_token', methods: ['GET'])]
-    public function token(Request $request): JsonResponse
+    public function token(): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $subscriberToken = $this->buildJwt(['/topic/reservations', '/topic/payments', '/topic/contact-messages']);
 
-        // Derive Mercure hub URL from the same host the mobile is calling,
-        // but on port 3000 (where the Mercure Docker container runs)
-        $host   = $request->getHost();
-        $hubUrl = "http://{$host}:3000/.well-known/mercure";
-
         return $this->json([
             'token'  => $subscriberToken,
-            'hubUrl' => $hubUrl,
+            'hubUrl' => $this->mercurePublicUrl,
         ]);
     }
 
