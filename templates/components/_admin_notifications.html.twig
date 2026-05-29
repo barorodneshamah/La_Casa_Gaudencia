@@ -241,7 +241,7 @@
                     storedNotifs = [...toAdd, ...storedNotifs].slice(0, 20);
                     localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
                     if (!noBell) renderGlobalDropdown(storedNotifs);
-                    if (!noBell) updateGlobalBadge(storedNotifs.length);
+                    if (!noBell) updateGlobalBadge(storedNotifs.filter(n => n.unread).length);
                 }
             }
 
@@ -258,6 +258,7 @@
             // Mark all as read the moment the user opens the dropdown
             storedNotifs = storedNotifs.map(n => ({ ...n, unread: false }));
             localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
+            updateGlobalBadge(0);
             renderGlobalDropdown(storedNotifs);
             pollAdminNotifs().then(() => renderGlobalDropdown(storedNotifs));
         } else {
@@ -281,7 +282,8 @@
     });
 
     // Restore badge from previous session immediately (before first poll)
-    if (storedNotifs.length) updateGlobalBadge(storedNotifs.length);
+    const initialUnread = storedNotifs.filter(n => n.unread).length;
+    if (initialUnread) updateGlobalBadge(initialUnread);
 
     pollAdminNotifs();
     setInterval(pollAdminNotifs, 8000);

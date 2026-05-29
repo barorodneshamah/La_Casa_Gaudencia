@@ -300,10 +300,11 @@ class ServiceApiController extends AbstractController
     private function buildImagePath(?string $dbImage, string $type, string $base = ''): string
     {
         $defaults = [
-            'rooms' => '/images/room1.jpg',
-            'tours' => '/images/tour1.jpg',
-            'foods' => '/images/food1.jpg',
-            'spas'  => '/images/ground.jpeg',
+            'rooms'    => '/images/bedroom.jpg',
+            'tours'    => '/images/oslob.jpg',
+            'foods'    => '/images/food.jpg',
+            'spas'     => '/images/ground.jpeg',
+            'packages' => '/images/Hotel.jpg',
         ];
 
         if (!$dbImage || empty(trim($dbImage))) {

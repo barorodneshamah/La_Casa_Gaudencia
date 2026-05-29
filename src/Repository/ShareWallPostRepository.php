@@ -49,7 +49,6 @@ class ShareWallPostRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->where('p.status = :status')
-            ->andWhere('p.authorNameOverride IS NOT NULL')
             ->setParameter('status', 'published')
             ->orderBy('p.isPinned', 'DESC')
             ->addOrderBy('p.createdAt', 'DESC')
