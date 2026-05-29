@@ -50,11 +50,6 @@ services:
         tags:
             - { name: 'api_platform.state_processor', priority: 1 }
 
-    App\Service\WebSocketPublisher:
-        arguments:
-            $wsServerUrl: '%env(default::WS_SERVER_URL)%'
-
     App\Service\NotificationService:
         arguments:
             $firebaseCredentialsPath: '%kernel.project_dir%/config/firebase-credentials.json'
-            $firebaseCredentialsJson: '%env(default::FIREBASE_CREDENTIALS_JSON)%'

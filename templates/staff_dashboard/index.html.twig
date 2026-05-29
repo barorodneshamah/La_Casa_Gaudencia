@@ -1432,21 +1432,17 @@ refreshBell();
             if (!data) return;
             const url = new URL(data.hubUrl);
             ['/topic/contact-messages', '/topic/reservations', '/topic/payments'].forEach(t => url.searchParams.append('topic', t));
-            url.searchParams.set('authorization', data.token);
-            const es = new EventSource(url.toString());
+            const es = new EventSource(url.toString(), { headers: { Authorization: 'Bearer ' + data.token } });
             es.onmessage = function (e) {
                 try {
                     const payload = JSON.parse(e.data);
                     if (payload.event === 'new_inquiry') {
                         refreshBell();
                         showAdminToast('📩 New Inquiry', payload.fullName + ': ' + payload.subject, '/dashboard/messages');
-                        if (window.notifMarkSeen && payload.id) window.notifMarkSeen('message', payload.id);
-                    } else if (payload.reservationCode && payload.status === 'PENDING') {
+                    } else if (payload.reservationCode) {
                         showAdminToast('📋 New Reservation', 'Reservation #' + payload.reservationCode + ' — ' + payload.serviceType, '/dashboard/reservations');
-                        if (window.notifMarkSeen && payload.id) window.notifMarkSeen('reservation', payload.id);
                     } else if (payload.transactionRef && payload.status === 'PENDING') {
                         showAdminToast('💳 New Payment', 'Transaction: ' + payload.transactionRef + ' — ₱' + Number(payload.amount).toLocaleString(), '/payments/pending');
-                        if (window.notifMarkSeen && payload.id) window.notifMarkSeen('payment', payload.id);
                     }
                 } catch {}
             };

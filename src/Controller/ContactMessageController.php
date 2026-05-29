@@ -6,8 +6,6 @@ use App\Entity\ContactMessage;
 use App\Entity\ContactReply;
 use App\Form\ContactMessageType;
 use App\Repository\ContactMessageRepository;
-use App\Repository\PaymentRepository;
-use App\Repository\ReservationRepository;
 use App\Repository\UserRepository;
 use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ContactMessageController extends AbstractController
 {
@@ -84,7 +81,6 @@ class ContactMessageController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_STAFF')]
     #[Route('/dashboard/messages/{id}/reply', name: 'app_contact_message_reply', methods: ['POST'])]
     public function reply(
         ContactMessage $message,
@@ -111,12 +107,7 @@ class ContactMessageController extends AbstractController
         $message->setStatus('replied');
 
         $em->persist($reply);
-        try {
-            $em->flush();
-        } catch (\Throwable) {
-            $this->addFlash('error', 'Failed to save reply. Please try again.');
-            return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
-        }
+        $em->flush();
 
         // Push notification — send once per reply chain, collapse duplicates on device
         if ($message->getPushSentAt() === null) {
@@ -150,7 +141,7 @@ class ContactMessageController extends AbstractController
                 );
             $mailer->send($email);
             $this->addFlash('success', 'Reply sent and saved successfully.');
-        } catch (\Throwable) {
+        } catch (\Exception) {
             $this->addFlash('success', 'Reply saved to database. Note: email delivery failed — check your mailer configuration.');
         }
 
@@ -186,15 +177,9 @@ class ContactMessageController extends AbstractController
     }
 
     #[Route('/dashboard/api/unread-count', name: 'app_contact_unread_count', methods: ['GET'])]
-    public function unreadCount(
-        ContactMessageRepository $repo,
-        ReservationRepository $reservationRepo,
-        PaymentRepository $paymentRepo
-    ): JsonResponse {
-        $count = $repo->countUnread()
-            + $reservationRepo->count(['status' => 'PENDING'])
-            + $paymentRepo->count(['status' => 'PENDING']);
-        return new JsonResponse(['count' => $count]);
+    public function unreadCount(ContactMessageRepository $repo): JsonResponse
+    {
+        return new JsonResponse(['count' => $repo->countUnread()]);
     }
 
     #[Route('/dashboard/messages/{id}/delete', name: 'app_contact_message_delete', methods: ['POST'])]

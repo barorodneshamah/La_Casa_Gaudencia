@@ -7,7 +7,6 @@ use App\Repository\TourRepository;
 use App\Repository\RoomRepository;
 use App\Repository\FoodRepository;
 use App\Repository\PackageRepository;
-use App\Repository\ReservationRepository;
 use App\Repository\SpaRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\UserRepository;
@@ -31,7 +30,6 @@ final class AdminDashboardController extends AbstractController
         RoomRepository $roomRepository,
         FoodRepository $foodRepository,
         PackageRepository $packageRepository,
-        ReservationRepository $reservationRepository,
         SpaRepository $spaRepository,
         PaymentRepository $paymentRepository,
         UserRepository $userRepository,
@@ -110,10 +108,8 @@ final class AdminDashboardController extends AbstractController
         $totalSpas = $spaRepository->count([]);
         $totalRecords = $totalTours + $totalRooms + $totalFoods + $totalPackages + $totalSpas;
 
-        // Notification bell count: unread messages + pending reservations + pending payments
-        $unreadMessages = $contactMessageRepository->countUnread()
-            + $reservationRepository->count(['status' => 'PENDING'])
-            + $paymentRepository->count(['status' => 'PENDING']);
+        // Unread messages (for notification bell)
+        $unreadMessages = $contactMessageRepository->countUnread();
 
         // Recent Activities (last 10)
         $recentActivities = $activityLogRepository->findBy(

@@ -9,23 +9,15 @@ class NotificationService
 {
     private ?\Kreait\Firebase\Contract\Messaging $messaging = null;
 
-    public function __construct(string $firebaseCredentialsPath, string $firebaseCredentialsJson = '')
+    public function __construct(string $firebaseCredentialsPath)
     {
+        if (!file_exists($firebaseCredentialsPath)) {
+            return;
+        }
+
         try {
-            $factory = new Factory();
-
-            if ($firebaseCredentialsJson !== '') {
-                $decoded = json_decode($firebaseCredentialsJson, true);
-                if (is_array($decoded)) {
-                    $factory = $factory->withServiceAccount($decoded);
-                }
-            } elseif (file_exists($firebaseCredentialsPath)) {
-                $factory = $factory->withServiceAccount($firebaseCredentialsPath);
-            } else {
-                return;
-            }
-
-            $this->messaging = $factory->createMessaging();
+            $firebase = (new Factory)->withServiceAccount($firebaseCredentialsPath);
+            $this->messaging = $firebase->createMessaging();
         } catch (\Throwable) {
         }
     }

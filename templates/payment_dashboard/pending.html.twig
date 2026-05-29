@@ -1979,8 +1979,7 @@ document.addEventListener('keydown', function(e) {
             if (!data) return;
             const url = new URL(data.hubUrl);
             url.searchParams.append('topic', '/topic/payments');
-            url.searchParams.set('authorization', data.token);
-            const es = new EventSource(url.toString());
+            const es = new EventSource(url.toString(), { headers: { Authorization: 'Bearer ' + data.token } });
             es.onmessage = function (e) {
                 try {
                     const payment = JSON.parse(e.data);
