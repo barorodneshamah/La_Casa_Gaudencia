@@ -15,9 +15,9 @@ class WebSocketPublisher
 {
     private string $broadcastUrl;
 
-    public function __construct(string $wsServerUrl = 'http://127.0.0.1:9090')
+    public function __construct(string $wsServerUrl = '')
     {
-        $this->broadcastUrl = rtrim($wsServerUrl, '/') . '/broadcast';
+        $this->broadcastUrl = $wsServerUrl !== '' ? rtrim($wsServerUrl, '/') . '/broadcast' : '';
     }
 
     /**
@@ -66,6 +66,10 @@ class WebSocketPublisher
 
     private function httpPost(array $payload): void
     {
+        if ($this->broadcastUrl === '') {
+            return;
+        }
+
         $ch = curl_init($this->broadcastUrl);
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,

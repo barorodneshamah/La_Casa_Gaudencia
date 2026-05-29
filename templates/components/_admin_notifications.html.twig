@@ -218,6 +218,16 @@
         });
     }
 
+    // Badge count = same absolute total as dashboard bells (unread msgs + pending reservations + payments)
+    async function refreshGlobalBadge() {
+        try {
+            const res = await fetch('/dashboard/api/unread-count', { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!noBell) updateGlobalBadge(data.count || 0);
+        } catch(e) {}
+    }
+
     async function pollAdminNotifs() {
         try {
             const res = await fetch(`/admin/notifications/pending?since=${lastChecked}`, { credentials: 'same-origin' });
@@ -241,7 +251,6 @@
                     storedNotifs = [...toAdd, ...storedNotifs].slice(0, 20);
                     localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
                     if (!noBell) renderGlobalDropdown(storedNotifs);
-                    if (!noBell) updateGlobalBadge(storedNotifs.filter(n => n.unread).length);
                 }
             }
 
@@ -281,11 +290,16 @@
         if (drop && !inside) drop.style.display = 'none';
     });
 
-    // Restore badge from previous session immediately (before first poll)
-    const initialUnread = storedNotifs.filter(n => n.unread).length;
-    if (initialUnread) updateGlobalBadge(initialUnread);
+    // Allow external code (e.g. Mercure handlers) to pre-mark an item as seen
+    // so pollAdminNotifs() won't fire a duplicate toast for the same event.
+    window.notifMarkSeen = function(type, id) {
+        seenIds.add(type + ':' + String(id));
+        saveSeen();
+    };
 
+    refreshGlobalBadge();
     pollAdminNotifs();
+    setInterval(refreshGlobalBadge, 30000);
     setInterval(pollAdminNotifs, 8000);
 })();
 </script>

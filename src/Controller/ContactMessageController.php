@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ContactMessageController extends AbstractController
 {
@@ -83,6 +84,7 @@ class ContactMessageController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_STAFF')]
     #[Route('/dashboard/messages/{id}/reply', name: 'app_contact_message_reply', methods: ['POST'])]
     public function reply(
         ContactMessage $message,
@@ -109,7 +111,12 @@ class ContactMessageController extends AbstractController
         $message->setStatus('replied');
 
         $em->persist($reply);
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (\Throwable) {
+            $this->addFlash('error', 'Failed to save reply. Please try again.');
+            return $this->redirectToRoute('app_contact_message_show', ['id' => $message->getId()]);
+        }
 
         // Push notification — send once per reply chain, collapse duplicates on device
         if ($message->getPushSentAt() === null) {
