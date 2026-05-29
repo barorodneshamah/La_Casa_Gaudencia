@@ -49,7 +49,7 @@ fi
 
 # Sync database schema (idempotent — safe to run on every restart)
 echo "==> Syncing database schema..."
-php bin/console doctrine:schema:update --force --no-interaction
+php bin/console doctrine:schema:update --force --no-interaction || echo "WARNING: schema:update failed — app will start but some pages may error until DB is in sync"
 
 # Seed default admin/staff accounts (idempotent — re-hashes password on every start)
 echo "==> Seeding admin accounts..."
