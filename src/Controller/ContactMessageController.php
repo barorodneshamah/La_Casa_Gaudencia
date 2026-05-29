@@ -150,7 +150,7 @@ class ContactMessageController extends AbstractController
                 );
             $mailer->send($email);
             $this->addFlash('success', 'Reply sent and saved successfully.');
-        } catch (\Exception) {
+        } catch (\Throwable) {
             $this->addFlash('success', 'Reply saved to database. Note: email delivery failed — check your mailer configuration.');
         }
 

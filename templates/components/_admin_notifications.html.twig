@@ -168,6 +168,8 @@
     }
 
     function showNotifToast(msg, detail, url, type) {
+        const container = document.getElementById('notifGlobalToastContainer');
+        if (!container) return;
         const { icon, color } = getMeta(type);
         const t = document.createElement('div');
         t.style.cssText = `background:white;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.18);
@@ -177,7 +179,7 @@
             <div><div style="font-weight:700;font-size:14px;color:#222;">${msg}</div>
             <div style="font-size:12px;color:#777;margin-top:3px;">${detail}</div></div>`;
         t.onclick = () => { window.location.href = url; };
-        document.getElementById('notifGlobalToastContainer').prepend(t);
+        container.prepend(t);
         setTimeout(() => { t.style.opacity = '0'; }, 5000);
         setTimeout(() => t.remove(), 5500);
     }
@@ -233,29 +235,33 @@
             const res = await fetch(`/admin/notifications/pending?since=${lastChecked}`, { credentials: 'same-origin' });
             if (!res.ok) return;
             const data = await res.json();
-
-            // Filter to only notifications not yet shown as toasts
-            const fresh = (data.notifications || []).filter(n => !seenIds.has(n.type + ':' + n.id));
-
-            if (fresh.length > 0) {
-                fresh.forEach(n => showNotifToast(n.message, n.detail, n.url, n.type));
-                fresh.forEach(n => seenIds.add(n.type + ':' + n.id));
-                saveSeen();
-
-                // Merge into dropdown list without duplicates, flagged as unread
-                const existingKeys = new Set(storedNotifs.map(n => n.type + ':' + n.id));
-                const toAdd = fresh
-                    .filter(n => !existingKeys.has(n.type + ':' + n.id))
-                    .map(n => ({ ...n, unread: true }));
-                if (toAdd.length) {
-                    storedNotifs = [...toAdd, ...storedNotifs].slice(0, 20);
-                    localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
-                    if (!noBell) renderGlobalDropdown(storedNotifs);
-                }
-            }
+            if (!data || !Array.isArray(data.notifications)) return;
 
             lastChecked = data.checkedAt;
             localStorage.setItem(LS_KEY_TS, String(lastChecked));
+
+            // Filter to only notifications not yet shown as toasts
+            const fresh = data.notifications.filter(n => !seenIds.has(n.type + ':' + n.id));
+
+            if (fresh.length === 0) return;
+
+            // Mark as seen first — even if toast render fails, won't retry the same items
+            fresh.forEach(n => seenIds.add(n.type + ':' + n.id));
+            saveSeen();
+
+            // Show toasts
+            fresh.forEach(n => showNotifToast(n.message, n.detail, n.url, n.type));
+
+            // Merge into dropdown list without duplicates, flagged as unread
+            const existingKeys = new Set(storedNotifs.map(n => n.type + ':' + n.id));
+            const toAdd = fresh
+                .filter(n => !existingKeys.has(n.type + ':' + n.id))
+                .map(n => ({ ...n, unread: true }));
+            if (toAdd.length) {
+                storedNotifs = [...toAdd, ...storedNotifs].slice(0, 20);
+                localStorage.setItem(LS_KEY_LIST, JSON.stringify(storedNotifs));
+                if (!noBell) renderGlobalDropdown(storedNotifs);
+            }
         } catch(e) {}
     }
 
