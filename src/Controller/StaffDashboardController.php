@@ -7,6 +7,7 @@ use App\Repository\TourRepository;
 use App\Repository\RoomRepository;
 use App\Repository\FoodRepository;
 use App\Repository\PackageRepository;
+use App\Repository\ReservationRepository;
 use App\Repository\SpaRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\ContactMessageRepository;
@@ -28,6 +29,7 @@ final class StaffDashboardController extends AbstractController
         RoomRepository $roomRepository,
         FoodRepository $foodRepository,
         PackageRepository $packageRepository,
+        ReservationRepository $reservationRepository,
         SpaRepository $spaRepository,
         PaymentRepository $paymentRepository,
         ContactMessageRepository $contactMessageRepository
@@ -80,7 +82,9 @@ final class StaffDashboardController extends AbstractController
             'today_sales' => $todaySales,
             'monthly_sales' => $monthlySales,
             'total_transactions' => $totalTransactions,
-            'unread_messages' => $contactMessageRepository->countUnread(),
+            'unread_messages' => $contactMessageRepository->countUnread()
+                + $reservationRepository->count(['status' => 'PENDING'])
+                + $paymentRepository->count(['status' => 'PENDING']),
         ]);
     }
 

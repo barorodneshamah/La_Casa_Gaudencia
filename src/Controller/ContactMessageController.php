@@ -6,6 +6,8 @@ use App\Entity\ContactMessage;
 use App\Entity\ContactReply;
 use App\Form\ContactMessageType;
 use App\Repository\ContactMessageRepository;
+use App\Repository\PaymentRepository;
+use App\Repository\ReservationRepository;
 use App\Repository\UserRepository;
 use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -177,9 +179,15 @@ class ContactMessageController extends AbstractController
     }
 
     #[Route('/dashboard/api/unread-count', name: 'app_contact_unread_count', methods: ['GET'])]
-    public function unreadCount(ContactMessageRepository $repo): JsonResponse
-    {
-        return new JsonResponse(['count' => $repo->countUnread()]);
+    public function unreadCount(
+        ContactMessageRepository $repo,
+        ReservationRepository $reservationRepo,
+        PaymentRepository $paymentRepo
+    ): JsonResponse {
+        $count = $repo->countUnread()
+            + $reservationRepo->count(['status' => 'PENDING'])
+            + $paymentRepo->count(['status' => 'PENDING']);
+        return new JsonResponse(['count' => $count]);
     }
 
     #[Route('/dashboard/messages/{id}/delete', name: 'app_contact_message_delete', methods: ['POST'])]
