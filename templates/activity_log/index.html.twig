@@ -1315,7 +1315,12 @@
                 </thead>
                 <tbody>
                 {% for log in logs %}
-                    <tr data-log-id="{{ log.id }}">
+                    <tr
+                        data-log-id="{{ log.id }}"
+                        {% if log.username == 'Anonymous' and log.userRole == 'GUEST' and log.action == 'UPDATE' and log.entityType == 'User' %}
+                            data-audit-noise="anonymous-user-update"
+                        {% endif %}
+                    >
                         <!-- DATE/TIME -->
                         <td>
                             <div class="datetime-cell">
@@ -1551,6 +1556,10 @@ $(document).ready(function() {
             });
         }
     });
+
+    window._activityDT.rows(function (_index, _data, node) {
+        return node?.dataset.auditNoise === 'anonymous-user-update';
+    }).remove().draw(false);
 });
 </script>
 
@@ -1574,6 +1583,7 @@ $(document).ready(function() {
     function injectLogRow(log) {
         const dt = window._activityDT;
         if (!dt) return;
+        if (isAnonymousUserUpdateNoise(log)) return;
         if (document.querySelector(`tr[data-log-id="${log.id}"]`)) return;
 
         const isOrder = log.action === 'CREATE' && log.entityType === 'Reservation';
@@ -1618,6 +1628,13 @@ $(document).ready(function() {
             const el = document.querySelector(`tr[data-log-id="${log.id}"]`);
             if (el) el.style.cssText = '';
         }, 3000);
+    }
+
+    function isAnonymousUserUpdateNoise(log) {
+        return log.username === 'Anonymous'
+            && log.userRole === 'GUEST'
+            && log.action === 'UPDATE'
+            && log.entityType === 'User';
     }
 })();
 </script>
