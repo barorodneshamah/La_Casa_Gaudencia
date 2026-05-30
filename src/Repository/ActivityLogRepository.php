@@ -19,14 +19,22 @@ class ActivityLogRepository extends ServiceEntityRepository
             ->leftJoin('al.user', 'u')
             ->orderBy('al.createdAt', 'DESC');
 
-        // Filter by action
+        // ORDER is a virtual action: CREATE + entityType=Reservation (customer bookings)
         if (!empty($filters['action'])) {
-            $qb->andWhere('al.action = :action')
-               ->setParameter('action', $filters['action']);
+            if ($filters['action'] === ActivityLog::ACTION_ORDER) {
+                $qb->andWhere('al.action = :action AND al.entityType = :orderEntity')
+                   ->setParameter('action', ActivityLog::ACTION_CREATE)
+                   ->setParameter('orderEntity', ActivityLog::ENTITY_RESERVATION);
+            } else {
+                $qb->andWhere('al.action = :action')
+                   ->setParameter('action', $filters['action']);
+            }
         }
 
-        // Filter by entity type
-        if (!empty($filters['entityType'])) {
+        // Filter by entity type (only when not already set by ORDER virtual filter)
+        if (!empty($filters['entityType']) && empty($filters['action']) || (
+            !empty($filters['entityType']) && ($filters['action'] ?? '') !== ActivityLog::ACTION_ORDER
+        )) {
             $qb->andWhere('al.entityType = :entityType')
                ->setParameter('entityType', $filters['entityType']);
         }
@@ -61,17 +69,36 @@ class ActivityLogRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function countCustomerOrders(): int
+    {
+        return (int) $this->createQueryBuilder('al')
+            ->select('COUNT(al.id)')
+            ->andWhere('al.action = :action AND al.entityType = :entity')
+            ->setParameter('action', ActivityLog::ACTION_CREATE)
+            ->setParameter('entity', ActivityLog::ENTITY_RESERVATION)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function countByFilters(array $filters = []): int
     {
         $qb = $this->createQueryBuilder('al')
             ->select('COUNT(al.id)');
 
         if (!empty($filters['action'])) {
-            $qb->andWhere('al.action = :action')
-               ->setParameter('action', $filters['action']);
+            if ($filters['action'] === ActivityLog::ACTION_ORDER) {
+                $qb->andWhere('al.action = :action AND al.entityType = :orderEntity')
+                   ->setParameter('action', ActivityLog::ACTION_CREATE)
+                   ->setParameter('orderEntity', ActivityLog::ENTITY_RESERVATION);
+            } else {
+                $qb->andWhere('al.action = :action')
+                   ->setParameter('action', $filters['action']);
+            }
         }
 
-        if (!empty($filters['entityType'])) {
+        if (!empty($filters['entityType']) && empty($filters['action']) || (
+            !empty($filters['entityType']) && ($filters['action'] ?? '') !== ActivityLog::ACTION_ORDER
+        )) {
             $qb->andWhere('al.entityType = :entityType')
                ->setParameter('entityType', $filters['entityType']);
         }

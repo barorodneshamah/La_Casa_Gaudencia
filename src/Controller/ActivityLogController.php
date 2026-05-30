@@ -34,17 +34,19 @@ class ActivityLogController extends AbstractController
         $totalPages = ceil($total / $limit);
 
         // Get statistics
-        $actionStats = $repository->getStatsByAction();
-        $entityStats = $repository->getStatsByEntityType();
+        $actionStats   = $repository->getStatsByAction();
+        $entityStats   = $repository->getStatsByEntityType();
+        $orderCount    = $repository->countCustomerOrders();
 
         return $this->render('activity_log/index.html.twig', [
-            'logs' => $logs,
-            'form' => $form->createView(),
+            'logs'        => $logs,
+            'form'        => $form->createView(),
             'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'total' => $total,
+            'totalPages'  => $totalPages,
+            'total'       => $total,
             'actionStats' => $actionStats,
             'entityStats' => $entityStats,
+            'orderCount'  => $orderCount,
         ]);
     }
 

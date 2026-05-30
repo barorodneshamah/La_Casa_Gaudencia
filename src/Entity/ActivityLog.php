@@ -28,12 +28,17 @@ class ActivityLog
     public const ACTION_CREATE = 'CREATE';
     public const ACTION_UPDATE = 'UPDATE';
     public const ACTION_DELETE = 'DELETE';
+    public const ACTION_ORDER  = 'ORDER';
 
     // Entity Type Constants
-    public const ENTITY_USER = 'User';
-    public const ENTITY_ROOM = 'Room';
-    public const ENTITY_TOUR = 'Tour';
-    public const ENTITY_FOOD = 'Food';
+    public const ENTITY_USER        = 'User';
+    public const ENTITY_ROOM        = 'Room';
+    public const ENTITY_TOUR        = 'Tour';
+    public const ENTITY_FOOD        = 'Food';
+    public const ENTITY_PACKAGE     = 'Package';
+    public const ENTITY_SPA         = 'Spa';
+    public const ENTITY_RESERVATION = 'Reservation';
+    public const ENTITY_PAYMENT     = 'Payment';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -267,7 +272,14 @@ class ActivityLog
             self::ACTION_CREATE => 'primary',
             self::ACTION_UPDATE => 'warning',
             self::ACTION_DELETE => 'danger',
+            self::ACTION_ORDER  => 'order',
             default             => 'info',
         };
+    }
+
+    public function isCustomerOrder(): bool
+    {
+        return $this->entityType === self::ENTITY_RESERVATION
+            && $this->action === self::ACTION_CREATE;
     }
 }

@@ -27,15 +27,28 @@ class PaymentMercureSubscriber
     private function publish(Payment $payment): void
     {
         try {
+            $reservation = $payment->getReservation();
+            $guest       = $reservation?->getGuest();
             $this->hub->publish(new Update(
                 '/topic/payments',
                 json_encode([
-                    'id'                 => $payment->getId(),
-                    'transactionRef'     => $payment->getTransactionReference(),
-                    'status'             => $payment->getStatus(),
-                    'amount'             => $payment->getAmount(),
-                    'paymentMethod'      => $payment->getPaymentMethod(),
-                    'reservationId'      => $payment->getReservation()?->getId(),
+                    'id'                => $payment->getId(),
+                    'transactionRef'    => $payment->getTransactionReference(),
+                    'status'            => $payment->getStatus(),
+                    'amount'            => $payment->getAmount(),
+                    'paymentMethod'     => $payment->getPaymentMethod(),
+                    'referenceNumber'   => $payment->getReferenceNumber(),
+                    'guestNotes'        => $payment->getGuestNotes(),
+                    'proofUrl'          => $payment->getProofOfPayment(),
+                    'reservationId'     => $reservation?->getId(),
+                    'reservationCode'   => $reservation?->getReservationCode(),
+                    'serviceType'       => $reservation?->getServiceType(),
+                    'guestEmail'        => $guest?->getEmail(),
+                    'guestName'         => $guest?->getFullName() ?? $guest?->getUsername(),
+                    'createdAt'         => $payment->getCreatedAt()?->format('M d, Y h:i A'),
+                    'hoursAgo'          => $payment->getCreatedAt()
+                        ? (int) round((time() - $payment->getCreatedAt()->getTimestamp()) / 3600)
+                        : 0,
                 ])
             ));
         } catch (\Throwable) {

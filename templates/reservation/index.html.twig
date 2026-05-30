@@ -1090,7 +1090,7 @@ table.dataTable tbody td {
                 </thead>
                 <tbody>
                 {% for reservation in reservations %}
-                    <tr>
+                    <tr data-res-id="{{ reservation.id ?? reservation['id'] ?? '' }}">
                         <!-- RESERVATION CODE -->
                         <td>
                             <div class="reservation-code">
@@ -1232,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 $(document).ready(function() {
-    $('#reservationTable').DataTable({
+    window._reservationDT = $('#reservationTable').DataTable({
         columnDefs: [
             { "defaultContent": "-", "targets": "_all" },
             { "orderable": false, "targets": [6] }
@@ -1275,38 +1275,129 @@ $(document).ready(function() {
     es.onmessage = function (event) {
         try {
             const data = JSON.parse(event.data);
+            if (data.status === 'PENDING') {
+                injectReservationRow(data);
+            } else {
+                updateReservationRow(data);
+            }
             showRealtimeToast(data);
-            // Give the user 3 seconds to read the toast, then refresh the list
-            setTimeout(function () { location.reload(); }, 3000);
         } catch (e) { /* ignore malformed payloads */ }
     };
 
-    es.onerror = function () {
-        // Mercure hub unreachable — silently disable real-time
-        es.close();
-    };
+    es.onerror = function () { es.close(); };
+
+    function injectReservationRow(data) {
+        const dt = window._reservationDT;
+        if (!dt) return;
+
+        // Skip if row already exists
+        if (document.querySelector(`tr[data-res-id="${data.id}"]`)) return;
+
+        const typeBadges = [
+            data.hasRoom    ? '<span class="type-badge room"><i class="fas fa-bed"></i> Room</span>'       : '',
+            data.hasTour    ? '<span class="type-badge tour"><i class="fas fa-map"></i> Tour</span>'       : '',
+            data.hasPackage ? '<span class="type-badge package"><i class="fas fa-gift"></i> Package</span>' : '',
+            data.hasSpa     ? '<span class="type-badge spa"><i class="fas fa-spa"></i> Spa</span>'         : '',
+            data.hasFood    ? '<span class="type-badge food"><i class="fas fa-utensils"></i> Food</span>'  : '',
+        ].join('');
+
+        const statusLower = (data.status || 'pending').toLowerCase();
+        const statusIcon  = statusLower === 'pending' ? 'clock' : statusLower === 'confirmed' ? 'check-circle' : statusLower === 'cancelled' ? 'times-circle' : 'flag-checkered';
+        const payLower    = (data.paymentStatus || 'unpaid').toLowerCase();
+
+        const html = `
+            <td>
+                <div class="reservation-code">
+                    <div class="reservation-icon"><i class="fas fa-ticket-alt"></i></div>
+                    <div class="reservation-info">
+                        <div class="code">${data.reservationCode || 'N/A'}</div>
+                        <div class="date">${data.createdAt || ''}</div>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="guest-cell">
+                    <span class="email">${data.guestEmail || 'N/A'}</span>
+                    ${data.contactPhone ? `<span class="phone"><i class="fas fa-phone"></i> ${data.contactPhone}</span>` : ''}
+                </div>
+            </td>
+            <td><div class="type-badges">${typeBadges || '<span style="color:#999">—</span>'}</div></td>
+            <td><div class="price-cell">₱${Number(data.totalAmount || 0).toLocaleString('en-PH', {minimumFractionDigits:2})}</div></td>
+            <td>
+                ${payLower === 'paid'
+                    ? '<span class="payment-badge paid"><i class="fas fa-check-circle"></i> PAID</span>'
+                    : '<span class="payment-badge unpaid"><i class="fas fa-times-circle"></i> UNPAID</span>'}
+            </td>
+            <td>
+                <span class="status-badge ${statusLower}">
+                    <i class="fas fa-${statusIcon}"></i> ${(data.status || 'PENDING').toUpperCase()}
+                </span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <a href="/reservation/show/${data.id}" class="btn-action btn-view" data-tooltip="View Details">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </div>
+            </td>`;
+
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-res-id', data.id);
+        tr.style.cssText = 'background:#f0fff4;animation:highlightFade 3s ease forwards;';
+        tr.innerHTML = html;
+        dt.row.add(tr).draw(false);
+
+        // Highlight new row
+        if (!document.getElementById('_resFadeStyle')) {
+            const s = document.createElement('style');
+            s.id = '_resFadeStyle';
+            s.textContent = '@keyframes highlightFade{0%{background:#d4edda}100%{background:transparent}}';
+            document.head.appendChild(s);
+        }
+    }
+
+    function updateReservationRow(data) {
+        const existing = document.querySelector(`tr[data-res-id="${data.id}"]`);
+        if (!existing) return;
+
+        const statusLower = (data.status || '').toLowerCase();
+        const statusIcon  = statusLower === 'pending' ? 'clock' : statusLower === 'confirmed' ? 'check-circle' : statusLower === 'cancelled' ? 'times-circle' : 'flag-checkered';
+        const payLower    = (data.paymentStatus || '').toLowerCase();
+
+        const statusBadge = existing.querySelector('.status-badge');
+        if (statusBadge) {
+            statusBadge.className = `status-badge ${statusLower}`;
+            statusBadge.innerHTML = `<i class="fas fa-${statusIcon}"></i> ${(data.status || '').toUpperCase()}`;
+        }
+        const payBadge = existing.querySelector('.payment-badge');
+        if (payBadge) {
+            payBadge.className = `payment-badge ${payLower}`;
+            payBadge.innerHTML = payLower === 'paid'
+                ? '<i class="fas fa-check-circle"></i> PAID'
+                : '<i class="fas fa-times-circle"></i> UNPAID';
+        }
+        existing.style.cssText = 'background:#fff9e6;transition:background 2s ease;';
+        setTimeout(() => { existing.style.cssText = ''; }, 2000);
+    }
 
     function showRealtimeToast(data) {
-        const action = data.status === 'PENDING' ? 'New booking' : 'Booking updated';
+        const isNew  = data.status === 'PENDING';
+        const action = isNew ? '🛎 New Booking' : '🔄 Booking Updated';
         const code   = data.reservationCode ? ' #' + data.reservationCode : '';
-        const msg    = action + code + ' — status: ' + (data.status || '?');
+        const msg    = action + code + ' — ' + (data.status || '');
 
         const toast = document.createElement('div');
-        toast.style.cssText = [
-            'position:fixed', 'top:20px', 'right:20px', 'z-index:9999',
-            'background:#2e7d32', 'color:#fff', 'padding:14px 20px',
-            'border-radius:10px', 'font-family:Roboto,sans-serif',
-            'font-size:14px', 'box-shadow:0 4px 20px rgba(0,0,0,0.2)',
-            'max-width:320px', 'line-height:1.4',
-            'animation:slideIn .3s ease'
-        ].join(';');
-        toast.textContent = '🔔 ' + msg;
+        toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:#2e7d32;color:#fff;padding:14px 20px;border-radius:10px;font-family:Roboto,sans-serif;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,0.2);max-width:320px;line-height:1.4;animation:slideIn .3s ease;';
+        toast.textContent = msg;
 
-        const style = document.createElement('style');
-        style.textContent = '@keyframes slideIn{from{transform:translateX(110%)}to{transform:translateX(0)}}';
-        document.head.appendChild(style);
+        if (!document.getElementById('_resToastStyle')) {
+            const s = document.createElement('style');
+            s.id = '_resToastStyle';
+            s.textContent = '@keyframes slideIn{from{transform:translateX(110%)}to{transform:translateX(0)}}';
+            document.head.appendChild(s);
+        }
         document.body.appendChild(toast);
-        setTimeout(function () { toast.remove(); }, 3500);
+        setTimeout(() => toast.remove(), 4000);
     }
 })();
 </script>

@@ -844,6 +844,37 @@
         color: #c62828;
     }
 
+    .action-badge.order {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #7b1fa2;
+    }
+
+    .source-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 6px;
+        vertical-align: middle;
+    }
+
+    .source-pill.mobile {
+        background: rgba(123,31,162,0.1);
+        color: #7b1fa2;
+    }
+
+    .source-pill.web {
+        background: rgba(21,101,192,0.1);
+        color: #1565c0;
+    }
+
+    .stat-card.order {
+        border-left: 4px solid #7b1fa2;
+    }
+
     .role-badge {
         display: inline-block;
         padding: 5px 10px;
@@ -1179,6 +1210,11 @@
             <div class="stat-number">{{ total }}</div>
             <div class="stat-label">Total Logs</div>
         </div>
+        <div class="stat-card order">
+            <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+            <div class="stat-number">{{ orderCount }}</div>
+            <div class="stat-label">Customer Orders</div>
+        </div>
         {% for stat in actionStats %}
             <div class="stat-card {{ stat.action|lower }}">
                 <div class="stat-icon">
@@ -1308,21 +1344,30 @@
 
                         <!-- ACTION -->
                         <td>
-                            {% set actionClass = log.action|lower %}
-                            <span class="action-badge {{ actionClass }}">
-                                {% if log.action == 'LOGIN' %}
-                                    <i class="fas fa-sign-in-alt"></i>
-                                {% elseif log.action == 'LOGOUT' %}
-                                    <i class="fas fa-sign-out-alt"></i>
-                                {% elseif log.action == 'CREATE' %}
-                                    <i class="fas fa-plus"></i>
-                                {% elseif log.action == 'UPDATE' %}
-                                    <i class="fas fa-edit"></i>
-                                {% elseif log.action == 'DELETE' %}
-                                    <i class="fas fa-trash"></i>
-                                {% endif %}
-                                {{ log.action }}
-                            </span>
+                            {% if log.action == 'CREATE' and log.entityType == 'Reservation' %}
+                                <span class="action-badge order">
+                                    <i class="fas fa-shopping-bag"></i> ORDER
+                                </span>
+                            {% else %}
+                                {% set actionClass = log.action|lower %}
+                                <span class="action-badge {{ actionClass }}">
+                                    {% if log.action == 'LOGIN' %}
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    {% elseif log.action == 'LOGOUT' %}
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    {% elseif log.action == 'CREATE' %}
+                                        <i class="fas fa-plus"></i>
+                                    {% elseif log.action == 'UPDATE' %}
+                                        <i class="fas fa-edit"></i>
+                                    {% elseif log.action == 'DELETE' %}
+                                        <i class="fas fa-trash"></i>
+                                    {% endif %}
+                                    {{ log.action }}
+                                </span>
+                            {% endif %}
+                            {% if log.source == 'mobile' %}
+                                <span class="source-pill mobile"><i class="fas fa-mobile-alt"></i> App</span>
+                            {% endif %}
                         </td>
 
                         <!-- ENTITY -->

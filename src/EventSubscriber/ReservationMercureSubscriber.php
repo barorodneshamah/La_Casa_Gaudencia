@@ -27,6 +27,7 @@ class ReservationMercureSubscriber
     private function publish(Reservation $reservation): void
     {
         try {
+            $guest = $reservation->getGuest();
             $this->hub->publish(new Update(
                 '/topic/reservations',
                 json_encode([
@@ -36,6 +37,14 @@ class ReservationMercureSubscriber
                     'paymentStatus'   => $reservation->getPaymentStatus(),
                     'serviceType'     => $reservation->getServiceType(),
                     'totalAmount'     => $reservation->getTotalAmount(),
+                    'guestEmail'      => $guest?->getEmail(),
+                    'contactPhone'    => $reservation->getContactPhone(),
+                    'createdAt'       => $reservation->getCreatedAt()?->format('M d, Y'),
+                    'hasRoom'         => $reservation->getRoom() !== null,
+                    'hasTour'         => $reservation->getTour() !== null,
+                    'hasPackage'      => $reservation->getPackage() !== null,
+                    'hasSpa'          => $reservation->getSpa() !== null,
+                    'hasFood'         => $reservation->getFoodItems() !== null && !$reservation->getFoodItems()->isEmpty(),
                 ])
             ));
         } catch (\Throwable) {

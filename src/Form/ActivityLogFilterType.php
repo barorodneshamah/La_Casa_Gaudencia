@@ -22,7 +22,8 @@ class ActivityLogFilterType extends AbstractType
                 'required' => false,
                 'placeholder' => 'All Actions',
                 'choices' => [
-                    'Login' => ActivityLog::ACTION_LOGIN,
+                    'Customer Order' => ActivityLog::ACTION_ORDER,
+                    'Login'  => ActivityLog::ACTION_LOGIN,
                     'Logout' => ActivityLog::ACTION_LOGOUT,
                     'Create' => ActivityLog::ACTION_CREATE,
                     'Update' => ActivityLog::ACTION_UPDATE,
@@ -35,13 +36,14 @@ class ActivityLogFilterType extends AbstractType
                 'required' => false,
                 'placeholder' => 'All Entities',
                 'choices' => [
-                    'User' => ActivityLog::ENTITY_USER,
-                    'Room' => ActivityLog::ENTITY_ROOM,
-                    'Tour' => ActivityLog::ENTITY_TOUR,
-                    'Food' => ActivityLog::ENTITY_FOOD,
-                    //'Package' => ActivityLog::ENTITY_PACKAGE,
-                    //'Custom Itinerary' => ActivityLog::ENTITY_ITINERARY,
-                   // 'Booking' => ActivityLog::ENTITY_BOOKING,
+                    'Reservation (Orders)' => ActivityLog::ENTITY_RESERVATION,
+                    'Payment'  => ActivityLog::ENTITY_PAYMENT,
+                    'User'     => ActivityLog::ENTITY_USER,
+                    'Room'     => ActivityLog::ENTITY_ROOM,
+                    'Tour'     => ActivityLog::ENTITY_TOUR,
+                    'Package'  => ActivityLog::ENTITY_PACKAGE,
+                    'Spa'      => ActivityLog::ENTITY_SPA,
+                    'Food'     => ActivityLog::ENTITY_FOOD,
                 ],
                 'attr' => ['class' => 'form-select']
             ])

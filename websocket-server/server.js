@@ -12,7 +12,9 @@
 const WebSocket = require('ws');
 const http      = require('http');
 
-const WS_PORT = 9090;
+// Railway (and other cloud hosts) inject the port via PORT env var.
+// Fall back to 9090 for local development.
+const WS_PORT = parseInt(process.env.PORT || '9090', 10);
 
 // userId / username / email (string) → Set<WebSocket>
 // One user may have several open sockets and several identity aliases.

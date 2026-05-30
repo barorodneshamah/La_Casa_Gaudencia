@@ -17,7 +17,10 @@ class WebSocketPublisher
 
     public function __construct(string $wsServerUrl = 'http://127.0.0.1:9090')
     {
-        $this->broadcastUrl = rtrim($wsServerUrl, '/') . '/broadcast';
+        // WS_SERVER_URL env var lets Railway point this to the deployed WS service.
+        // e.g. WS_SERVER_URL=https://your-ws-service.railway.app
+        $resolved = $_ENV['WS_SERVER_URL'] ?? getenv('WS_SERVER_URL') ?: $wsServerUrl;
+        $this->broadcastUrl = rtrim($resolved, '/') . '/broadcast';
     }
 
     /**

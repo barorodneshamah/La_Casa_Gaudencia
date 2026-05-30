@@ -1973,35 +1973,86 @@ document.addEventListener('keydown', function(e) {
 
 // Real-time payment notifications via Mercure
 (function () {
-    fetch('/api/mercure/token')
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-            if (!data) return;
-            const url = new URL(data.hubUrl);
-            url.searchParams.append('topic', '/topic/payments');
-            const es = new EventSource(url.toString(), { headers: { Authorization: 'Bearer ' + data.token } });
-            es.onmessage = function (e) {
-                try {
-                    const payment = JSON.parse(e.data);
-                    if (payment.status === 'PENDING') {
-                        showPaymentToast(payment);
-                    }
-                } catch {}
-            };
-        })
-        .catch(() => {});
+    const hubUrl = new URL('{{ mercure('/topic/payments')|e('js') }}');
+    const es = new EventSource(hubUrl);
 
-    function showPaymentToast(payment) {
+    es.onmessage = function (e) {
+        try {
+            const p = JSON.parse(e.data);
+            if (p.status === 'PENDING') {
+                injectPaymentCard(p);
+            }
+            showPaymentToast(p);
+        } catch {}
+    };
+    es.onerror = function () { es.close(); };
+
+    function injectPaymentCard(p) {
+        const container = document.getElementById('paymentsList');
+        if (!container) return;
+        if (document.querySelector(`[data-payment-id="${p.id}"]`)) return;
+
+        const methodIcons = { GCASH:'fa-mobile-alt', MAYA:'fa-wallet', BANK_TRANSFER:'fa-university', CREDIT_CARD:'fa-credit-card', CASH:'fa-money-bill-wave' };
+        const icon = methodIcons[p.paymentMethod] || 'fa-money-check';
+        const svcLabel = (p.serviceType || 'reservation').charAt(0).toUpperCase() + (p.serviceType || '').slice(1).toLowerCase();
+        const urgent = (p.hoursAgo || 0) > 24 ? 'urgent' : '';
+
+        const card = document.createElement('div');
+        card.className = `payment-card ${urgent}`;
+        card.setAttribute('data-payment-id', p.id);
+        card.setAttribute('data-service', p.serviceType || '');
+        card.setAttribute('data-method', p.paymentMethod || '');
+        card.setAttribute('data-search', `${(p.transactionRef||'').toLowerCase()} ${(p.guestName||'').toLowerCase()} ${(p.guestEmail||'').toLowerCase()}`);
+        card.style.cssText = 'animation:highlightNew 3s ease forwards;';
+        card.innerHTML = `
+            <div class="payment-card-header">
+                <div class="payment-ref">
+                    <span class="ref-code">${p.transactionRef || 'N/A'}</span>
+                    ${p.referenceNumber ? `<span class="ext-ref"><i class="fas fa-hashtag"></i>${p.referenceNumber}</span>` : ''}
+                </div>
+                <span class="service-type-badge" style="background:#f3e5f5;color:#7b1fa2;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">
+                    <i class="fas fa-shopping-bag"></i> ${svcLabel}
+                </span>
+            </div>
+            <div class="payment-card-body">
+                <div class="info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div class="info-item"><span class="label" style="font-size:11px;color:#888;display:block;">Guest</span><span style="font-weight:600;">${p.guestName || p.guestEmail || 'N/A'}</span></div>
+                    <div class="info-item"><span class="label" style="font-size:11px;color:#888;display:block;">Amount</span><span style="font-weight:700;color:#2e7d32;font-size:18px;">₱${Number(p.amount||0).toLocaleString('en-PH',{minimumFractionDigits:2})}</span></div>
+                    <div class="info-item"><span class="label" style="font-size:11px;color:#888;display:block;">Reservation</span><span>${p.reservationCode || '#'+p.reservationId || 'N/A'}</span></div>
+                    <div class="info-item"><span class="label" style="font-size:11px;color:#888;display:block;">Payment Method</span>
+                        <span class="method-badge"><i class="fas ${icon}"></i> ${(p.paymentMethod||'').replace('_',' ')}</span>
+                    </div>
+                </div>
+                ${p.guestNotes ? `<div style="background:#fff8e1;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;"><i class="fas fa-comment" style="color:#f57f17;"></i> ${p.guestNotes}</div>` : ''}
+                <div class="payment-actions" style="display:flex;gap:8px;justify-content:flex-end;">
+                    <a href="/payment/${p.id}" class="btn-view" style="padding:8px 16px;border-radius:8px;background:#e3f2fd;color:#1565c0;text-decoration:none;font-size:13px;font-weight:600;">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                </div>
+            </div>`;
+
+        container.prepend(card);
+
+        if (!document.getElementById('_payFadeStyle')) {
+            const s = document.createElement('style');
+            s.id = '_payFadeStyle';
+            s.textContent = '@keyframes highlightNew{0%{background:#d4edda;transform:translateY(-10px);opacity:0}20%{opacity:1;transform:translateY(0)}100%{background:white;}}';
+            document.head.appendChild(s);
+        }
+
+        // Update pending count badge
+        const badge = document.querySelector('.btn-pending .badge');
+        if (badge) badge.textContent = parseInt(badge.textContent || '0') + 1;
+    }
+
+    function showPaymentToast(p) {
+        const isNew = p.status === 'PENDING';
         const toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:#c24a16;color:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:320px;font-family:Roboto,sans-serif;';
-        toast.innerHTML = '<strong>New Payment Submitted</strong><br>Transaction: ' + (payment.transactionRef || payment.id) + '<br>Amount: ₱' + Number(payment.amount).toLocaleString();
-        const btn = document.createElement('button');
-        btn.textContent = 'View';
-        btn.style.cssText = 'margin-top:8px;background:#fff;color:#c24a16;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:600;';
-        btn.onclick = () => location.reload();
-        toast.appendChild(btn);
+        toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:#c24a16;color:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:320px;font-family:Roboto,sans-serif;cursor:pointer;';
+        toast.innerHTML = `<strong>${isNew ? '💳 New Payment Submitted' : '🔄 Payment Updated'}</strong><br>Ref: ${p.transactionRef || p.id}<br>Amount: ₱${Number(p.amount||0).toLocaleString()}`;
+        toast.onclick = () => toast.remove();
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 12000);
+        setTimeout(() => toast.remove(), 8000);
     }
 })();
 </script>
