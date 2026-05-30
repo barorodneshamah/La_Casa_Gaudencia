@@ -256,6 +256,8 @@ class AuthController extends AbstractController
             // Generate JWT
             $token = $this->jwtManager->create($user);
 
+            try { $this->activityLog->logLogin($user); } catch (\Throwable) {}
+
             return $this->json([
                 'success'  => true,
                 'token'    => $token,
