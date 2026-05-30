@@ -1578,6 +1578,7 @@ body {
                 {% set hoursAgo = date().diff(payment.createdAt).h + (date().diff(payment.createdAt).days * 24) %}
                 
                 <div class="payment-card {% if hoursAgo > 24 %}urgent{% endif %}"
+                     data-payment-id="{{ payment.id }}"
                      data-service="{{ reservation.serviceType }}"
                      data-method="{{ payment.paymentMethod }}"
                      data-search="{{ payment.transactionReference|lower }} {{ (guest.fullName ?? guest.username)|lower }} {{ guest.email|lower }}">
@@ -1982,8 +1983,8 @@ document.addEventListener('keydown', function(e) {
             const data = await res.json();
             lastChecked = data.checkedAt;
             (data.payments || []).forEach(p => {
-                injectPaymentCard(p);
-                showPaymentToast(p);
+                const injected = injectPaymentCard(p);
+                if (injected) showPaymentToast(p);
             });
         } catch {}
     }
@@ -1992,8 +1993,8 @@ document.addEventListener('keydown', function(e) {
 
     function injectPaymentCard(p) {
         const container = document.getElementById('paymentsList');
-        if (!container) return;
-        if (document.querySelector(`[data-payment-id="${p.id}"]`)) return;
+        if (!container) return false;
+        if (document.querySelector(`[data-payment-id="${p.id}"]`)) return false;
 
         const methodIcons = { GCASH:'fa-mobile-alt', MAYA:'fa-wallet', BANK_TRANSFER:'fa-university', CREDIT_CARD:'fa-credit-card', CASH:'fa-money-bill-wave' };
         const icon = methodIcons[p.paymentMethod] || 'fa-money-check';
@@ -2046,6 +2047,8 @@ document.addEventListener('keydown', function(e) {
         // Update pending count badge
         const badge = document.querySelector('.btn-pending .badge');
         if (badge) badge.textContent = parseInt(badge.textContent || '0') + 1;
+
+        return true;
     }
 
     function showPaymentToast(p) {
