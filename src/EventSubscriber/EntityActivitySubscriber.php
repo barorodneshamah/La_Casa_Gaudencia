@@ -18,6 +18,7 @@ use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
+use Symfony\Bundle\SecurityBundle\Security;
 
 #[AsDoctrineListener(event: Events::postPersist)]
 #[AsDoctrineListener(event: Events::preUpdate)]
@@ -39,7 +40,10 @@ class EntityActivitySubscriber
         Payment::class,
     ];
 
-    public function __construct(ActivityLogService $activityLogService)
+    public function __construct(
+        ActivityLogService $activityLogService,
+        private Security $security
+    )
     {
         $this->activityLogService = $activityLogService;
     }
@@ -67,6 +71,10 @@ class EntityActivitySubscriber
         }
 
         if ($this->shouldTrackEntity($entity)) {
+            if ($entity instanceof User && !($this->security->getUser() instanceof User)) {
+                return;
+            }
+
             if ($entity instanceof User && $this->isInfrastructureOnlyUserUpdate($args->getEntityChangeSet())) {
                 return;
             }
