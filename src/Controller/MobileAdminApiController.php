@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -32,6 +33,7 @@ class MobileAdminApiController extends AbstractController
         private WebSocketPublisher $ws,
         private UserRepository $users,
         private UserPasswordHasherInterface $passwordHasher,
+        private RequestStack $requestStack,
     ) {}
 
     #[Route('/admin/users', name: 'api_mobile_admin_user_create', methods: ['POST'])]
@@ -324,7 +326,9 @@ class MobileAdminApiController extends AbstractController
         if ($blocked = $this->staffOnly()) return $blocked;
 
         $this->applyRoom($room, $this->jsonBody($request));
-        $this->em->flush();
+        if ($this->hasRealChanges($room)) {
+            $this->em->flush();
+        }
 
         return $this->json(['message' => 'Room updated.', 'room' => $this->roomData($room)]);
     }
@@ -359,7 +363,9 @@ class MobileAdminApiController extends AbstractController
         if ($blocked = $this->staffOnly()) return $blocked;
 
         $this->applyTour($tour, $this->jsonBody($request));
-        $this->em->flush();
+        if ($this->hasRealChanges($tour)) {
+            $this->em->flush();
+        }
 
         return $this->json(['message' => 'Tour updated.', 'tour' => $this->tourData($tour)]);
     }
@@ -394,7 +400,9 @@ class MobileAdminApiController extends AbstractController
         if ($blocked = $this->staffOnly()) return $blocked;
 
         $this->applyFood($food, $this->jsonBody($request));
-        $this->em->flush();
+        if ($this->hasRealChanges($food)) {
+            $this->em->flush();
+        }
 
         return $this->json(['message' => 'Food updated.', 'food' => $this->foodData($food)]);
     }
@@ -429,7 +437,9 @@ class MobileAdminApiController extends AbstractController
         if ($blocked = $this->staffOnly()) return $blocked;
 
         $this->applyPackage($package, $this->jsonBody($request));
-        $this->em->flush();
+        if ($this->hasRealChanges($package)) {
+            $this->em->flush();
+        }
 
         return $this->json(['message' => 'Package updated.', 'package' => $this->packageData($package)]);
     }
@@ -464,7 +474,9 @@ class MobileAdminApiController extends AbstractController
         if ($blocked = $this->staffOnly()) return $blocked;
 
         $this->applySpa($spa, $this->jsonBody($request));
-        $this->em->flush();
+        if ($this->hasRealChanges($spa)) {
+            $this->em->flush();
+        }
 
         return $this->json(['message' => 'Spa service updated.', 'spa' => $this->spaData($spa)]);
     }
@@ -562,6 +574,33 @@ class MobileAdminApiController extends AbstractController
         $clean = array_values(array_intersect($allowed, array_map('strval', $roles)));
 
         return $clean ?: [User::ROLE_GUEST];
+    }
+
+    private function hasRealChanges(object $entity): bool
+    {
+        $uow  = $this->em->getUnitOfWork();
+        $meta = $this->em->getClassMetadata(get_class($entity));
+        $uow->recomputeSingleEntityChangeSet($meta, $entity);
+        return !empty($uow->getEntityChangeSet($entity));
+    }
+
+    private function imageUrl(?string $path, string $type = ''): ?string
+    {
+        if (!$path || !trim($path)) return null;
+        $path = trim($path);
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        $base = ($this->requestStack->getCurrentRequest()?->getSchemeAndHttpHost()) ?? '';
+        if (str_starts_with($path, '/')) return $base . $path;
+        if (str_starts_with($path, 'uploads/')) return $base . '/' . $path;
+        return $base . '/uploads/' . ($type ? $type . '/' : '') . $path;
+    }
+
+    private function imageUrls(?array $paths, string $type): array
+    {
+        if (!$paths) return [];
+        return array_values(array_filter(array_map(fn($p) => $this->imageUrl($p, $type), $paths)));
     }
 
     private function applyRoom(Room $room, array $data): void
@@ -944,7 +983,7 @@ class MobileAdminApiController extends AbstractController
     private function roomData(Room $room): array
     {
         return [
-            'id' => $room->getId(),
+            'id'           => $room->getId(),
             'roomNumber' => $room->getRoomNumber(),
             'roomType' => $room->getRoomType(),
             'pricePerNight' => $room->getPricePerNight(),
@@ -952,8 +991,8 @@ class MobileAdminApiController extends AbstractController
             'features' => $room->getFeatures(),
             'description' => $room->getDescription(),
             'status' => $room->getStatus(),
-            'mainImage' => $room->getMainImage(),
-            'galleryImages' => $room->getGalleryImages(),
+            'mainImage' => $this->imageUrl($room->getMainImage(), 'rooms'),
+            'galleryImages' => $this->imageUrls($room->getGalleryImages(), 'rooms'),
             'isOffer' => $room->isOffer(),
         ];
     }
@@ -970,8 +1009,8 @@ class MobileAdminApiController extends AbstractController
             'availableSlots' => $tour->getAvailableSlots(),
             'status' => $tour->getStatus(),
             'scheduleDate' => $tour->getScheduleDate()?->format('Y-m-d'),
-            'mainImage' => $tour->getMainImage(),
-            'galleryImages' => $tour->getGalleryImages(),
+            'mainImage' => $this->imageUrl($tour->getMainImage(), 'tours'),
+            'galleryImages' => $this->imageUrls($tour->getGalleryImages(), 'tours'),
             'isOffer' => $tour->isOffer(),
         ];
     }
@@ -986,8 +1025,8 @@ class MobileAdminApiController extends AbstractController
             'category' => $food->getCategory(),
             'availableStock' => $food->getAvailableStock(),
             'status' => $food->getStatus(),
-            'mainImage' => $food->getMainImage(),
-            'galleryImages' => $food->getGalleryImages(),
+            'mainImage' => $this->imageUrl($food->getMainImage(), 'foods'),
+            'galleryImages' => $this->imageUrls($food->getGalleryImages(), 'foods'),
             'isOffer' => $food->isOffer(),
         ];
     }
@@ -1004,8 +1043,8 @@ class MobileAdminApiController extends AbstractController
             'validFrom' => $package->getValidFrom()?->format('Y-m-d'),
             'validUntil' => $package->getValidUntil()?->format('Y-m-d'),
             'status' => $package->getStatus(),
-            'mainImage' => $package->getMainImage(),
-            'galleryImages' => $package->getGalleryImages(),
+            'mainImage' => $this->imageUrl($package->getMainImage(), 'packages'),
+            'galleryImages' => $this->imageUrls($package->getGalleryImages(), 'packages'),
             'inclusions' => $package->getInclusions(),
             'exclusions' => $package->getExclusions(),
             'durationDays' => $package->getDurationDays(),
@@ -1033,8 +1072,8 @@ class MobileAdminApiController extends AbstractController
             'capacity' => $spa->getCapacity(),
             'category' => $spa->getCategory(),
             'status' => $spa->getStatus(),
-            'mainImage' => $spa->getMainImage(),
-            'galleryImages' => $spa->getGalleryImages(),
+            'mainImage' => $this->imageUrl($spa->getMainImage(), 'spas'),
+            'galleryImages' => $this->imageUrls($spa->getGalleryImages(), 'spas'),
             'isOffer' => $spa->isOffer(),
         ];
     }
