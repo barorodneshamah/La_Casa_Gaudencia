@@ -1279,7 +1279,6 @@ $(document).ready(function() {
             lastChecked = data.checkedAt;
             (data.reservations || []).forEach(r => {
                 injectReservationRow(r);
-                showRealtimeToast(r);
             });
         } catch {}
     }
@@ -1380,25 +1379,6 @@ $(document).ready(function() {
         setTimeout(() => { existing.style.cssText = ''; }, 2000);
     }
 
-    function showRealtimeToast(data) {
-        const isNew  = data.status === 'PENDING';
-        const action = isNew ? '🛎 New Booking' : '🔄 Booking Updated';
-        const code   = data.reservationCode ? ' #' + data.reservationCode : '';
-        const msg    = action + code + ' — ' + (data.status || '');
-
-        const toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:#2e7d32;color:#fff;padding:14px 20px;border-radius:10px;font-family:Roboto,sans-serif;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,0.2);max-width:320px;line-height:1.4;animation:slideIn .3s ease;';
-        toast.textContent = msg;
-
-        if (!document.getElementById('_resToastStyle')) {
-            const s = document.createElement('style');
-            s.id = '_resToastStyle';
-            s.textContent = '@keyframes slideIn{from{transform:translateX(110%)}to{transform:translateX(0)}}';
-            document.head.appendChild(s);
-        }
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-    }
 })();
 </script>
 {% endblock %}
