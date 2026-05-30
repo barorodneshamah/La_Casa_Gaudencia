@@ -169,8 +169,10 @@ class AuthController extends AbstractController
             return $this->json(['message' => 'fcmToken is required'], 400);
         }
 
-        $user->setFcmToken($fcmToken);
-        $this->entityManager->flush();
+        if ($user->getFcmToken() !== $fcmToken) {
+            $user->setFcmToken($fcmToken);
+            $this->entityManager->flush();
+        }
 
         return $this->json(['success' => true]);
     }

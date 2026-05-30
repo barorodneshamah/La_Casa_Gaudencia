@@ -67,6 +67,10 @@ class EntityActivitySubscriber
         }
 
         if ($this->shouldTrackEntity($entity)) {
+            if ($entity instanceof User && $this->isInfrastructureOnlyUserUpdate($args->getEntityChangeSet())) {
+                return;
+            }
+
             // Store old data before update
             $this->oldEntityData[spl_object_id($entity)] = $args->getEntityChangeSet();
         }
@@ -82,7 +86,11 @@ class EntityActivitySubscriber
 
         if ($this->shouldTrackEntity($entity)) {
             $objectId = spl_object_id($entity);
-            $oldData = $this->oldEntityData[$objectId] ?? [];
+            if (!array_key_exists($objectId, $this->oldEntityData)) {
+                return;
+            }
+
+            $oldData = $this->oldEntityData[$objectId];
             
             // Format old data for logging
             $formattedOldData = [];
@@ -118,5 +126,10 @@ class EntityActivitySubscriber
             }
         }
         return false;
+    }
+
+    private function isInfrastructureOnlyUserUpdate(array $changeSet): bool
+    {
+        return array_diff(array_keys($changeSet), ['fcmToken', 'updatedAt']) === [];
     }
 }
