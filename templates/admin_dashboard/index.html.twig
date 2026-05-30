@@ -1090,6 +1090,8 @@ body {
     .sidebar-accent.open{ transform: translateX(0); }
 }
 
+/* real-time stats: no flash — numbers update silently */
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce){
   *,.reveal, .topbar{
@@ -1966,6 +1968,11 @@ setInterval(refreshBell, 8000); // keep the message badge live
                 seen = new Set(arr);
                 localStorage.setItem(KEY_SEEN, JSON.stringify(arr));
                 updateDashBadge();
+
+                // Immediately refresh sales numbers on any payment event
+                if (fresh.some(n => n.type === 'payment') && window.refreshDashboardStats) {
+                    window.refreshDashboardStats();
+                }
             }
             lastTs = d.checkedAt;
             localStorage.setItem(KEY_TS, String(lastTs));
@@ -1974,6 +1981,75 @@ setInterval(refreshBell, 8000); // keep the message badge live
 
     poll();
     setInterval(poll, 8000);
+})();
+
+// ── Real-time Sales Stats Poller ──────────────────────────────────────────────
+(function () {
+    const STAT_MAP = {
+        total_sales:        { sel: '.sales-card.total .count',        decimals: 2 },
+        today_sales:        { sel: '.sales-card.today .count',        decimals: 2 },
+        monthly_sales:      { sel: '.sales-card.monthly .count',      decimals: 2 },
+        total_transactions: { sel: '.sales-card.transactions .count', decimals: 0 },
+    };
+
+    // Seed current values from what Twig rendered
+    const current = {};
+    Object.entries(STAT_MAP).forEach(([key, cfg]) => {
+        const el = document.querySelector(cfg.sel);
+        current[key] = el ? parseFloat(el.dataset.count || '0') : 0;
+    });
+
+    window.refreshDashboardStats = async function () {
+        try {
+            const r = await fetch('/admin/dashboard/stats', { credentials: 'same-origin' });
+            if (!r.ok) return;
+            const data = await r.json();
+
+            Object.entries(STAT_MAP).forEach(([key, cfg]) => {
+                const newVal = cfg.decimals === 0
+                    ? parseInt(data[key] || 0, 10)
+                    : parseFloat(data[key] || 0);
+
+                if (Math.abs(newVal - (current[key] || 0)) > 0.001) {
+                    const el = document.querySelector(cfg.sel);
+                    if (el) {
+                        el.textContent = newVal.toLocaleString('en-US', {
+                            minimumFractionDigits: cfg.decimals,
+                            maximumFractionDigits: cfg.decimals,
+                        });
+                        el.dataset.count = newVal;
+                    }
+                    current[key] = newVal;
+                }
+            });
+        } catch {}
+    };
+
+    // Background poll every 15 seconds (catches approvals from other tabs/users)
+    setInterval(window.refreshDashboardStats, 15000);
+})();
+
+// ── Mercure: instant stats refresh on payment approval ─────────────
+(function () {
+    fetch('/api/mercure/token', { credentials: 'same-origin' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data) return;
+            const url = new URL(data.hubUrl);
+            url.searchParams.append('topic', '/topic/payments');
+            const es = new EventSource(url.toString(), {
+                headers: { Authorization: 'Bearer ' + data.token }
+            });
+            es.onmessage = function (e) {
+                try {
+                    const p = JSON.parse(e.data);
+                    if (p.status === 'APPROVED' && window.refreshDashboardStats) {
+                        window.refreshDashboardStats();
+                    }
+                } catch {}
+            };
+        })
+        .catch(() => {});
 })();
 
 </script>

@@ -10,6 +10,7 @@ use App\Service\NotificationService;
 use App\Service\WebSocketPublisher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -116,6 +117,22 @@ class PaymentDashboardController extends AbstractController
             'serviceType' => $serviceType,
             'serviceLabel' => $serviceLabels[$serviceType] ?? $serviceType,
             'currentStatus' => $status,
+        ]);
+    }
+
+    #[Route('/api/stats', name: 'app_payment_stats_api', methods: ['GET'])]
+    public function statsApi(
+        PaymentRepository $paymentRepository,
+        ReservationRepository $reservationRepository
+    ): JsonResponse {
+        return new JsonResponse([
+            'totalRevenue'      => $paymentRepository->getTotalApprovedAmount(),
+            'todayRevenue'      => $paymentRepository->getTodayApprovedAmount(),
+            'pendingAmount'     => $paymentRepository->getTotalPendingAmount(),
+            'pendingCount'      => $paymentRepository->countPending(),
+            'revenueByService'  => $paymentRepository->getApprovedAmountByServiceType(),
+            'pendingByService'  => $paymentRepository->getPendingCountByServiceType(),
+            'reservationCounts' => $reservationRepository->getCountByServiceType(),
         ]);
     }
 

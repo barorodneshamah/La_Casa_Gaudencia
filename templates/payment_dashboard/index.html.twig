@@ -564,7 +564,7 @@ body {
                 <div class="overview-icon"><i class="fas fa-peso-sign"></i></div>
             </div>
             <div class="overview-content">
-                <h3>₱{{ totalRevenue|number_format(2) }}</h3>
+                <h3 id="stat-total-revenue">₱{{ totalRevenue|number_format(2) }}</h3>
                 <p>Total Revenue</p>
             </div>
         </div>
@@ -573,7 +573,7 @@ body {
                 <div class="overview-icon"><i class="fas fa-calendar-day"></i></div>
             </div>
             <div class="overview-content">
-                <h3>₱{{ todayRevenue|number_format(2) }}</h3>
+                <h3 id="stat-today-revenue">₱{{ todayRevenue|number_format(2) }}</h3>
                 <p>Today's Revenue</p>
             </div>
         </div>
@@ -582,7 +582,7 @@ body {
                 <div class="overview-icon"><i class="fas fa-hourglass-half"></i></div>
             </div>
             <div class="overview-content">
-                <h3>₱{{ pendingAmount|number_format(2) }}</h3>
+                <h3 id="stat-pending-amount">₱{{ pendingAmount|number_format(2) }}</h3>
                 <p>Pending Amount</p>
             </div>
         </div>
@@ -591,7 +591,7 @@ body {
                 <div class="overview-icon"><i class="fas fa-tasks"></i></div>
             </div>
             <div class="overview-content">
-                <h3>{{ pendingCount }}</h3>
+                <h3 id="stat-pending-count">{{ pendingCount }}</h3>
                 <p>Awaiting Approval</p>
             </div>
         </div>
@@ -605,8 +605,9 @@ body {
     <!-- SERVICE CARDS -->
     <div class="service-cards">
         {% for service in services %}
-        <a href="{{ path('app_payment_by_service', {serviceType: service.type}) }}" 
-           class="service-card" 
+        <a href="{{ path('app_payment_by_service', {serviceType: service.type}) }}"
+           class="service-card"
+           data-service-type="{{ service.type }}"
            style="--card-color: {{ service.color }};">
             <div class="service-card-header">
                 <div class="service-card-icon" style="background: {{ service.bgColor }}; color: {{ service.color }};">
@@ -665,5 +666,97 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDateTime();
     setInterval(updateDateTime, 1000);
 });
+
+// ── Real-time payment dashboard stats ─────────────────────────────
+(function () {
+    function fmt(n, decimals) {
+        return Number(n).toLocaleString('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+        });
+    }
+
+    function refreshStats() {
+        fetch('/payments/api/stats', { credentials: 'same-origin' })
+            .then(r => r.ok ? r.json() : null)
+            .then(function (d) {
+                if (!d) return;
+
+                // Overview cards — plain text update, no animation
+                var elTR = document.getElementById('stat-total-revenue');
+                if (elTR) elTR.textContent = '₱' + fmt(d.totalRevenue, 2);
+
+                var elTD = document.getElementById('stat-today-revenue');
+                if (elTD) elTD.textContent = '₱' + fmt(d.todayRevenue, 2);
+
+                var elPA = document.getElementById('stat-pending-amount');
+                if (elPA) elPA.textContent = '₱' + fmt(d.pendingAmount, 2);
+
+                var elPC = document.getElementById('stat-pending-count');
+                if (elPC) elPC.textContent = d.pendingCount;
+
+                // Pending button badge
+                var badge = document.querySelector('.btn-pending .badge');
+                if (d.pendingCount > 0) {
+                    if (badge) { badge.textContent = d.pendingCount; }
+                } else if (badge) {
+                    badge.remove();
+                }
+
+                // Service cards
+                document.querySelectorAll('.service-card[data-service-type]').forEach(function (card) {
+                    var type = card.dataset.serviceType;
+                    var pending     = (d.pendingByService  && d.pendingByService[type])     ? d.pendingByService[type]     : 0;
+                    var revenue     = (d.revenueByService  && d.revenueByService[type])     ? d.revenueByService[type]     : 0;
+                    var reservations = (d.reservationCounts && d.reservationCounts[type])   ? d.reservationCounts[type]    : 0;
+
+                    var boxes = card.querySelectorAll('.stat-box .number');
+                    if (boxes[0]) boxes[0].textContent = reservations;
+                    if (boxes[1]) boxes[1].textContent = pending;
+                    if (boxes[2]) boxes[2].textContent = '₱' + fmt(Math.round(revenue), 0);
+
+                    var footerBadge = card.querySelector('.pending-badge');
+                    if (pending > 0) {
+                        if (footerBadge) {
+                            footerBadge.innerHTML = '<i class="fas fa-clock"></i> ' + pending + ' pending';
+                        } else {
+                            var footer = card.querySelector('.service-card-footer');
+                            if (footer) {
+                                var nb = document.createElement('span');
+                                nb.className = 'pending-badge';
+                                nb.innerHTML = '<i class="fas fa-clock"></i> ' + pending + ' pending';
+                                footer.appendChild(nb);
+                            }
+                        }
+                    } else if (footerBadge) {
+                        footerBadge.remove();
+                    }
+                });
+            })
+            .catch(function () {});
+    }
+
+    // Connect to Mercure for instant updates when any payment changes
+    fetch('/api/mercure/token', { credentials: 'same-origin' })
+        .then(r => r.ok ? r.json() : null)
+        .then(function (data) {
+            if (!data) return;
+            var url = new URL(data.hubUrl);
+            url.searchParams.append('topic', '/topic/payments');
+            var es = new EventSource(url.toString(), {
+                headers: { Authorization: 'Bearer ' + data.token }
+            });
+            es.onmessage = function (e) {
+                try {
+                    var p = JSON.parse(e.data);
+                    if (p.transactionRef) { refreshStats(); }
+                } catch {}
+            };
+        })
+        .catch(function () {});
+
+    // Fallback: silent refresh every 30 s in case Mercure is unavailable
+    setInterval(refreshStats, 30000);
+})();
 </script>
 {% endblock %}

@@ -40,35 +40,26 @@ final class AdminDashboardController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         
-        // Total Sales
-        $totalSales = $paymentRepository->createQueryBuilder('p')
-            ->select('SUM(p.amount)')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-        
-        // Today's Sales
+        // Total Sales (approved payments only)
+        $totalSales = $paymentRepository->getTotalApprovedAmount();
+
+        // Today's Sales (approved today)
         $today = new \DateTime('today');
         $tomorrow = new \DateTime('tomorrow');
-        $todaySales = $paymentRepository->createQueryBuilder('p')
-            ->select('SUM(p.amount)')
-            ->where('p.createdAt >= :today')
-            ->andWhere('p.createdAt < :tomorrow')
-            ->setParameter('today', $today)
-            ->setParameter('tomorrow', $tomorrow)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-        
-        // Monthly Sales
+        $todaySales = $paymentRepository->getTodayApprovedAmount();
+
+        // Monthly Sales (approved this month)
         $startOfMonth = new \DateTime('first day of this month midnight');
         $endOfMonth = new \DateTime('first day of next month midnight');
-        $monthlySales = $paymentRepository->createQueryBuilder('p')
+        $monthlySales = (float) ($paymentRepository->createQueryBuilder('p')
             ->select('SUM(p.amount)')
-            ->where('p.createdAt >= :start')
-            ->andWhere('p.createdAt < :end')
+            ->where('p.status = :status')
+            ->andWhere('p.approvedAt >= :start')
+            ->andWhere('p.approvedAt < :end')
+            ->setParameter('status', \App\Entity\Payment::STATUS_APPROVED)
             ->setParameter('start', $startOfMonth)
             ->setParameter('end', $endOfMonth)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+            ->getQuery()->getSingleScalarResult() ?? 0);
 
         // Total Transactions
         $totalTransactions = $paymentRepository->count([]);
@@ -141,6 +132,30 @@ final class AdminDashboardController extends AbstractController
             'recent_activities' => $recentActivities,
             'today_activities' => $todayActivities,
             'unread_messages' => $unreadMessages,
+        ]);
+    }
+
+    #[Route('/admin/dashboard/stats', name: 'app_admin_dashboard_stats', methods: ['GET'])]
+    public function stats(PaymentRepository $paymentRepository): JsonResponse
+    {
+        $startOfMonth = new \DateTime('first day of this month midnight');
+        $endOfMonth   = new \DateTime('first day of next month midnight');
+
+        $monthlySales = (float) ($paymentRepository->createQueryBuilder('p')
+            ->select('SUM(p.amount)')
+            ->where('p.status = :status')
+            ->andWhere('p.approvedAt >= :start')
+            ->andWhere('p.approvedAt < :end')
+            ->setParameter('status', \App\Entity\Payment::STATUS_APPROVED)
+            ->setParameter('start', $startOfMonth)
+            ->setParameter('end', $endOfMonth)
+            ->getQuery()->getSingleScalarResult() ?? 0);
+
+        return new JsonResponse([
+            'total_sales'        => $paymentRepository->getTotalApprovedAmount(),
+            'today_sales'        => $paymentRepository->getTodayApprovedAmount(),
+            'monthly_sales'      => $monthlySales,
+            'total_transactions' => $paymentRepository->count([]),
         ]);
     }
 
