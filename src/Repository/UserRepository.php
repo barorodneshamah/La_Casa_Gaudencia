@@ -33,6 +33,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * Returns all admin and staff users that have an FCM token registered.
+     * Used to broadcast push notifications to staff when customers act.
+     *
+     * @return User[]
+     */
+    public function findAdminAndStaffWithFcmToken(): array
+    {
+        return array_values(array_filter(
+            $this->createQueryBuilder('u')
+                ->where('u.fcmToken IS NOT NULL')
+                ->andWhere("u.roles LIKE :admin OR u.roles LIKE :staff")
+                ->setParameter('admin', '%ROLE_ADMIN%')
+                ->setParameter('staff', '%ROLE_STAFF%')
+                ->getQuery()
+                ->getResult(),
+            fn(User $u) => $u->getFcmToken() !== null && $u->getFcmToken() !== '',
+        ));
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

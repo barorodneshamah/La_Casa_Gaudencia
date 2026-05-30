@@ -11,13 +11,21 @@ class NotificationService
 
     public function __construct(string $firebaseCredentialsPath)
     {
-        if (!file_exists($firebaseCredentialsPath)) {
-            return;
-        }
+        // Railway and other cloud hosts cannot persist files — check env var first.
+        $credentialsJson = $_ENV['FIREBASE_CREDENTIALS_JSON'] ?? getenv('FIREBASE_CREDENTIALS_JSON') ?: null;
 
         try {
-            $firebase = (new Factory)->withServiceAccount($firebaseCredentialsPath);
-            $this->messaging = $firebase->createMessaging();
+            if ($credentialsJson) {
+                $decoded = json_decode($credentialsJson, true);
+                if (is_array($decoded)) {
+                    $this->messaging = (new Factory)->withServiceAccount($decoded)->createMessaging();
+                    return;
+                }
+            }
+
+            if (file_exists($firebaseCredentialsPath)) {
+                $this->messaging = (new Factory)->withServiceAccount($firebaseCredentialsPath)->createMessaging();
+            }
         } catch (\Throwable) {
         }
     }
