@@ -74,7 +74,7 @@
 }
 #custNotifToastContainer {
     position: fixed;
-    top: 80px;
+    bottom: 24px;
     right: 24px;
     z-index: 9999;
     display: flex;
@@ -222,23 +222,23 @@
             const data = await res.json();
 
             // Filter to only notifications not yet shown as toasts
-            const fresh = (data.notifications || []).filter(n => !seenIds.has(n.type + ':' + n.id));
+            const fresh = (data.notifications || []).filter(n => !seenIds.has(n.type + ':' + n.id + ':' + (n.status || '')));
 
             if (fresh.length > 0) {
                 fresh.forEach(n => showCustToast(n.message, n.detail, n.url, n.status));
-                fresh.forEach(n => seenIds.add(n.type + ':' + n.id));
+                fresh.forEach(n => seenIds.add(n.type + ':' + n.id + ':' + (n.status || '')));
                 saveSeen();
 
                 // Merge into dropdown list without duplicates, flagged as unread
-                const existingKeys = new Set(stored.map(n => n.type + ':' + n.id));
+                const existingKeys = new Set(stored.map(n => n.type + ':' + n.id + ':' + (n.status || '')));
                 const toAdd = fresh
-                    .filter(n => !existingKeys.has(n.type + ':' + n.id))
+                    .filter(n => !existingKeys.has(n.type + ':' + n.id + ':' + (n.status || '')))
                     .map(n => ({ ...n, unread: true }));
                 if (toAdd.length) {
                     stored = [...toAdd, ...stored].slice(0, 20);
                     localStorage.setItem(LS_KEY_LIST, JSON.stringify(stored));
                     renderCustDropdown(stored);
-                    updateCustBadge(stored.length);
+                    updateCustBadge(stored.filter(n => n.unread).length);
                 }
             }
 
@@ -255,6 +255,7 @@
             // Mark all as read the moment the user opens the dropdown
             stored = stored.map(n => ({ ...n, unread: false }));
             localStorage.setItem(LS_KEY_LIST, JSON.stringify(stored));
+            updateCustBadge(0);
             renderCustDropdown(stored);
         } else {
             d.style.display = 'none';
@@ -277,7 +278,8 @@
     });
 
     // Restore badge from previous session immediately (before first poll)
-    if (stored.length) updateCustBadge(stored.length);
+    const initialUnread = stored.filter(n => n.unread).length;
+    if (initialUnread) updateCustBadge(initialUnread);
 
     pollCustNotifs();
     setInterval(pollCustNotifs, 8000);
