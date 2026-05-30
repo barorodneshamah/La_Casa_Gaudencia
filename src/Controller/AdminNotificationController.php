@@ -111,6 +111,94 @@ class AdminNotificationController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/live/reservations', name: 'admin_live_reservations', methods: ['GET'])]
+    public function liveReservations(Request $request, ReservationRepository $reservationRepo): JsonResponse
+    {
+        $since = $request->query->get('since');
+        $sinceDate = $since ? new \DateTime('@' . (int) $since) : new \DateTime('-10 seconds');
+
+        $rows = $reservationRepo->createQueryBuilder('r')
+            ->select('r.id, r.reservationCode, r.status, r.paymentStatus, r.totalAmount, r.serviceType, r.contactPhone, r.createdAt')
+            ->addSelect('u.email AS guestEmail')
+            ->addSelect('CASE WHEN rm.id IS NOT NULL THEN 1 ELSE 0 END AS hasRoom')
+            ->addSelect('CASE WHEN t.id  IS NOT NULL THEN 1 ELSE 0 END AS hasTour')
+            ->addSelect('CASE WHEN pk.id IS NOT NULL THEN 1 ELSE 0 END AS hasPackage')
+            ->addSelect('CASE WHEN sp.id IS NOT NULL THEN 1 ELSE 0 END AS hasSpa')
+            ->leftJoin('r.guest',   'u')
+            ->leftJoin('r.room',    'rm')
+            ->leftJoin('r.tour',    't')
+            ->leftJoin('r.package', 'pk')
+            ->leftJoin('r.spa',     'sp')
+            ->where('r.createdAt > :since')
+            ->setParameter('since', $sinceDate)
+            ->orderBy('r.createdAt', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getArrayResult();
+
+        return $this->json([
+            'reservations' => array_map(fn($r) => [
+                'id'             => $r['id'],
+                'reservationCode'=> $r['reservationCode'],
+                'status'         => $r['status'],
+                'paymentStatus'  => $r['paymentStatus'],
+                'totalAmount'    => $r['totalAmount'],
+                'serviceType'    => $r['serviceType'],
+                'contactPhone'   => $r['contactPhone'],
+                'guestEmail'     => $r['guestEmail'],
+                'createdAt'      => $this->dateValue($r['createdAt'])->format('M d, Y'),
+                'hasRoom'        => (bool) $r['hasRoom'],
+                'hasTour'        => (bool) $r['hasTour'],
+                'hasPackage'     => (bool) $r['hasPackage'],
+                'hasSpa'         => (bool) $r['hasSpa'],
+                'hasFood'        => false,
+            ], $rows),
+            'checkedAt' => time(),
+        ]);
+    }
+
+    #[Route('/admin/live/payments', name: 'admin_live_payments', methods: ['GET'])]
+    public function livePayments(Request $request, PaymentRepository $paymentRepo): JsonResponse
+    {
+        $since = $request->query->get('since');
+        $sinceDate = $since ? new \DateTime('@' . (int) $since) : new \DateTime('-10 seconds');
+
+        $rows = $paymentRepo->createQueryBuilder('p')
+            ->select('p.id, p.transactionReference, p.amount, p.paymentMethod, p.status, p.referenceNumber, p.guestNotes, p.createdAt')
+            ->addSelect('u.email AS guestEmail, u.fullName AS guestName')
+            ->addSelect('r.id AS reservationId, r.reservationCode, r.serviceType')
+            ->leftJoin('p.paidBy',      'u')
+            ->leftJoin('p.reservation', 'r')
+            ->where('p.createdAt > :since')
+            ->andWhere('p.status = :status')
+            ->setParameter('since', $sinceDate)
+            ->setParameter('status', 'PENDING')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getArrayResult();
+
+        return $this->json([
+            'payments' => array_map(fn($p) => [
+                'id'              => $p['id'],
+                'transactionRef'  => $p['transactionReference'],
+                'amount'          => $p['amount'],
+                'paymentMethod'   => $p['paymentMethod'],
+                'status'          => $p['status'],
+                'referenceNumber' => $p['referenceNumber'],
+                'guestNotes'      => $p['guestNotes'],
+                'guestEmail'      => $p['guestEmail'],
+                'guestName'       => $p['guestName'],
+                'reservationId'   => $p['reservationId'],
+                'reservationCode' => $p['reservationCode'],
+                'serviceType'     => $p['serviceType'],
+                'createdAt'       => $this->dateValue($p['createdAt'])->format('M d, Y h:i A'),
+                'hoursAgo'        => (int) round((time() - $this->dateValue($p['createdAt'])->getTimestamp()) / 3600),
+            ], $rows),
+            'checkedAt' => time(),
+        ]);
+    }
+
     private function dateValue(mixed $value): \DateTimeInterface
     {
         return $value instanceof \DateTimeInterface ? $value : new \DateTime((string) $value);

@@ -1266,25 +1266,25 @@ $(document).ready(function() {
 });
 </script>
 
-{# ── Mercure real-time reservation updates ──────────────────────────────── #}
+{# ── Real-time reservation polling (replaces Mercure for Railway) ──────── #}
 <script>
 (function () {
-    const hubUrl = new URL('{{ mercure('/topic/reservations')|e('js') }}');
-    const es = new EventSource(hubUrl);
+    let lastChecked = Math.floor(Date.now() / 1000);
 
-    es.onmessage = function (event) {
+    async function pollReservations() {
         try {
-            const data = JSON.parse(event.data);
-            if (data.status === 'PENDING') {
-                injectReservationRow(data);
-            } else {
-                updateReservationRow(data);
-            }
-            showRealtimeToast(data);
-        } catch (e) { /* ignore malformed payloads */ }
-    };
+            const res = await fetch(`/admin/live/reservations?since=${lastChecked}`, { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            lastChecked = data.checkedAt;
+            (data.reservations || []).forEach(r => {
+                injectReservationRow(r);
+                showRealtimeToast(r);
+            });
+        } catch {}
+    }
 
-    es.onerror = function () { es.close(); };
+    setInterval(pollReservations, 5000);
 
     function injectReservationRow(data) {
         const dt = window._reservationDT;

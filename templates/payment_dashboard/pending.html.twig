@@ -1971,21 +1971,24 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Real-time payment notifications via Mercure
+// Real-time payment polling (replaces Mercure for Railway)
 (function () {
-    const hubUrl = new URL('{{ mercure('/topic/payments')|e('js') }}');
-    const es = new EventSource(hubUrl);
+    let lastChecked = Math.floor(Date.now() / 1000);
 
-    es.onmessage = function (e) {
+    async function pollPayments() {
         try {
-            const p = JSON.parse(e.data);
-            if (p.status === 'PENDING') {
+            const res = await fetch(`/admin/live/payments?since=${lastChecked}`, { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            lastChecked = data.checkedAt;
+            (data.payments || []).forEach(p => {
                 injectPaymentCard(p);
-            }
-            showPaymentToast(p);
+                showPaymentToast(p);
+            });
         } catch {}
-    };
-    es.onerror = function () { es.close(); };
+    }
+
+    setInterval(pollPayments, 5000);
 
     function injectPaymentCard(p) {
         const container = document.getElementById('paymentsList');
