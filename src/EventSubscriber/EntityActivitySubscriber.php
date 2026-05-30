@@ -75,7 +75,14 @@ class EntityActivitySubscriber
                 return;
             }
 
-            if ($entity instanceof User && $this->isInfrastructureOnlyUserUpdate($args->getEntityChangeSet())) {
+            // Skip updates where only infrastructure fields changed (updatedAt, fcmToken for User).
+            // Calling flush() from inside postUpdate triggers the outer flush to re-process entities
+            // with their #[ORM\PreUpdate] callbacks, producing updatedAt-only spurious changes.
+            $infrastructureFields = $entity instanceof User
+                ? ['fcmToken', 'updatedAt']
+                : ['updatedAt'];
+
+            if (array_diff(array_keys($args->getEntityChangeSet()), $infrastructureFields) === []) {
                 return;
             }
 
@@ -136,8 +143,4 @@ class EntityActivitySubscriber
         return false;
     }
 
-    private function isInfrastructureOnlyUserUpdate(array $changeSet): bool
-    {
-        return array_diff(array_keys($changeSet), ['fcmToken', 'updatedAt']) === [];
-    }
 }
