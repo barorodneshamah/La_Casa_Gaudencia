@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ActivityLogRepository;
 use App\Repository\ContactMessageRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\ReservationRepository;
@@ -195,6 +196,39 @@ class AdminNotificationController extends AbstractController
                 'createdAt'       => $this->dateValue($p['createdAt'])->format('M d, Y h:i A'),
                 'hoursAgo'        => (int) round((time() - $this->dateValue($p['createdAt'])->getTimestamp()) / 3600),
             ], $rows),
+            'checkedAt' => time(),
+        ]);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/admin/live/activity-logs', name: 'admin_live_activity_logs', methods: ['GET'])]
+    public function liveActivityLogs(Request $request, ActivityLogRepository $activityLogRepo): JsonResponse
+    {
+        $since = $request->query->get('since');
+        $sinceDate = $since ? new \DateTime('@' . (int) $since) : new \DateTime('-10 seconds');
+
+        $logs = $activityLogRepo->createQueryBuilder('l')
+            ->where('l.createdAt > :since')
+            ->setParameter('since', $sinceDate)
+            ->orderBy('l.createdAt', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json([
+            'logs' => array_map(fn($l) => [
+                'id'          => $l->getId(),
+                'createdAt'   => $l->getCreatedAt()->format('M d, Y'),
+                'createdTime' => $l->getCreatedAt()->format('h:i:s A'),
+                'username'    => $l->getUsername(),
+                'userRole'    => $l->getUserRole(),
+                'action'      => $l->getAction(),
+                'entityType'  => $l->getEntityType(),
+                'entityId'    => $l->getEntityId(),
+                'description' => $l->getDescription(),
+                'ipAddress'   => $l->getIpAddress(),
+                'source'      => $l->getSource(),
+            ], $logs),
             'checkedAt' => time(),
         ]);
     }

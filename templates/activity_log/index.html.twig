@@ -1315,7 +1315,7 @@
                 </thead>
                 <tbody>
                 {% for log in logs %}
-                    <tr>
+                    <tr data-log-id="{{ log.id }}">
                         <!-- DATE/TIME -->
                         <td>
                             <div class="datetime-cell">
@@ -1517,7 +1517,7 @@ function initReveal() {
 }
 
 $(document).ready(function() {
-    $('#activityTable').DataTable({
+    window._activityDT = $('#activityTable').DataTable({
         columnDefs: [
             { "defaultContent": "-", "targets": "_all" },
             { "orderable": false, "targets": [7] }
@@ -1552,6 +1552,74 @@ $(document).ready(function() {
         }
     });
 });
+</script>
+
+{# ── Real-time activity log polling ─────────────────────────────────────── #}
+<script>
+(function () {
+    let lastChecked = Math.floor(Date.now() / 1000);
+
+    async function pollActivityLogs() {
+        try {
+            const res = await fetch(`/admin/live/activity-logs?since=${lastChecked}`, { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            lastChecked = data.checkedAt;
+            (data.logs || []).forEach(injectLogRow);
+        } catch {}
+    }
+
+    setInterval(pollActivityLogs, 5000);
+
+    function injectLogRow(log) {
+        const dt = window._activityDT;
+        if (!dt) return;
+        if (document.querySelector(`tr[data-log-id="${log.id}"]`)) return;
+
+        const isOrder = log.action === 'CREATE' && log.entityType === 'Reservation';
+        let actionHtml;
+        if (isOrder) {
+            actionHtml = '<span class="action-badge order"><i class="fas fa-shopping-bag"></i> ORDER</span>';
+        } else {
+            const icons = { LOGIN:'fa-sign-in-alt', LOGOUT:'fa-sign-out-alt', CREATE:'fa-plus', UPDATE:'fa-edit', DELETE:'fa-trash' };
+            const icon = icons[log.action] || 'fa-circle';
+            actionHtml = `<span class="action-badge ${(log.action||'').toLowerCase()}"><i class="fas ${icon}"></i> ${log.action||''}</span>`;
+        }
+        if (log.source === 'mobile') {
+            actionHtml += '<span class="source-pill mobile"><i class="fas fa-mobile-alt"></i> App</span>';
+        }
+
+        const entityHtml = log.entityType
+            ? `<div class="entity-cell"><div class="entity-type">${log.entityType}</div>${log.entityId ? `<div class="entity-id">#${log.entityId}</div>` : ''}</div>`
+            : '<span style="color:#999;">-</span>';
+
+        const desc     = log.description || '-';
+        const descTrim = desc.length > 40 ? desc.slice(0, 40) + '...' : desc;
+        const ipHtml   = log.ipAddress ? `<span class="ip-cell">${log.ipAddress}</span>` : '<span style="color:#999;">N/A</span>';
+        const initials = (log.username || 'NA').slice(0, 2).toUpperCase();
+        const role     = (log.userRole || '').toLowerCase();
+
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-log-id', log.id);
+        tr.style.cssText = 'background:#e8f5e9;';
+        tr.innerHTML = `
+            <td><div class="datetime-cell"><div class="date">${log.createdAt}</div><div class="time">${log.createdTime}</div></div></td>
+            <td><div class="user-cell"><div class="user-avatar-small">${initials}</div><span class="user-name">${log.username||'N/A'}</span></div></td>
+            <td><span class="role-badge ${role}">${log.userRole||''}</span></td>
+            <td>${actionHtml}</td>
+            <td>${entityHtml}</td>
+            <td><div class="description-cell" title="${desc}">${descTrim}</div></td>
+            <td>${ipHtml}</td>
+            <td><div class="action-buttons"><a href="/admin/activity-logs/show/${log.id}" class="btn-action btn-view" data-tooltip="View Details"><i class="fas fa-eye"></i></a></div></td>`;
+
+        dt.row.add(tr).draw(false);
+
+        setTimeout(() => {
+            const el = document.querySelector(`tr[data-log-id="${log.id}"]`);
+            if (el) el.style.cssText = '';
+        }, 3000);
+    }
+})();
 </script>
 
 {% endblock %}
