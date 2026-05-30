@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ActivityLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 class ActivityLogRepository extends ServiceEntityRepository
@@ -18,6 +19,7 @@ class ActivityLogRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('al')
             ->leftJoin('al.user', 'u')
             ->orderBy('al.createdAt', 'DESC');
+        $this->excludeAnonymousUserUpdateNoise($qb);
 
         // ORDER is a virtual action: CREATE + entityType=Reservation (customer bookings)
         if (!empty($filters['action'])) {
@@ -84,6 +86,7 @@ class ActivityLogRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('al')
             ->select('COUNT(al.id)');
+        $this->excludeAnonymousUserUpdateNoise($qb);
 
         if (!empty($filters['action'])) {
             if ($filters['action'] === ActivityLog::ACTION_ORDER) {
@@ -123,11 +126,12 @@ class ActivityLogRepository extends ServiceEntityRepository
 
     public function getRecentLogs(int $limit = 10): array
     {
-        return $this->createQueryBuilder('al')
+        $qb = $this->createQueryBuilder('al')
             ->orderBy('al.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+        $this->excludeAnonymousUserUpdateNoise($qb);
+
+        return $qb->getQuery()->getResult();
     }
 
     public function getLogsByUser(int $userId, int $limit = 50): array
@@ -143,21 +147,35 @@ class ActivityLogRepository extends ServiceEntityRepository
 
     public function getStatsByAction(): array
     {
-        return $this->createQueryBuilder('al')
+        $qb = $this->createQueryBuilder('al')
             ->select('al.action, COUNT(al.id) as count')
-            ->groupBy('al.action')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('al.action');
+        $this->excludeAnonymousUserUpdateNoise($qb);
+
+        return $qb->getQuery()->getResult();
     }
 
     public function getStatsByEntityType(): array
     {
-        return $this->createQueryBuilder('al')
+        $qb = $this->createQueryBuilder('al')
             ->select('al.entityType, COUNT(al.id) as count')
             ->where('al.entityType IS NOT NULL')
-            ->groupBy('al.entityType')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('al.entityType');
+        $this->excludeAnonymousUserUpdateNoise($qb);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function excludeAnonymousUserUpdateNoise(QueryBuilder $qb, string $alias = 'al'): void
+    {
+        $qb->andWhere(sprintf(
+            'NOT (%1$s.username = :noiseUsername AND %1$s.userRole = :noiseRole AND %1$s.action = :noiseAction AND %1$s.entityType = :noiseEntity)',
+            $alias
+        ))
+            ->setParameter('noiseUsername', 'Anonymous')
+            ->setParameter('noiseRole', 'GUEST')
+            ->setParameter('noiseAction', ActivityLog::ACTION_UPDATE)
+            ->setParameter('noiseEntity', ActivityLog::ENTITY_USER);
     }
 }
 

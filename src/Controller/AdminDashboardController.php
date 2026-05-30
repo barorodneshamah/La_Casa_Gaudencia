@@ -112,19 +112,15 @@ final class AdminDashboardController extends AbstractController
         $unreadMessages = $contactMessageRepository->countUnread();
 
         // Recent Activities (last 10)
-        $recentActivities = $activityLogRepository->findBy(
-            [],
-            ['createdAt' => 'DESC'],
-            10
-        );
+        $recentActivities = $activityLogRepository->getRecentLogs(10);
 
         // Today's Activities Count
         $todayActivities = $activityLogRepository->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->where('a.createdAt >= :today')
-            ->setParameter('today', $today)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+            ->setParameter('today', $today);
+        $activityLogRepository->excludeAnonymousUserUpdateNoise($todayActivities, 'a');
+        $todayActivities = $todayActivities->getQuery()->getSingleScalarResult() ?? 0;
 
         return $this->render('admin_dashboard/index.html.twig', [
             'user' => $user,

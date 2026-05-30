@@ -211,9 +211,9 @@ class AdminNotificationController extends AbstractController
             ->where('l.createdAt > :since')
             ->setParameter('since', $sinceDate)
             ->orderBy('l.createdAt', 'DESC')
-            ->setMaxResults(20)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults(20);
+        $activityLogRepo->excludeAnonymousUserUpdateNoise($logs, 'l');
+        $logs = $logs->getQuery()->getResult();
 
         return $this->json([
             'logs' => array_map(fn($l) => [
