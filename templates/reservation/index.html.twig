@@ -1285,6 +1285,31 @@ $(document).ready(function() {
 
     setInterval(pollReservations, 5000);
 
+    // Mercure: instant push when a reservation is created or updated
+    fetch('/api/mercure/token', { credentials: 'same-origin' })
+        .then(r => r.ok ? r.json() : null)
+        .then(function (token) {
+            if (!token) return;
+            var url = new URL(token.hubUrl);
+            url.searchParams.append('topic', '/topic/reservations');
+            var es = new EventSource(url.toString(), {
+                headers: { Authorization: 'Bearer ' + token.token }
+            });
+            es.onmessage = function (e) {
+                try {
+                    var d = JSON.parse(e.data);
+                    if (!d.reservationCode) return;
+                    var existing = document.querySelector('tr[data-res-id="' + d.id + '"]');
+                    if (existing) {
+                        updateReservationRow(d);
+                    } else {
+                        injectReservationRow(d);
+                    }
+                } catch {}
+            };
+        })
+        .catch(function () {});
+
     function injectReservationRow(data) {
         const dt = window._reservationDT;
         if (!dt) return;
@@ -1342,17 +1367,8 @@ $(document).ready(function() {
 
         const tr = document.createElement('tr');
         tr.setAttribute('data-res-id', data.id);
-        tr.style.cssText = 'background:#f0fff4;animation:highlightFade 3s ease forwards;';
         tr.innerHTML = html;
         dt.row.add(tr).draw(false);
-
-        // Highlight new row
-        if (!document.getElementById('_resFadeStyle')) {
-            const s = document.createElement('style');
-            s.id = '_resFadeStyle';
-            s.textContent = '@keyframes highlightFade{0%{background:#d4edda}100%{background:transparent}}';
-            document.head.appendChild(s);
-        }
     }
 
     function updateReservationRow(data) {
@@ -1375,8 +1391,6 @@ $(document).ready(function() {
                 ? '<i class="fas fa-check-circle"></i> PAID'
                 : '<i class="fas fa-times-circle"></i> UNPAID';
         }
-        existing.style.cssText = 'background:#fff9e6;transition:background 2s ease;';
-        setTimeout(() => { existing.style.cssText = ''; }, 2000);
     }
 
 })();
